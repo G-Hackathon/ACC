@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ACC — Publish Article</title>
+
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+            min-height: 100vh;
+
+            background: #050505;
+
+            color: white;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+        }
+
+
+        .navbar {
+            height: 76px;
+
+            padding: 0 5vw;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            border-bottom: 1px solid #1d1d1d;
+        }
+
+
+        .logo {
+            font-size: 1.1rem;
+
+            font-weight: 950;
+
+            letter-spacing: 4px;
+        }
+
+
+        .nav-actions {
+            display: flex;
+
+            gap: 25px;
+        }
+
+
+        .nav-actions a {
+            color: #888;
+
+            font-size: 0.62rem;
+
+            font-weight: 900;
+
+            letter-spacing: 1.5px;
+        }
+
+
+        .nav-actions a:hover {
+            color: white;
+        }
+
+
+        .page {
+            width: min(900px, 88vw);
+
+            margin: 0 auto;
+
+            padding: 110px 0;
+        }
+
+
+        .eyebrow {
+            color: #666;
+
+            font-size: 0.62rem;
+
+            font-weight: 900;
+
+            letter-spacing: 4px;
+        }
+
+
+        h1 {
+            margin-top: 20px;
+
+            font-size: clamp(3.5rem, 10vw, 7rem);
+
+            line-height: 0.85;
+
+            letter-spacing: -5px;
+
+            font-weight: 950;
+        }
+
+
+        .identity {
+            margin-top: 35px;
+
+            padding: 18px;
+
+            background: #0a0a0a;
+
+            border: 1px solid #222;
+        }
+
+
+        .identity-label {
+            color: #555;
+
+            font-size: 0.55rem;
+
+            font-weight: 900;
+
+            letter-spacing: 2px;
+        }
+
+
+        .identity-name {
+            margin-top: 7px;
+
+            font-size: 0.95rem;
+
+            font-weight: 900;
+        }
+
+
+        .identity-publication {
+            margin-top: 4px;
+
+            color: #777;
+
+            font-size: 0.65rem;
+
+            letter-spacing: 1px;
+        }
+
+
+        form {
+            margin-top: 45px;
+        }
+
+
+        label {
+            display: block;
+
+            margin-bottom: 10px;
+
+            color: #666;
+
+            font-size: 0.6rem;
+
+            font-weight: 900;
+
+            letter-spacing: 2px;
+        }
+
+
+        input,
+        textarea {
+            width: 100%;
+
+            background: #090909;
+
+            color: white;
+
+            border: 1px solid #292929;
+
+            outline: none;
+
+            font-family: inherit;
+
+            transition: border-color 0.2s ease;
+        }
+
+
+        input {
+            height: 56px;
+
+            padding: 0 16px;
+
+            font-size: 0.95rem;
+        }
+
+
+        textarea {
+            min-height: 360px;
+
+            padding: 16px;
+
+            resize: vertical;
+
+            font-size: 0.9rem;
+
+            line-height: 1.7;
+        }
+
+
+        input:focus,
+        textarea:focus {
+            border-color: #777;
+        }
+
+
+        .field {
+            margin-bottom: 25px;
+        }
+
+
+        .submit {
+            width: 100%;
+
+            height: 55px;
+
+            border: none;
+
+            background: white;
+
+            color: black;
+
+            cursor: pointer;
+
+            font-size: 0.67rem;
+
+            font-weight: 900;
+
+            letter-spacing: 2px;
+
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease;
+        }
+
+
+        .submit:hover {
+            background: #ccc;
+
+            transform: translateY(-2px);
+        }
+
+
+        .error {
+            margin-bottom: 25px;
+
+            padding: 14px;
+
+            border: 1px solid #3a3a3a;
+
+            color: #aaa;
+
+            font-size: 0.7rem;
+        }
+
+
+        @media (max-width: 600px) {
+
+            .page {
+                padding: 75px 0;
+            }
+
+
+            .nav-actions a:first-child {
+                display: none;
+            }
+
+
+            textarea {
+                min-height: 300px;
+            }
+
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <nav class="navbar">
+
+        <a href="/" class="logo">
+            ACC
+        </a>
+
+
+        <div class="nav-actions">
+
+            <a href="/articles">
+                ARTICLES
+            </a>
+
+            <a href="/press-logout">
+                LOG OUT
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <main class="page">
+
+        <div class="eyebrow">
+            PRESS CORPS / NEW REPORT
+        </div>
+
+
+        <h1>
+            PUBLISH
+            <br>
+            REPORT.
+        </h1>
+
+
+        <div class="identity">
+
+            <div class="identity-label">
+                AUTHENTICATED AS
+            </div>
+
+            <div class="identity-name">
+                {{ name }}
+            </div>
+
+            <div class="identity-publication">
+                {{ publication }}
+            </div>
+
+        </div>
+
+
+        <form method="POST" action="/press-upload">
+
+            {% if error %}
+
+            <div class="error">
+                {{ error }}
+            </div>
+
+            {% endif %}
+
+
+            <div class="field">
+
+                <label for="title">
+                    HEADLINE
+                </label>
+
+                <input type="text" id="title" name="title" maxlength="200" value="{{ title }}"
+                    placeholder="Enter your headline..." required>
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="content">
+                    ARTICLE
+                </label>
+
+                <textarea id="content" name="content" placeholder="Write your report..."
+                    required>{{ content }}</textarea>
+
+            </div>
+
+
+            <button type="submit" class="submit">
+                PUBLISH ARTICLE →
+            </button>
+
+        </form>
+
+    </main>
+
+</body>
+
+</html>

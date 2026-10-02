@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Press Articles — ACC</title>
+
+
+    <style>
+        /* =====================================================
+           RESET
+        ===================================================== */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+
+        body {
+
+            background: #090909;
+
+            color: #f5f5f5;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            min-height: 100vh;
+
+            overflow-x: hidden;
+
+        }
+
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+
+        button {
+            font-family: inherit;
+        }
+
+
+        /* =====================================================
+           CURSOR LIGHT
+        ===================================================== */
+
+        #cursor-light {
+
+            position: fixed;
+
+            width: 320px;
+            height: 320px;
+
+            left: 0;
+            top: 0;
+
+            pointer-events: none;
+
+            z-index: 999999;
+
+            border-radius: 50%;
+
+            transform:
+                translate(-50%, -50%);
+
+            opacity: 0;
+
+            background:
+                radial-gradient(circle,
+                    rgba(255, 255, 255, 0.20) 0%,
+                    rgba(255, 255, 255, 0.11) 18%,
+                    rgba(255, 255, 255, 0.055) 35%,
+                    rgba(255, 255, 255, 0.018) 52%,
+                    rgba(255, 255, 255, 0) 72%);
+
+            filter:
+                blur(2px);
+
+            mix-blend-mode:
+                screen;
+
+            will-change:
+                left,
+                top;
+
+            transition:
+                opacity 0.15s ease;
+
+        }
+
+
+        /* =====================================================
+           NAVBAR
+        ===================================================== */
+
+        .navbar {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 1000;
+
+            width: 100%;
+
+            height: 78px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 5vw;
+
+            background:
+                rgba(9, 9, 9, 0.94);
+
+            border-bottom:
+                1px solid #292929;
+
+            backdrop-filter:
+                blur(16px);
+
+            -webkit-backdrop-filter:
+                blur(16px);
+
+        }
+
+
+        .logo {
+
+            font-size: 25px;
+
+            font-weight: 900;
+
+            letter-spacing: -1px;
+
+            transition:
+                transform 0.25s ease,
+                opacity 0.25s ease;
+
+        }
+
+
+        .logo:hover {
+
+            transform:
+                translateY(-2px);
+
+            opacity:
+                0.7;
+
+        }
+
+
+        .nav-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 34px;
+
+        }
+
+
+        .nav-links {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 28px;
+
+        }
+
+
+        .nav-link {
+
+            position: relative;
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+            letter-spacing: 1.5px;
+
+            color: #bdbdbd;
+
+            transition:
+                color 0.2s ease;
+
+        }
+
+
+        .nav-link::after {
+
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+
+            bottom: -7px;
+
+            width: 0;
+
+            height: 1px;
+
+            background: #fff;
+
+            transition:
+                width 0.25s ease;
+
+        }
+
+
+        .nav-link:hover {
+
+            color: #fff;
+
+        }
+
+
+        .nav-link:hover::after {
+
+            width: 100%;
+
+        }
+
+
+        /* =====================================================
+           PROFILE
+        ===================================================== */
+
+        .profile-wrapper {
+
+            position: relative;
+
+        }
+
+
+        .profile-button {
+
+            width: 42px;
+
+            height: 42px;
+
+            border:
+                1px solid #444;
+
+            border-radius: 50%;
+
+            background:
+                #111;
+
+            color:
+                white;
+
+            cursor:
+                pointer;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            transition:
+                transform 0.25s ease,
+                border-color 0.25s ease,
+                background 0.25s ease;
+
+        }
+
+
+        .profile-button:hover {
+
+            transform:
+                translateY(-2px);
+
+            border-color:
+                #fff;
+
+            background:
+                #181818;
+
+        }
+
+
+        .person-icon {
+
+            position:
+                relative;
+
+            width:
+                20px;
+
+            height:
+                20px;
+
+            display:
+                block;
+
+        }
+
+
+        .person-icon::before {
+
+            content:
+                "";
+
+            position:
+                absolute;
+
+            width:
+                7px;
+
+            height:
+                7px;
+
+            left:
+                50%;
+
+            top:
+                1px;
+
+            transform:
+                translateX(-50%);
+
+            background:
+                #f5f5f5;
+
+            border-radius:
+                50%;
+
+        }
+
+
+        .person-icon::after {
+
+            content:
+                "";
+
+            position:
+                absolute;
+
+            width:
+                14px;
+
+            height:
+                8px;
+
+            left:
+                50%;
+
+            bottom:
+                1px;
+
+            transform:
+                translateX(-50%);
+
+            background:
+                #f5f5f5;
+
+            border-radius:
+                9px 9px 4px 4px;
+
+        }
+
+
+        /* =====================================================
+           PROFILE MENU
+        ===================================================== */
+
+        .profile-menu {
+
+            position:
+                absolute;
+
+            right:
+                0;
+
+            top:
+                54px;
+
+            width:
+                250px;
+
+            padding:
+                20px;
+
+            background:
+                #101010;
+
+            border:
+                1px solid #333;
+
+            box-shadow:
+                0 25px 70px rgba(0, 0, 0, 0.65);
+
+            opacity:
+                0;
+
+            visibility:
+                hidden;
+
+            transform:
+                translateY(-8px);
+
+            transition:
+                opacity 0.2s ease,
+                transform 0.2s ease,
+                visibility 0.2s ease;
+
+        }
+
+
+        .profile-wrapper.open .profile-menu {
+
+            opacity:
+                1;
+
+            visibility:
+                visible;
+
+            transform:
+                translateY(0);
+
+        }
+
+
+        .profile-heading {
+
+            font-size:
+                9px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                2px;
+
+            color:
+                #777;
+
+            margin-bottom:
+                7px;
+
+        }
+
+
+        .profile-name {
+
+            font-size:
+                18px;
+
+            font-weight:
+                800;
+
+            margin-bottom:
+                3px;
+
+        }
+
+
+        .profile-publication {
+
+            font-size:
+                11px;
+
+            color:
+                #888;
+
+            margin-bottom:
+                18px;
+
+        }
+
+
+        .profile-menu a {
+
+            display:
+                block;
+
+            padding:
+                11px 0;
+
+            border-top:
+                1px solid #282828;
+
+            font-size:
+                10px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                1px;
+
+            color:
+                #ccc;
+
+            transition:
+                padding-left 0.2s ease,
+                color 0.2s ease;
+
+        }
+
+
+        .profile-menu a:hover {
+
+            padding-left:
+                6px;
+
+            color:
+                #fff;
+
+        }
+
+
+        /* =====================================================
+           PAGE HEADER
+        ===================================================== */
+
+        .page {
+
+            width:
+                min(1400px, 90%);
+
+            margin:
+                0 auto;
+
+            padding:
+                90px 0 120px;
+
+        }
+
+
+        .eyebrow {
+
+            font-size:
+                10px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                3px;
+
+            color:
+                #777;
+
+            margin-bottom:
+                18px;
+
+        }
+
+
+        .page-title {
+
+            font-size:
+                clamp(48px, 8vw, 105px);
+
+            line-height:
+                0.9;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                -5px;
+
+            margin-bottom:
+                35px;
+
+        }
+
+
+        .page-intro {
+
+            max-width:
+                680px;
+
+            color:
+                #8d8d8d;
+
+            font-size:
+                15px;
+
+            line-height:
+                1.8;
+
+        }
+
+
+        /* =====================================================
+           STATUS BAR
+        ===================================================== */
+
+        .status-bar {
+
+            margin-top:
+                60px;
+
+            padding:
+                16px 20px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            gap:
+                20px;
+
+            border-top:
+                1px solid #292929;
+
+            border-bottom:
+                1px solid #292929;
+
+        }
+
+
+        .status-left {
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                12px;
+
+            font-size:
+                9px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                2px;
+
+        }
+
+
+        .status-dot {
+
+            width:
+                7px;
+
+            height:
+                7px;
+
+            border-radius:
+                50%;
+
+            background:
+                #fff;
+
+            box-shadow:
+                0 0 12px rgba(255, 255, 255, 0.5);
+
+        }
+
+
+        .status-right {
+
+            font-size:
+                9px;
+
+            font-weight:
+                700;
+
+            letter-spacing:
+                1.5px;
+
+            color:
+                #666;
+
+            text-align:
+                right;
+
+        }
+
+
+        .upload-button {
+
+            display:
+                inline-flex;
+
+            align-items:
+                center;
+
+            padding:
+                12px 16px;
+
+            border:
+                1px solid #555;
+
+            background:
+                #fff;
+
+            color:
+                #000;
+
+            font-size:
+                9px;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                1.2px;
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease;
+
+        }
+
+
+        .upload-button:hover {
+
+            transform:
+                translateY(-2px);
+
+            background:
+                #ddd;
+
+        }
+
+
+        /* =====================================================
+           ARTICLE GRID
+        ===================================================== */
+
+        .article-grid {
+
+            margin-top:
+                50px;
+
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap:
+                26px;
+
+        }
+
+
+        .article-card-wrapper {
+
+            position:
+                relative;
+
+            min-width:
+                0;
+
+        }
+
+
+        /* =====================================================
+           ARTICLE CARD
+        ===================================================== */
+
+        .article-card {
+
+            position:
+                relative;
+
+            display:
+                flex;
+
+            flex-direction:
+                column;
+
+            height:
+                455px;
+
+            padding:
+                28px;
+
+            overflow:
+                hidden;
+
+            background:
+                #111;
+
+            border:
+                1px solid #292929;
+
+            transition:
+                transform 0.3s ease,
+                border-color 0.3s ease,
+                background 0.3s ease;
+
+        }
+
+
+        .article-card:hover {
+
+            transform:
+                translateY(-8px);
+
+            border-color:
+                #555;
+
+            background:
+                #151515;
+
+        }
+
+
+        .article-top {
+
+            display:
+                flex;
+
+            justify-content:
+                space-between;
+
+            align-items:
+                center;
+
+            gap:
+                20px;
+
+            padding-bottom:
+                20px;
+
+            border-bottom:
+                1px solid #292929;
+
+        }
+
+
+        .article-publication {
+
+            font-size:
+                9px;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                2px;
+
+            color:
+                #fff;
+
+        }
+
+
+        .article-date {
+
+            font-size:
+                9px;
+
+            font-weight:
+                700;
+
+            letter-spacing:
+                1px;
+
+            color:
+                #666;
+
+            text-align:
+                right;
+
+        }
+
+
+        .article-title {
+
+            margin-top:
+                27px;
+
+            font-size:
+                clamp(25px, 3vw, 40px);
+
+            line-height:
+                1.02;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                -1.8px;
+
+            color:
+                #f5f5f5;
+
+        }
+
+
+        .article-preview {
+
+            position:
+                relative;
+
+            margin-top:
+                24px;
+
+            height:
+                175px;
+
+            overflow:
+                hidden;
+
+            color:
+                #999;
+
+            font-size:
+                14px;
+
+            line-height:
+                1.75;
+
+            white-space:
+                pre-line;
+
+        }
+
+
+        .article-preview::after {
+
+            content:
+                "";
+
+            position:
+                absolute;
+
+            left:
+                0;
+
+            right:
+                0;
+
+            bottom:
+                0;
+
+            height:
+                110px;
+
+            background:
+                linear-gradient(to bottom,
+                    rgba(17, 17, 17, 0),
+                    rgba(17, 17, 17, 0.35) 20%,
+                    rgba(17, 17, 17, 0.82) 68%,
+                    #111 100%);
+
+            pointer-events:
+                none;
+
+        }
+
+
+        .article-card:hover .article-preview::after {
+
+            background:
+                linear-gradient(to bottom,
+                    rgba(21, 21, 21, 0),
+                    rgba(21, 21, 21, 0.35) 20%,
+                    rgba(21, 21, 21, 0.82) 68%,
+                    #151515 100%);
+
+        }
+
+
+        .article-bottom {
+
+            margin-top:
+                auto;
+
+            padding-top:
+                20px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            border-top:
+                1px solid #292929;
+
+        }
+
+
+        .article-author {
+
+            font-size:
+                9px;
+
+            font-weight:
+                700;
+
+            letter-spacing:
+                1px;
+
+            color:
+                #666;
+
+        }
+
+
+        .read-more {
+
+            font-size:
+                9px;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                1.5px;
+
+            color:
+                #fff;
+
+            transition:
+                transform 0.2s ease,
+                opacity 0.2s ease;
+
+        }
+
+
+        .article-card:hover .read-more {
+
+            transform:
+                translateX(5px);
+
+        }
+
+
+        /* =====================================================
+           DELETE
+        ===================================================== */
+
+        .delete-form {
+
+            margin-top:
+                10px;
+
+        }
+
+
+        .delete-button {
+
+            width:
+                100%;
+
+            padding:
+                12px;
+
+            border:
+                1px solid #3a3a3a;
+
+            background:
+                transparent;
+
+            color:
+                #777;
+
+            font-size:
+                9px;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                1.5px;
+
+            cursor:
+                pointer;
+
+            transition:
+                color 0.2s ease,
+                border-color 0.2s ease,
+                background 0.2s ease;
+
+        }
+
+
+        .delete-button:hover {
+
+            color:
+                #fff;
+
+            border-color:
+                #777;
+
+            background:
+                #181818;
+
+        }
+
+
+        /* =====================================================
+           EMPTY
+        ===================================================== */
+
+        .empty-state {
+
+            margin-top:
+                50px;
+
+            padding:
+                90px 30px;
+
+            text-align:
+                center;
+
+            border:
+                1px solid #292929;
+
+            background:
+                #111;
+
+        }
+
+
+        .empty-state h2 {
+
+            font-size:
+                30px;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                -1px;
+
+            margin-bottom:
+                12px;
+
+        }
+
+
+        .empty-state p {
+
+            color:
+                #666;
+
+            font-size:
+                13px;
+
+            line-height:
+                1.7;
+
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        footer {
+
+            border-top:
+                1px solid #292929;
+
+            padding:
+                28px 5vw;
+
+            display:
+                flex;
+
+            justify-content:
+                space-between;
+
+            align-items:
+                center;
+
+            color:
+                #555;
+
+            font-size:
+                9px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                1.5px;
+
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 800px) {
+
+            .navbar {
+
+                height:
+                    70px;
+
+                padding:
+                    0 6%;
+
+            }
+
+
+            .nav-right {
+
+                gap:
+                    15px;
+
+            }
+
+
+            .nav-links {
+
+                gap:
+                    17px;
+
+            }
+
+
+            .nav-link {
+
+                font-size:
+                    9px;
+
+                letter-spacing:
+                    1px;
+
+            }
+
+
+            .profile-menu {
+
+                right:
+                    -5px;
+
+                width:
+                    min(250px,
+                        calc(100vw - 30px));
+
+            }
+
+
+            .page {
+
+                width:
+                    88%;
+
+                padding-top:
+                    65px;
+
+            }
+
+
+            .page-title {
+
+                letter-spacing:
+                    -3px;
+
+            }
+
+
+            .status-bar {
+
+                align-items:
+                    flex-start;
+
+                flex-direction:
+                    column;
+
+            }
+
+
+            .status-right {
+
+                text-align:
+                    left;
+
+            }
+
+
+            .article-grid {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+
+            .article-card {
+
+                height:
+                    440px;
+
+            }
+
+
+            footer {
+
+                flex-direction:
+                    column;
+
+                gap:
+                    10px;
+
+                text-align:
+                    center;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           SMALL PHONES
+        ===================================================== */
+
+        @media (max-width: 500px) {
+
+            .logo {
+
+                font-size:
+                    21px;
+
+            }
+
+
+            .nav-links {
+
+                gap:
+                    11px;
+
+            }
+
+
+            .nav-link {
+
+                display:
+                    none;
+
+            }
+
+
+            .profile-button {
+
+                width:
+                    40px;
+
+                height:
+                    40px;
+
+            }
+
+
+            .page-title {
+
+                font-size:
+                    50px;
+
+            }
+
+
+            .article-card {
+
+                padding:
+                    22px;
+
+                height:
+                    450px;
+
+            }
+
+
+            .article-title {
+
+                font-size:
+                    28px;
+
+            }
+
+
+            .article-preview {
+
+                height:
+                    170px;
+
+            }
+
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         CURSOR LIGHT
+    ===================================================== -->
+
+    <div id="cursor-light"></div>
+
+
+    <!-- =====================================================
+         NAVBAR
+    ===================================================== -->
+
+    <nav class="navbar">
+
+        <a href="{{ url_for('home') }}" class="logo">
+            ACC
+        </a>
+
+
+        <div class="nav-right">
+
+            <div class="nav-links">
+
+                <a href="{{ url_for('home') }}" class="nav-link">
+                    HOME
+                </a>
+
+                <a href="{{ url_for('articles') }}" class="nav-link">
+                    ARTICLES
+                </a>
+
+            </div>
+
+
+            <div class="profile-wrapper" id="profileWrapper">
+
+                <button type="button" class="profile-button" id="profileButton" aria-label="Account">
+
+                    <span class="person-icon"></span>
+
+                </button>
+
+
+                <div class="profile-menu" id="profileMenu">
+
+                    {% if session.get("chair_authenticated") %}
+
+                    <div class="profile-heading">
+                        CHAIR ACCOUNT
+                    </div>
+
+                    <div class="profile-name">
+                        CHAIR
+                    </div>
+
+                    <a href="{{ url_for('articles') }}">
+                        ARTICLES →
+                    </a>
+
+                    <a href="{{ url_for('chair_logout') }}">
+                        LOG OUT →
+                    </a>
+
+
+                    {% elif session.get("press_authenticated") %}
+
+                    <div class="profile-heading">
+                        PRESS ACCOUNT
+                    </div>
+
+                    <div class="profile-name">
+                        {{ session.get("press_name") }}
+                    </div>
+
+                    <div class="profile-publication">
+                        {{ session.get("press_publication") }}
+                    </div>
+
+                    <a href="{{ url_for('articles') }}">
+                        ARTICLES →
+                    </a>
+
+                    <a href="{{ url_for('press_upload') }}">
+                        UPLOAD ARTICLE →
+                    </a>
+
+                    <a href="{{ url_for('press_logout') }}">
+                        LOG OUT →
+                    </a>
+
+
+                    {% else %}
+
+                    <div class="profile-heading">
+                        ACCOUNT
+                    </div>
+
+                    <div class="profile-name">
+                        NOT SIGNED IN
+                    </div>
+
+                    <a href="{{ url_for('press_login') }}">
+                        PRESS LOGIN →
+                    </a>
+
+                    <a href="{{ url_for('chair_login') }}">
+                        CHAIR LOGIN →
+                    </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- =====================================================
+         PAGE
+    ===================================================== -->
+
+    <main class="page">
+
+        <div class="eyebrow">
+            ARKANIAN JOINT CRISIS COMMITTEE
+        </div>
+
+
+        <h1 class="page-title">
+            PRESS<br>
+            ARTICLES.
+        </h1>
+
+
+        <p class="page-intro">
+            The official press archive of the Arkanian Joint Crisis
+            Committee. Read reports, developments, and breaking coverage
+            submitted by authorized press delegates.
+        </p>
+
+
+        <!-- STATUS -->
+
+        <div class="status-bar">
+
+            <div class="status-left">
+
+                <span class="status-dot"></span>
+
+
+                {% if session.get("chair_authenticated") %}
+
+                <span>
+                    CHAIR MODE / DELETE ENABLED
+                </span>
+
+                {% elif session.get("press_authenticated") %}
+
+                <span>
+                    {{ session.get("press_publication") }}
+                    / PRESS DELEGATE
+                </span>
+
+                {% else %}
+
+                <span>
+                    PUBLIC ARCHIVE
+                </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="status-right">
+
+                {% if session.get("press_authenticated") %}
+
+                <a href="{{ url_for('press_upload') }}" class="upload-button">
+                    UPLOAD ARTICLE →
+                </a>
+
+                {% elif session.get("chair_authenticated") %}
+
+                CHAIR ACCESS ACTIVE
+
+                {% else %}
+
+                AUTHORIZED PRESS ACCESS ONLY
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- ARTICLES -->
+
+        {% if articles %}
+
+        <div class="article-grid">
+
+            {% for article in articles %}
+
+            <div class="article-card-wrapper">
+
+
+                <a href="{{ url_for('full_article', article_id=article.id) }}" class="article-card">
+
+                    <div class="article-top">
+
+                        <span class="article-publication">
+                            {{ article.publication }}
+                        </span>
+
+                        <span class="article-date">
+                            {{ article.date }}
+                        </span>
+
+                    </div>
+
+
+                    <h2 class="article-title">
+                        {{ article.title }}
+                    </h2>
+
+
+                    <div class="article-preview">
+                        {{ article.content }}
+                    </div>
+
+
+                    <div class="article-bottom">
+
+                        <span class="article-author">
+                            BY {{ article.author }}
+                        </span>
+
+                        <span class="read-more">
+                            READ FULL ARTICLE →
+                        </span>
+
+                    </div>
+
+                </a>
+
+
+                {% if session.get("chair_authenticated") %}
+
+                <form method="POST" action="{{ url_for('delete_article', article_id=article.id) }}" class="delete-form"
+                    onsubmit="return confirm('Delete this article?');">
+
+                    <button type="submit" class="delete-button">
+                        DELETE ARTICLE
+                    </button>
+
+                </form>
+
+                {% endif %}
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+
+        {% else %}
+
+        <div class="empty-state">
+
+            <h2>
+                NO ARTICLES YET.
+            </h2>
+
+            <p>
+                The press archive is currently empty.
+                Authorized press delegates can publish articles
+                once they sign in.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ===================================================== -->
+
+    <footer>
+
+        <span>
+            ARKANIAN JOINT CRISIS COMMITTEE
+        </span>
+
+        <span>
+            PRESS ARCHIVE
+        </span>
+
+    </footer>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ===================================================== -->
+
+    <script>
+
+        /* =================================================
+           PROFILE
+        ================================================= */
+
+        const profileButton =
+            document.getElementById("profileButton");
+
+
+        const profileWrapper =
+            document.getElementById("profileWrapper");
+
+
+        if (
+            profileButton &&
+            profileWrapper
+        ) {
+
+            profileButton.addEventListener(
+                "click",
+                function (event) {
+
+                    event.stopPropagation();
+
+                    profileWrapper.classList.toggle(
+                        "open"
+                    );
+
+                }
+            );
+
+
+            document.addEventListener(
+                "click",
+                function (event) {
+
+                    if (
+                        !profileWrapper.contains(
+                            event.target
+                        )
+                    ) {
+
+                        profileWrapper.classList.remove(
+                            "open"
+                        );
+
+                    }
+
+                }
+            );
+
+
+            document.addEventListener(
+                "keydown",
+                function (event) {
+
+                    if (
+                        event.key === "Escape"
+                    ) {
+
+                        profileWrapper.classList.remove(
+                            "open"
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           CURSOR LIGHT
+        ================================================= */
+
+        const cursorLight =
+            document.getElementById("cursor-light");
+
+
+        let mouseX = 0;
+        let mouseY = 0;
+
+        let lightX = 0;
+        let lightY = 0;
+
+        let mouseStarted = false;
+
+
+        if (cursorLight) {
+
+            document.addEventListener(
+                "mousemove",
+                function (event) {
+
+                    mouseX =
+                        event.clientX;
+
+                    mouseY =
+                        event.clientY;
+
+
+                    if (!mouseStarted) {
+
+                        lightX =
+                            mouseX;
+
+                        lightY =
+                            mouseY;
+
+                        mouseStarted =
+                            true;
+
+                    }
+
+
+                    cursorLight.style.opacity =
+                        "1";
+
+                }
+            );
+
+
+            document.addEventListener(
+                "mouseleave",
+                function () {
+
+                    cursorLight.style.opacity =
+                        "0";
+
+                }
+            );
+
+
+            function moveLight() {
+
+                lightX +=
+                    (
+                        mouseX -
+                        lightX
+                    ) * 0.75;
+
+
+                lightY +=
+                    (
+                        mouseY -
+                        lightY
+                    ) * 0.75;
+
+
+                cursorLight.style.left =
+                    lightX + "px";
+
+
+                cursorLight.style.top =
+                    lightY + "px";
+
+
+                requestAnimationFrame(
+                    moveLight
+                );
+
+            }
+
+
+            moveLight();
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>

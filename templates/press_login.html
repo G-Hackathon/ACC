@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Press Login</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #050505;
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .top {
+            height: 76px;
+            padding: 0 5%;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            border-bottom: 1px solid #202020;
+        }
+
+        .back {
+            color: #777;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+        }
+
+        .back:hover {
+            color: white;
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 70px 20px;
+        }
+
+        .box {
+            width: min(100%, 520px);
+        }
+
+        .label {
+            color: #666;
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: clamp(60px, 11vw, 105px);
+            line-height: .82;
+            letter-spacing: -.07em;
+            margin-bottom: 25px;
+        }
+
+        .description {
+            color: #777;
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+
+        .form {
+            border-top: 1px solid #222;
+            padding-top: 30px;
+        }
+
+        .delegates {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .delegate {
+            position: relative;
+        }
+
+        .delegate input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .delegate label {
+            min-height: 90px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            border: 1px solid #292929;
+            background: #090909;
+            cursor: pointer;
+            transition: .25s;
+        }
+
+        .delegate label strong {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .delegate label span {
+            color: #666;
+            font-size: 9px;
+            letter-spacing: 1px;
+        }
+
+        .delegate input:checked+label {
+            background: white;
+            color: black;
+            border-color: white;
+        }
+
+        .delegate input:checked+label span {
+            color: #555;
+        }
+
+        .password-label {
+            display: block;
+            color: #666;
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .password {
+            width: 100%;
+            height: 55px;
+            background: #0b0b0b;
+            border: 1px solid #333;
+            color: white;
+            outline: none;
+            padding: 0 15px;
+            margin-bottom: 18px;
+            font-size: 15px;
+        }
+
+        .password:focus {
+            border-color: white;
+        }
+
+        button {
+            width: 100%;
+            height: 55px;
+            background: white;
+            color: black;
+            border: 1px solid white;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: .25s;
+        }
+
+        button:hover {
+            background: black;
+            color: white;
+        }
+
+        .error {
+            border: 1px solid #444;
+            padding: 13px;
+            margin-bottom: 20px;
+            color: #bbb;
+            font-size: 11px;
+        }
+
+        footer {
+            padding: 25px 5%;
+            border-top: 1px solid #181818;
+            color: #444;
+            font-size: 9px;
+            letter-spacing: 1.5px;
+        }
+
+        @media (max-width: 600px) {
+
+            .top {
+                padding: 0 20px;
+            }
+
+            .main {
+                align-items: flex-start;
+                padding-top: 80px;
+            }
+
+            .delegates {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: clamp(58px, 18vw, 85px);
+            }
+
+        }
+    </style>
+
+</head>
+
+<body>
+
+
+    <div class="top">
+
+        <a href="/articles" class="back">
+            ← BACK TO ARTICLES
+        </a>
+
+    </div>
+
+
+    <main class="main">
+
+        <div class="box">
+
+            <div class="label">
+                PRESS ACCESS
+            </div>
+
+            <h1>
+                PRESS<br>LOGIN.
+            </h1>
+
+            <p class="description">
+                Authorized press delegates can publish reports
+                to the ACC press archive.
+            </p>
+
+
+            <form action="/press-login" method="POST" class="form">
+
+                {% if error %}
+
+                <div class="error">
+                    {{ error }}
+                </div>
+
+                {% endif %}
+
+
+                <div class="delegates">
+
+                    <div class="delegate">
+
+                        <input type="radio" id="yukta" name="delegate" value="yukta" required>
+
+                        <label for="yukta">
+
+                            <strong>YUKTA</strong>
+
+                            <span>
+                                AL JAZEERA
+                            </span>
+
+                        </label>
+
+                    </div>
+
+
+                    <div class="delegate">
+
+                        <input type="radio" id="nandika" name="delegate" value="nandika">
+
+                        <label for="nandika">
+
+                            <strong>NANDIKA</strong>
+
+                            <span>
+                                REUTERS
+                            </span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <label for="password" class="password-label">
+                    PRESS PASSWORD
+                </label>
+
+                <input type="password" id="password" name="password" class="password" placeholder="Enter password"
+                    required>
+
+
+                <button type="submit">
+                    ENTER PRESS ARCHIVE →
+                </button>
+
+            </form>
+
+        </div>
+
+    </main>
+
+
+    <footer>
+        PRESS ACCESS
+    </footer>
+
+
+</body>
+
+</html>

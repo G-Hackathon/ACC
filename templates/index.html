@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ACC | Arkanian Joint Crisis Committee</title>
+
+
+    <style>
+        /* =====================================================
+           RESET
+        ===================================================== */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+
+        body {
+            background: #050505;
+            color: #ffffff;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            overflow-x: hidden;
+        }
+
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+
+        /* =====================================================
+           CURSOR LIGHT
+        ===================================================== */
+
+        #cursor-light {
+
+            position: fixed;
+
+            left: 0;
+            top: 0;
+
+            width: 360px;
+            height: 360px;
+
+            transform:
+                translate(-50%, -50%);
+
+            pointer-events: none;
+
+            z-index: 999999;
+
+            border-radius: 50%;
+
+            opacity: 0;
+
+            background:
+                radial-gradient(circle,
+                    rgba(255, 255, 255, 0.24) 0%,
+                    rgba(255, 255, 255, 0.14) 18%,
+                    rgba(255, 255, 255, 0.07) 35%,
+                    rgba(255, 255, 255, 0.025) 52%,
+                    rgba(255, 255, 255, 0) 72%);
+
+            transition:
+                opacity 0.1s ease;
+
+            will-change:
+                left,
+                top;
+
+        }
+
+
+        /* =====================================================
+           NAVBAR
+        ===================================================== */
+
+        .navbar {
+
+            height: 76px;
+            width: 100%;
+
+            padding:
+                0 5%;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            z-index: 1000;
+
+            background:
+                rgba(5, 5, 5, 0.92);
+
+            backdrop-filter:
+                blur(16px);
+
+            -webkit-backdrop-filter:
+                blur(16px);
+
+            border-bottom:
+                1px solid #202020;
+
+        }
+
+
+        .logo {
+
+            font-size: 24px;
+
+            font-weight: 950;
+
+            letter-spacing: -1px;
+
+            transition:
+                opacity 0.25s ease,
+                transform 0.25s ease;
+
+        }
+
+
+        .logo:hover {
+
+            opacity: 0.7;
+
+            transform:
+                translateY(-2px);
+
+        }
+
+
+        .nav-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 32px;
+
+        }
+
+
+        .nav-link {
+
+            position: relative;
+
+            font-size: 10px;
+
+            font-weight: 900;
+
+            letter-spacing: 1.7px;
+
+            color: #888;
+
+            transition:
+                color 0.25s ease;
+
+        }
+
+
+        .nav-link:hover {
+
+            color: white;
+
+        }
+
+
+        .nav-link::after {
+
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+            bottom: -7px;
+
+            width: 0;
+            height: 1px;
+
+            background: white;
+
+            transition:
+                width 0.25s ease;
+
+        }
+
+
+        .nav-link:hover::after {
+
+            width: 100%;
+
+        }
+
+
+        /* =====================================================
+           PROFILE
+        ===================================================== */
+
+        .profile-wrapper {
+
+            position: relative;
+
+        }
+
+
+        .profile-button {
+
+            width: 42px;
+            height: 42px;
+
+            border:
+                1px solid #3c3c3c;
+
+            border-radius: 50%;
+
+            background:
+                #0d0d0d;
+
+            color:
+                white;
+
+            cursor:
+                pointer;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            transition:
+                0.25s;
+
+        }
+
+
+        .profile-button:hover {
+
+            background:
+                white;
+
+            color:
+                black;
+
+            transform:
+                translateY(-2px);
+
+        }
+
+
+        .person-icon {
+
+            position:
+                relative;
+
+            width:
+                15px;
+
+            height:
+                18px;
+
+            display:
+                block;
+
+        }
+
+
+        .person-icon::before {
+
+            content:
+                "";
+
+            position:
+                absolute;
+
+            width:
+                7px;
+
+            height:
+                7px;
+
+            border-radius:
+                50%;
+
+            background:
+                currentColor;
+
+            left:
+                4px;
+
+            top:
+                0;
+
+        }
+
+
+        .person-icon::after {
+
+            content:
+                "";
+
+            position:
+                absolute;
+
+            width:
+                15px;
+
+            height:
+                8px;
+
+            border-radius:
+                9px 9px 3px 3px;
+
+            background:
+                currentColor;
+
+            left:
+                0;
+
+            bottom:
+                0;
+
+        }
+
+
+        /* =====================================================
+           PROFILE MENU
+        ===================================================== */
+
+        .profile-menu {
+
+            position:
+                absolute;
+
+            top:
+                54px;
+
+            right:
+                0;
+
+            width:
+                260px;
+
+            padding:
+                20px;
+
+            background:
+                #101010;
+
+            border:
+                1px solid #333;
+
+            box-shadow:
+                0 25px 70px rgba(0, 0, 0, .55);
+
+            opacity:
+                0;
+
+            visibility:
+                hidden;
+
+            transform:
+                translateY(-8px);
+
+            transition:
+                .25s;
+
+        }
+
+
+        .profile-wrapper.open .profile-menu {
+
+            opacity:
+                1;
+
+            visibility:
+                visible;
+
+            transform:
+                translateY(0);
+
+        }
+
+
+        .profile-label {
+
+            color:
+                #666;
+
+            font-size:
+                9px;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                2px;
+
+            margin-bottom:
+                8px;
+
+        }
+
+
+        .profile-name {
+
+            font-size:
+                15px;
+
+            font-weight:
+                900;
+
+            margin-bottom:
+                16px;
+
+        }
+
+
+        .profile-menu a {
+
+            display:
+                block;
+
+            border-top:
+                1px solid #292929;
+
+            padding:
+                13px 0;
+
+            font-size:
+                10px;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                1.2px;
+
+            transition:
+                color .2s ease,
+                padding-left .2s ease;
+
+        }
+
+
+        .profile-menu a:hover {
+
+            color:
+                #999;
+
+            padding-left:
+                5px;
+
+        }
+
+
+        /* =====================================================
+           HERO
+        ===================================================== */
+
+        .hero {
+
+            min-height:
+                100vh;
+
+            padding:
+                150px 7% 100px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+        }
+
+
+        .hero-inner {
+
+            width:
+                100%;
+
+            max-width:
+                1150px;
+
+        }
+
+
+        .eyebrow {
+
+            display:
+                inline-block;
+
+            padding:
+                9px 12px;
+
+            border:
+                1px solid #333;
+
+            color:
+                #777;
+
+            font-size:
+                9px;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                2.5px;
+
+            margin-bottom:
+                30px;
+
+        }
+
+
+        .hero-title {
+
+            width:
+                100%;
+
+            font-size:
+                clamp(62px, 12vw, 165px);
+
+            line-height:
+                .83;
+
+            letter-spacing:
+                -.075em;
+
+            font-weight:
+                950;
+
+        }
+
+
+        .hero-title span {
+
+            display:
+                block;
+
+        }
+
+
+        .hero-description {
+
+            max-width:
+                650px;
+
+            margin-top:
+                38px;
+
+            color:
+                #888;
+
+            font-size:
+                16px;
+
+            line-height:
+                1.8;
+
+        }
+
+
+        .buttons {
+
+            display:
+                flex;
+
+            flex-wrap:
+                wrap;
+
+            gap:
+                12px;
+
+            margin-top:
+                35px;
+
+        }
+
+
+        .button {
+
+            min-height:
+                50px;
+
+            padding:
+                0 22px;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            border:
+                1px solid #3c3c3c;
+
+            font-size:
+                10px;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                1.4px;
+
+            transition:
+                .3s;
+
+        }
+
+
+        .button.primary {
+
+            background:
+                white;
+
+            color:
+                black;
+
+            border-color:
+                white;
+
+        }
+
+
+        .button:hover {
+
+            background:
+                white;
+
+            color:
+                black;
+
+            border-color:
+                white;
+
+            transform:
+                translateY(-4px);
+
+        }
+
+
+        /* =====================================================
+           ABOUT
+        ===================================================== */
+
+        .section {
+
+            border-top:
+                1px solid #191919;
+
+            padding:
+                110px 7%;
+
+        }
+
+
+        .section-label {
+
+            color:
+                #666;
+
+            font-size:
+                9px;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                2.5px;
+
+            margin-bottom:
+                18px;
+
+        }
+
+
+        .section-title {
+
+            font-size:
+                clamp(42px, 6vw, 80px);
+
+            line-height:
+                .9;
+
+            letter-spacing:
+                -.06em;
+
+            margin-bottom:
+                50px;
+
+        }
+
+
+        .cards {
+
+            display:
+                grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap:
+                15px;
+
+        }
+
+
+        .card {
+
+            min-height:
+                280px;
+
+            padding:
+                30px;
+
+            background:
+                #090909;
+
+            border:
+                1px solid #242424;
+
+            transition:
+                .3s;
+
+        }
+
+
+        .card:hover {
+
+            transform:
+                translateY(-8px);
+
+            border-color:
+                #555;
+
+        }
+
+
+        .card-number {
+
+            color:
+                #555;
+
+            font-size:
+                10px;
+
+            margin-bottom:
+                70px;
+
+        }
+
+
+        .card h3 {
+
+            font-size:
+                24px;
+
+            margin-bottom:
+                15px;
+
+        }
+
+
+        .card p {
+
+            color:
+                #777;
+
+            font-size:
+                13px;
+
+            line-height:
+                1.8;
+
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        footer {
+
+            border-top:
+                1px solid #191919;
+
+            padding:
+                35px 7%;
+
+            color:
+                #444;
+
+            font-size:
+                9px;
+
+            letter-spacing:
+                1.5px;
+
+            display:
+                flex;
+
+            justify-content:
+                space-between;
+
+        }
+
+
+        /* =====================================================
+           TABLET
+        ===================================================== */
+
+        @media (max-width: 800px) {
+
+            .cards {
+
+                grid-template-columns:
+                    1fr;
+
+            }
+
+
+            .card {
+
+                min-height:
+                    230px;
+
+            }
+
+
+            .card-number {
+
+                margin-bottom:
+                    40px;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 600px) {
+
+            .navbar {
+
+                padding:
+                    0 20px;
+
+            }
+
+
+            .nav-link {
+
+                display:
+                    none;
+
+            }
+
+
+            .hero {
+
+                padding:
+                    125px 20px 80px;
+
+            }
+
+
+            .hero-title {
+
+                font-size:
+                    clamp(56px,
+                        18vw,
+                        90px);
+
+            }
+
+
+            .hero-description {
+
+                font-size:
+                    14px;
+
+            }
+
+
+            .buttons {
+
+                flex-direction:
+                    column;
+
+            }
+
+
+            .button {
+
+                width:
+                    100%;
+
+            }
+
+
+            .section {
+
+                padding:
+                    80px 20px;
+
+            }
+
+
+            footer {
+
+                padding:
+                    30px 20px;
+
+                flex-direction:
+                    column;
+
+                gap:
+                    10px;
+
+            }
+
+
+            .profile-menu {
+
+                position:
+                    fixed;
+
+                top:
+                    75px;
+
+                right:
+                    15px;
+
+                width:
+                    calc(100vw - 30px);
+
+            }
+
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         CURSOR LIGHT
+    ===================================================== -->
+
+    <div id="cursor-light"></div>
+
+
+    <!-- =====================================================
+         NAVBAR
+    ===================================================== -->
+
+    <nav class="navbar">
+
+        <a href="/" class="logo">
+            ACC
+        </a>
+
+
+        <div class="nav-right">
+
+            <a href="/" class="nav-link">
+                HOME
+            </a>
+
+            <a href="/articles" class="nav-link">
+                ARTICLES
+            </a>
+
+
+            <div class="profile-wrapper">
+
+                <button type="button" class="profile-button" id="profileButton" aria-label="Account">
+
+                    <span class="person-icon"></span>
+
+                </button>
+
+
+                <div class="profile-menu">
+
+
+                    {% if session.get("chair_authenticated") %}
+
+                    <div class="profile-label">
+                        CHAIR ACCOUNT
+                    </div>
+
+                    <div class="profile-name">
+                        CHAIR
+                    </div>
+
+                    <a href="/articles">
+                        ARTICLES →
+                    </a>
+
+                    <a href="/chair-logout">
+                        LOG OUT →
+                    </a>
+
+
+                    {% elif session.get("press_authenticated") %}
+
+                    <div class="profile-label">
+                        PRESS ACCOUNT
+                    </div>
+
+                    <div class="profile-name">
+
+                        {{ session.get("press_name") }}
+
+                        <br>
+
+                        <span style="
+                                    font-size:11px;
+                                    color:#666;
+                                ">
+                            {{ session.get("press_publication") }}
+                        </span>
+
+                    </div>
+
+                    <a href="/articles">
+                        ARTICLES →
+                    </a>
+
+                    <a href="/press-upload">
+                        UPLOAD ARTICLE →
+                    </a>
+
+                    <a href="/press-logout">
+                        LOG OUT →
+                    </a>
+
+
+                    {% else %}
+
+                    <div class="profile-label">
+                        ACCOUNT
+                    </div>
+
+                    <div class="profile-name">
+                        NOT SIGNED IN
+                    </div>
+
+                    <a href="/press-login">
+                        PRESS LOGIN →
+                    </a>
+
+                    <a href="/chair-login">
+                        CHAIR LOGIN →
+                    </a>
+
+                    {% endif %}
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- =====================================================
+         HERO
+    ===================================================== -->
+
+    <section class="hero">
+
+        <div class="hero-inner">
+
+            <div class="eyebrow">
+                ARKANIAN JOINT CRISIS COMMITTEE
+            </div>
+
+
+            <h1 class="hero-title">
+
+                <span>
+                    ARKANIAN
+                </span>
+
+                <span>
+                    ACC.
+                </span>
+
+            </h1>
+
+
+            <p class="hero-description">
+
+                A live crisis environment built around rapid
+                decision-making, diplomacy, intelligence,
+                consequences and controlled chaos.
+
+            </p>
+
+
+            <div class="buttons">
+
+                <a href="/articles" class="button primary">
+                    READ PRESS ARTICLES →
+                </a>
+
+
+                <a href="#about" class="button">
+                    EXPLORE THE COMMITTEE
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ABOUT
+    ===================================================== -->
+
+    <section class="section" id="about">
+
+        <div class="section-label">
+            THE COMMITTEE
+        </div>
+
+
+        <h2 class="section-title">
+
+            ONE ROOM.<br>
+            CONSTANTLY CHANGING.
+
+        </h2>
+
+
+        <div class="cards">
+
+
+            <div class="card">
+
+                <div class="card-number">
+                    01
+                </div>
+
+                <h3>
+                    DELEGATES
+                </h3>
+
+                <p>
+
+                    Representatives operate inside a rapidly
+                    developing crisis where decisions can change
+                    the situation instantly.
+
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-number">
+                    02
+                </div>
+
+                <h3>
+                    CRISIS
+                </h3>
+
+                <p>
+
+                    Information develops continuously.
+                    Delegates must interpret events, respond
+                    quickly and adapt their strategy.
+
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-number">
+                    03
+                </div>
+
+                <h3>
+                    CONSEQUENCES
+                </h3>
+
+                <p>
+
+                    Every decision creates consequences.
+                    Alliances, intelligence and diplomacy can
+                    shift the balance at any moment.
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         FOOTER
+    ===================================================== -->
+
+    <footer>
+
+        <span>
+            ARKANIAN JOINT CRISIS COMMITTEE
+        </span>
+
+        <span>
+            ACC © 2026
+        </span>
+
+    </footer>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ===================================================== -->
+
+    <script>
+
+        /* =================================================
+           PROFILE MENU
+        ================================================= */
+
+        const profileButton =
+            document.getElementById(
+                "profileButton"
+            );
+
+
+        const profileWrapper =
+            document.querySelector(
+                ".profile-wrapper"
+            );
+
+
+        if (
+            profileButton &&
+            profileWrapper
+        ) {
+
+            profileButton.addEventListener(
+                "click",
+                function (event) {
+
+                    event.stopPropagation();
+
+                    profileWrapper.classList.toggle(
+                        "open"
+                    );
+
+                }
+            );
+
+
+            document.addEventListener(
+                "click",
+                function (event) {
+
+                    if (
+                        !profileWrapper.contains(
+                            event.target
+                        )
+                    ) {
+
+                        profileWrapper.classList.remove(
+                            "open"
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           CURSOR LIGHT
+        ================================================= */
+
+        const cursorLight =
+            document.getElementById(
+                "cursor-light"
+            );
+
+
+        let mouseX = 0;
+        let mouseY = 0;
+
+        let lightX = 0;
+        let lightY = 0;
+
+        let mouseDetected = false;
+
+
+        document.addEventListener(
+            "mousemove",
+            function (event) {
+
+                mouseX =
+                    event.clientX;
+
+                mouseY =
+                    event.clientY;
+
+
+                if (!mouseDetected) {
+
+                    lightX =
+                        mouseX;
+
+                    lightY =
+                        mouseY;
+
+                    mouseDetected =
+                        true;
+
+                }
+
+
+                cursorLight.style.opacity =
+                    "1";
+
+            }
+        );
+
+
+        document.addEventListener(
+            "mouseleave",
+            function () {
+
+                cursorLight.style.opacity =
+                    "0";
+
+            }
+        );
+
+
+        function animateCursorLight() {
+
+            lightX +=
+                (
+                    mouseX -
+                    lightX
+                ) * 0.72;
+
+
+            lightY +=
+                (
+                    mouseY -
+                    lightY
+                ) * 0.72;
+
+
+            cursorLight.style.left =
+                lightX + "px";
+
+
+            cursorLight.style.top =
+                lightY + "px";
+
+
+            requestAnimationFrame(
+                animateCursorLight
+            );
+
+        }
+
+
+        animateCursorLight();
+
+    </script>
+
+
+</body>
+
+</html>

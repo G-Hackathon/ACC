@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {{ article.title }} — ACC
+    </title>
+
+
+    <style>
+        /* =====================================================
+           RESET
+        ===================================================== */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+
+        body {
+
+            background: #090909;
+
+            color: #f5f5f5;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            min-height: 100vh;
+
+            overflow-x: hidden;
+
+        }
+
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+
+        button {
+            font-family: inherit;
+        }
+
+
+        /* =====================================================
+           CURSOR LIGHT
+        ===================================================== */
+
+        #cursor-light {
+
+            position: fixed;
+
+            width: 320px;
+            height: 320px;
+
+            left: 0;
+            top: 0;
+
+            pointer-events: none;
+
+            z-index: 999999;
+
+            border-radius: 50%;
+
+            transform:
+                translate(-50%, -50%);
+
+            opacity: 0;
+
+            background:
+                radial-gradient(circle,
+                    rgba(255, 255, 255, 0.20) 0%,
+                    rgba(255, 255, 255, 0.11) 18%,
+                    rgba(255, 255, 255, 0.055) 35%,
+                    rgba(255, 255, 255, 0.018) 52%,
+                    rgba(255, 255, 255, 0) 72%);
+
+            filter:
+                blur(2px);
+
+            mix-blend-mode:
+                screen;
+
+            will-change:
+                left,
+                top;
+
+            transition:
+                opacity 0.15s ease;
+
+        }
+
+
+        /* =====================================================
+           NAVBAR
+        ===================================================== */
+
+        .navbar {
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 1000;
+
+            width: 100%;
+
+            height: 78px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 5vw;
+
+            background:
+                rgba(9, 9, 9, 0.94);
+
+            border-bottom:
+                1px solid #292929;
+
+            backdrop-filter:
+                blur(16px);
+
+            -webkit-backdrop-filter:
+                blur(16px);
+
+        }
+
+
+        .logo {
+
+            font-size: 25px;
+
+            font-weight: 900;
+
+            letter-spacing: -1px;
+
+            transition:
+                transform 0.25s ease,
+                opacity 0.25s ease;
+
+        }
+
+
+        .logo:hover {
+
+            transform:
+                translateY(-2px);
+
+            opacity:
+                0.7;
+
+        }
+
+
+        .nav-right {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 34px;
+
+        }
+
+
+        .nav-links {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 28px;
+
+        }
+
+
+        .nav-link {
+
+            position: relative;
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+            letter-spacing: 1.5px;
+
+            color: #bdbdbd;
+
+            transition:
+                color 0.2s ease;
+
+        }
+
+
+        .nav-link::after {
+
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+
+            bottom: -7px;
+
+            width: 0;
+
+            height: 1px;
+
+            background: #fff;
+
+            transition:
+                width 0.25s ease;
+
+        }
+
+
+        .nav-link:hover {
+
+            color:
+                #fff;
+
+        }
+
+
+        .nav-link:hover::after {
+
+            width:
+                100%;
+
+        }
+
+
+        /* =====================================================
+           PROFILE
+        ===================================================== */
+
+        .profile-wrapper {
+
+            position:
+                relative;
+
+        }
+
+
+        .profile-button {
+
+            width:
+                42px;
+
+            height:
+                42px;
+
+            border:
+                1px solid #444;
+
+            border-radius:
+                50%;
+
+            background:
+                #111;
+
+            cursor:
+                pointer;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            transition:
+                transform 0.25s ease,
+                border-color 0.25s ease,
+                background 0.25s ease;
+
+        }
+
+
+        .profile-button:hover {
+
+            transform:
+                translateY(-2px);
+
+            border-color:
+                #fff;
+
+            background:
+                #181818;
+
+        }
+
+
+        .person-icon {
+
+            position:
+                relative;
+
+            width:
+                20px;
+
+            height:
+                20px;
+
+            display:
+                block;
+
+        }
+
+
+        .person-icon::before {
+
+            content:
+                "";
+
+            position:
+                absolute;
+
+            width:
+                7px;
+
+            height:
+                7px;
+
+            left:
+                50%;
+
+            top:
+                1px;
+
+            transform:
+                translateX(-50%);
+
+            background:
+                #f5f5f5;
+
+            border-radius:
+                50%;
+
+        }
+
+
+        .person-icon::after {
+
+            content:
+                "";
+
+            position:
+                absolute;
+
+            width:
+                14px;
+
+            height:
+                8px;
+
+            left:
+                50%;
+
+            bottom:
+                1px;
+
+            transform:
+                translateX(-50%);
+
+            background:
+                #f5f5f5;
+
+            border-radius:
+                9px 9px 4px 4px;
+
+        }
+
+
+        .profile-menu {
+
+            position:
+                absolute;
+
+            right:
+                0;
+
+            top:
+                54px;
+
+            width:
+                250px;
+
+            padding:
+                20px;
+
+            background:
+                #101010;
+
+            border:
+                1px solid #333;
+
+            box-shadow:
+                0 25px 70px rgba(0, 0, 0, 0.65);
+
+            opacity:
+                0;
+
+            visibility:
+                hidden;
+
+            transform:
+                translateY(-8px);
+
+            transition:
+                opacity 0.2s ease,
+                transform 0.2s ease,
+                visibility 0.2s ease;
+
+        }
+
+
+        .profile-wrapper.open .profile-menu {
+
+            opacity:
+                1;
+
+            visibility:
+                visible;
+
+            transform:
+                translateY(0);
+
+        }
+
+
+        .profile-heading {
+
+            font-size:
+                9px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                2px;
+
+            color:
+                #777;
+
+            margin-bottom:
+                7px;
+
+        }
+
+
+        .profile-name {
+
+            font-size:
+                18px;
+
+            font-weight:
+                800;
+
+            margin-bottom:
+                3px;
+
+        }
+
+
+        .profile-publication {
+
+            font-size:
+                11px;
+
+            color:
+                #888;
+
+            margin-bottom:
+                18px;
+
+        }
+
+
+        .profile-menu a {
+
+            display:
+                block;
+
+            padding:
+                11px 0;
+
+            border-top:
+                1px solid #282828;
+
+            font-size:
+                10px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                1px;
+
+            color:
+                #ccc;
+
+            transition:
+                padding-left 0.2s ease,
+                color 0.2s ease;
+
+        }
+
+
+        .profile-menu a:hover {
+
+            padding-left:
+                6px;
+
+            color:
+                #fff;
+
+        }
+
+
+        /* =====================================================
+           ARTICLE READER
+        ===================================================== */
+
+        .reader {
+
+            width:
+                min(900px, 88%);
+
+            margin:
+                0 auto;
+
+            padding:
+                90px 0 120px;
+
+        }
+
+
+        /* =====================================================
+           BACK BUTTON
+        ===================================================== */
+
+        .back-button {
+
+            display:
+                inline-block;
+
+            margin-bottom:
+                65px;
+
+            color:
+                #777;
+
+            font-size:
+                10px;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                1.5px;
+
+            transition:
+                color 0.2s ease,
+                transform 0.2s ease;
+
+        }
+
+
+        .back-button:hover {
+
+            color:
+                #fff;
+
+            transform:
+                translateX(-5px);
+
+        }
+
+
+        /* =====================================================
+           PUBLICATION
+        ===================================================== */
+
+        .article-publication {
+
+            margin-bottom:
+                22px;
+
+            color:
+                #777;
+
+            font-size:
+                10px;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                3px;
+
+        }
+
+
+        /* =====================================================
+           TITLE
+        ===================================================== */
+
+        .article-title {
+
+            max-width:
+                100%;
+
+            margin-bottom:
+                35px;
+
+            color:
+                #f5f5f5;
+
+            font-size:
+                clamp(45px, 7vw, 82px);
+
+            line-height:
+                0.98;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                -4px;
+
+            overflow-wrap:
+                break-word;
+
+        }
+
+
+        /* =====================================================
+           META
+        ===================================================== */
+
+        .article-meta {
+
+            display:
+                flex;
+
+            flex-wrap:
+                wrap;
+
+            gap:
+                12px 28px;
+
+            padding:
+                18px 0;
+
+            border-top:
+                1px solid #292929;
+
+            border-bottom:
+                1px solid #292929;
+
+            color:
+                #666;
+
+            font-size:
+                9px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                1.2px;
+
+        }
+
+
+        /* =====================================================
+           ARTICLE BODY
+        ===================================================== */
+
+        .article-content {
+
+            margin-top:
+                60px;
+
+            color:
+                #cfcfcf;
+
+            font-size:
+                18px;
+
+            line-height:
+                2;
+
+            white-space:
+                pre-line;
+
+            overflow-wrap:
+                break-word;
+
+            word-wrap:
+                break-word;
+
+        }
+
+
+        /*
+           Every paragraph / line of the article
+           gets proper spacing.
+        */
+
+        .article-content p {
+
+            margin-bottom:
+                30px;
+
+        }
+
+
+        /* =====================================================
+           CHAIR CONTROLS
+        ===================================================== */
+
+        .chair-controls {
+
+            margin-top:
+                75px;
+
+            padding-top:
+                25px;
+
+            border-top:
+                1px solid #292929;
+
+        }
+
+
+        .delete-button {
+
+            padding:
+                13px 18px;
+
+            border:
+                1px solid #444;
+
+            background:
+                transparent;
+
+            color:
+                #888;
+
+            cursor:
+                pointer;
+
+            font-size:
+                9px;
+
+            font-weight:
+                900;
+
+            letter-spacing:
+                1.5px;
+
+            transition:
+                background 0.2s ease,
+                color 0.2s ease,
+                border-color 0.2s ease;
+
+        }
+
+
+        .delete-button:hover {
+
+            background:
+                #fff;
+
+            color:
+                #000;
+
+            border-color:
+                #fff;
+
+        }
+
+
+        /* =====================================================
+           END
+        ===================================================== */
+
+        .article-end {
+
+            margin-top:
+                100px;
+
+            padding-top:
+                25px;
+
+            border-top:
+                1px solid #292929;
+
+            color:
+                #555;
+
+            font-size:
+                9px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                1.5px;
+
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        footer {
+
+            border-top:
+                1px solid #292929;
+
+            padding:
+                28px 5vw;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                space-between;
+
+            color:
+                #555;
+
+            font-size:
+                9px;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                1.5px;
+
+        }
+
+
+        /* =====================================================
+           TABLET
+        ===================================================== */
+
+        @media (max-width: 800px) {
+
+            .navbar {
+
+                height:
+                    70px;
+
+                padding:
+                    0 6%;
+
+            }
+
+
+            .nav-right {
+
+                gap:
+                    15px;
+
+            }
+
+
+            .nav-links {
+
+                gap:
+                    17px;
+
+            }
+
+
+            .nav-link {
+
+                font-size:
+                    9px;
+
+                letter-spacing:
+                    1px;
+
+            }
+
+
+            .profile-menu {
+
+                right:
+                    -5px;
+
+                width:
+                    min(250px,
+                        calc(100vw - 30px));
+
+            }
+
+
+            .reader {
+
+                width:
+                    88%;
+
+                padding:
+                    65px 0 90px;
+
+            }
+
+
+            .article-title {
+
+                letter-spacing:
+                    -3px;
+
+            }
+
+
+            .article-content {
+
+                font-size:
+                    17px;
+
+                line-height:
+                    1.9;
+
+            }
+
+
+            footer {
+
+                flex-direction:
+                    column;
+
+                gap:
+                    10px;
+
+                text-align:
+                    center;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           PHONE
+        ===================================================== */
+
+        @media (max-width: 500px) {
+
+            .logo {
+
+                font-size:
+                    21px;
+
+            }
+
+
+            .nav-link {
+
+                display:
+                    none;
+
+            }
+
+
+            .profile-button {
+
+                width:
+                    40px;
+
+                height:
+                    40px;
+
+            }
+
+
+            .reader {
+
+                width:
+                    88%;
+
+            }
+
+
+            .article-title {
+
+                font-size:
+                    44px;
+
+                letter-spacing:
+                    -2.5px;
+
+                line-height:
+                    0.98;
+
+            }
+
+
+            .article-content {
+
+                font-size:
+                    16px;
+
+                line-height:
+                    1.9;
+
+            }
+
+
+            .article-meta {
+
+                gap:
+                    10px 18px;
+
+            }
+
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         CURSOR LIGHT
+    ===================================================== -->
+
+    <div id="cursor-light"></div>
+
+
+    <!-- =====================================================
+         NAVBAR
+    ===================================================== -->
+
+    <nav class="navbar">
+
+        <a href="{{ url_for('home') }}" class="logo">
+            ACC
+        </a>
+
+
+        <div class="nav-right">
+
+            <div class="nav-links">
+
+                <a href="{{ url_for('home') }}" class="nav-link">
+                    HOME
+                </a>
+
+                <a href="{{ url_for('articles') }}" class="nav-link">
+                    ARTICLES
+                </a>
+
+            </div>
+
+
+            <div class="profile-wrapper" id="profileWrapper">
+
+                <button type="button" class="profile-button" id="profileButton" aria-label="Account">
+
+                    <span class="person-icon"></span>
+
+                </button>
+
+
+                <div class="profile-menu" id="profileMenu">
+
+                    {% if session.get("chair_authenticated") %}
+
+                    <div class="profile-heading">
+                        CHAIR ACCOUNT
+                    </div>
+
+                    <div class="profile-name">
+                        CHAIR
+                    </div>
+
+                    <a href="{{ url_for('articles') }}">
+                        ARTICLES →
+                    </a>
+
+                    <a href="{{ url_for('chair_logout') }}">
+                        LOG OUT →
+                    </a>
+
+
+                    {% elif session.get("press_authenticated") %}
+
+                    <div class="profile-heading">
+                        PRESS ACCOUNT
+                    </div>
+
+                    <div class="profile-name">
+                        {{ session.get("press_name") }}
+                    </div>
+
+                    <div class="profile-publication">
+                        {{ session.get("press_publication") }}
+                    </div>
+
+                    <a href="{{ url_for('articles') }}">
+                        ARTICLES →
+                    </a>
+
+                    <a href="{{ url_for('press_upload') }}">
+                        UPLOAD ARTICLE →
+                    </a>
+
+                    <a href="{{ url_for('press_logout') }}">
+                        LOG OUT →
+                    </a>
+
+
+                    {% else %}
+
+                    <div class="profile-heading">
+                        ACCOUNT
+                    </div>
+
+                    <div class="profile-name">
+                        NOT SIGNED IN
+                    </div>
+
+                    <a href="{{ url_for('press_login') }}">
+                        PRESS LOGIN →
+                    </a>
+
+                    <a href="{{ url_for('chair_login') }}">
+                        CHAIR LOGIN →
+                    </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </nav>
+
+
+    <!-- =====================================================
+         ARTICLE
+    ===================================================== -->
+
+    <main class="reader">
+
+
+        <a href="{{ url_for('articles') }}" class="back-button">
+            ← BACK TO ARTICLES
+        </a>
+
+
+        <div class="article-publication">
+            {{ article.publication }}
+        </div>
+
+
+        <h1 class="article-title">
+            {{ article.title }}
+        </h1>
+
+
+        <div class="article-meta">
+
+            <span>
+                BY {{ article.author }}
+            </span>
+
+            <span>
+                {{ article.date }}
+            </span>
+
+            {% if article.time %}
+
+            <span>
+                {{ article.time }}
+            </span>
+
+            {% endif %}
+
+        </div>
+
+
+        <article class="article-content">
+
+            {{ article.content }}
+
+        </article>
+
+
+        {% if session.get("chair_authenticated") %}
+
+        <div class="chair-controls">
+
+            <form method="POST" action="{{ url_for('delete_article', article_id=article.id) }}"
+                onsubmit="return confirm('Delete this article?');">
+
+                <button type="submit" class="delete-button">
+                    DELETE ARTICLE
+                </button>
+
+            </form>
+
+        </div>
+
+        {% endif %}
+
+
+        <div class="article-end">
+            END OF ARTICLE
+        </div>
+
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ===================================================== -->
+
+    <footer>
+
+        <span>
+            ARKANIAN JOINT CRISIS COMMITTEE
+        </span>
+
+        <span>
+            PRESS ARCHIVE
+        </span>
+
+    </footer>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ===================================================== -->
+
+    <script>
+
+
+        /* =================================================
+           PROFILE MENU
+        ================================================= */
+
+        const profileButton =
+            document.getElementById(
+                "profileButton"
+            );
+
+
+        const profileWrapper =
+            document.getElementById(
+                "profileWrapper"
+            );
+
+
+        if (
+            profileButton &&
+            profileWrapper
+        ) {
+
+            profileButton.addEventListener(
+                "click",
+                function (event) {
+
+                    event.stopPropagation();
+
+                    profileWrapper.classList.toggle(
+                        "open"
+                    );
+
+                }
+            );
+
+
+            document.addEventListener(
+                "click",
+                function (event) {
+
+                    if (
+                        !profileWrapper.contains(
+                            event.target
+                        )
+                    ) {
+
+                        profileWrapper.classList.remove(
+                            "open"
+                        );
+
+                    }
+
+                }
+            );
+
+
+            document.addEventListener(
+                "keydown",
+                function (event) {
+
+                    if (
+                        event.key === "Escape"
+                    ) {
+
+                        profileWrapper.classList.remove(
+                            "open"
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
+           CURSOR LIGHT
+        ================================================= */
+
+        const cursorLight =
+            document.getElementById(
+                "cursor-light"
+            );
+
+
+        let mouseX = 0;
+        let mouseY = 0;
+
+        let lightX = 0;
+        let lightY = 0;
+
+        let mouseStarted = false;
+
+
+        if (cursorLight) {
+
+            document.addEventListener(
+                "mousemove",
+                function (event) {
+
+                    mouseX =
+                        event.clientX;
+
+                    mouseY =
+                        event.clientY;
+
+
+                    if (!mouseStarted) {
+
+                        lightX =
+                            mouseX;
+
+                        lightY =
+                            mouseY;
+
+                        mouseStarted =
+                            true;
+
+                    }
+
+
+                    cursorLight.style.opacity =
+                        "1";
+
+                }
+            );
+
+
+            document.addEventListener(
+                "mouseleave",
+                function () {
+
+                    cursorLight.style.opacity =
+                        "0";
+
+                }
+            );
+
+
+            function moveLight() {
+
+                lightX +=
+                    (
+                        mouseX -
+                        lightX
+                    ) * 0.75;
+
+
+                lightY +=
+                    (
+                        mouseY -
+                        lightY
+                    ) * 0.75;
+
+
+                cursorLight.style.left =
+                    lightX + "px";
+
+
+                cursorLight.style.top =
+                    lightY + "px";
+
+
+                requestAnimationFrame(
+                    moveLight
+                );
+
+            }
+
+
+            moveLight();
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>
