@@ -9,11 +9,11 @@ from flask import (
     request,
     redirect,
     url_for,
-    session,
     flash,
+    session,
     send_from_directory,
+    abort,
 )
-from werkzeug.utils import secure_filename
 
 
 # ============================================================
@@ -24,21 +24,20 @@ app = Flask(__name__)
 
 app.secret_key = os.environ.get(
     "SECRET_KEY",
-    "acc-development-secret-key-change-this"
+    "dev-secret-change-this"
 )
 
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
 
 
-# ============================================================
-# DIRECTORIES
-# ============================================================
-
 BASE_DIR = os.path.abspath(
     os.path.dirname(__file__)
 )
 
-DATA_DIR = BASE_DIR
+DATA_DIR = os.path.join(
+    BASE_DIR,
+    "data"
+)
 
 DATABASE = os.path.join(
     DATA_DIR,
@@ -50,7 +49,16 @@ UPLOAD_FOLDER = os.path.join(
     "uploads"
 )
 
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+os.makedirs(
+    DATA_DIR,
+    exist_ok=True
+)
+
+os.makedirs(
+    UPLOAD_FOLDER,
+    exist_ok=True
+)
 
 
 # ============================================================
@@ -64,23 +72,13 @@ CHAIR_PASSWORD = os.environ.get(
 
 
 PRESS_PASSWORDS = {
-    "Yukta": os.environ.get(
-        "PRESS_YUKTA_PASSWORD",
-        "aljazeeraarticles"
-    ),
-
-    "Nandika": os.environ.get(
-        "PRESS_NANDIKA_PASSWORD",
-        "aarushismybf"
-    ),
+    "Yukta": "aljazeeraarticles",
+    "Nandika": "aarushismybf",
 }
 
 
-# ============================================================
-# DELEGATE ACCOUNTS
-# ============================================================
-
 DELEGATES = {
+
     "Siddhiksha": {
         "delegation": "National Liberation Council",
         "password": "NLC#Liberation2026!Sec",
@@ -200,11 +198,92 @@ DELEGATES = {
         "delegation": "Maren Coast",
         "password": "MC#MarenCoast!274",
     },
+
+    "Manisha": {
+        "delegation": "Class Teacher",
+        "password": "ClassTeach094",
+    },
 }
 
 
 # ============================================================
-# ALLOWED UPLOAD FILE TYPES
+# DATABASE
+# ============================================================
+
+def get_db():
+
+    conn = sqlite3.connect(
+        DATABASE
+    )
+
+    conn.row_factory = sqlite3.Row
+
+    return conn
+
+
+def init_db():
+
+    conn = get_db()
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS crises (
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            title TEXT NOT NULL,
+
+            description TEXT NOT NULL,
+
+            filename TEXT,
+
+            created_at TEXT NOT NULL
+
+        )
+    """)
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS articles (
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            author TEXT NOT NULL,
+
+            delegation TEXT,
+
+            title TEXT NOT NULL,
+
+            body TEXT NOT NULL,
+
+            created_at TEXT NOT NULL
+
+        )
+    """)
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS notes (
+
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            username TEXT NOT NULL,
+
+            title TEXT NOT NULL,
+
+            content TEXT NOT NULL,
+
+            created_at TEXT NOT NULL,
+
+            updated_at TEXT NOT NULL
+
+        )
+    """)
+
+    conn.commit()
+
+    conn.close()
+
+
+# ============================================================
+# FILE VALIDATION
 # ============================================================
 
 ALLOWED_EXTENSIONS = {
@@ -221,91 +300,22 @@ ALLOWED_EXTENSIONS = {
 
 def allowed_file(filename):
 
-    return (
-        "." in filename
-        and filename.rsplit(
-            ".",
-            1
-        )[1].lower()
-        in ALLOWED_EXTENSIONS
-    )
+    if not filename:
+        return False
+
+    if "." not in filename:
+        return False
+
+    extension = filename.rsplit(
+        ".",
+        1
+    )[1].lower()
+
+    return extension in ALLOWED_EXTENSIONS
 
 
 # ============================================================
-# DATABASE
-# ============================================================
-
-def get_db():
-
-    connection = sqlite3.connect(
-        DATABASE
-    )
-
-    connection.row_factory = sqlite3.Row
-
-    return connection
-
-
-def init_db():
-
-    connection = get_db()
-
-    connection.execute(
-        """
-        CREATE TABLE IF NOT EXISTS crises (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            description TEXT NOT NULL,
-            filename TEXT,
-            created_at TEXT NOT NULL
-        )
-        """
-    )
-
-    connection.execute(
-        """
-        CREATE TABLE IF NOT EXISTS articles (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            author TEXT NOT NULL,
-            delegation TEXT NOT NULL,
-            title TEXT NOT NULL,
-            body TEXT NOT NULL,
-            created_at TEXT NOT NULL
-        )
-        """
-    )
-
-    connection.execute(
-        """
-        CREATE TABLE IF NOT EXISTS notes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL,
-            title TEXT NOT NULL,
-            content TEXT NOT NULL,
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL
-        )
-        """
-    )
-
-    connection.commit()
-
-    connection.close()
-
-
-# ============================================================
-# TIME
-# ============================================================
-
-def now_string():
-
-    return datetime.now().strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
-
-
-# ============================================================
-# USER SYSTEM
+# CURRENT USER
 # ============================================================
 
 def current_user():
@@ -317,79 +327,77 @@ def current_user():
     if not username:
         return None
 
-    # --------------------------------------------------------
     # CHAIR
-    # --------------------------------------------------------
 
     if username == "__chair__":
 
         return {
             "username": "Chair",
             "role": "chair",
-            "delegation": "Arkanian Crisis Committee",
         }
 
-    # --------------------------------------------------------
     # PRESS
-    # --------------------------------------------------------
 
     if username in PRESS_PASSWORDS:
 
         return {
             "username": username,
             "role": "press",
-            "delegation": "Press Corps",
         }
 
-    # --------------------------------------------------------
     # DELEGATE
-    # --------------------------------------------------------
 
     if username in DELEGATES:
 
         return {
             "username": username,
             "role": "delegate",
-            "delegation": DELEGATES[
-                username
-            ]["delegation"],
+            "delegation":
+                DELEGATES[username]["delegation"],
         }
 
-    # --------------------------------------------------------
-    # INVALID SESSION
-    # --------------------------------------------------------
-
-    session.clear()
-
     return None
+
+
+# ============================================================
+# MAKE USER AVAILABLE TO ALL TEMPLATES
+# ============================================================
+
+@app.context_processor
+def inject_user():
+
+    return {
+        "user": current_user()
+    }
 
 
 # ============================================================
 # LOGIN REQUIRED
 # ============================================================
 
-def login_required(function):
+def login_required(view):
 
-    @wraps(function)
-    def wrapper(*args, **kwargs):
+    @wraps(view)
+    def wrapped(*args, **kwargs):
 
-        if current_user() is None:
+        user = current_user()
+
+        if user is None:
 
             flash(
-                "Please log in to access that page.",
-                "error"
+                "Please log in first."
             )
 
             return redirect(
                 url_for("login")
             )
 
-        return function(
+        return view(
             *args,
             **kwargs
         )
 
-    return wrapper
+    return wrapped
 
 
 # ============================================================
@@ -398,18 +406,17 @@ def login_required(function):
 
 def role_required(*roles):
 
-    def decorator(function):
+    def decorator(view):
 
-        @wraps(function)
-        def wrapper(*args, **kwargs):
+        @wraps(view)
+        def wrapped(*args, **kwargs):
 
             user = current_user()
 
             if user is None:
 
                 flash(
-                    "Please log in first.",
-                    "error"
+                    "Please log in first."
                 )
 
                 return redirect(
@@ -419,20 +426,19 @@ def role_required(*roles):
             if user["role"] not in roles:
 
                 flash(
-                    "You do not have permission to access that.",
-                    "error"
+                    "You do not have permission to access that."
                 )
 
                 return redirect(
                     url_for("home")
                 )
 
-            return function(
+            return view(
                 *args,
                 **kwargs
             )
 
-        return wrapper
+        return wrapped
 
     return decorator
 
@@ -444,38 +450,33 @@ def role_required(*roles):
 @app.route("/")
 def home():
 
-    db = get_db()
+    conn = get_db()
 
-    latest_crisis = db.execute(
-        """
+    latest_crisis = conn.execute("""
         SELECT *
         FROM crises
         ORDER BY id DESC
         LIMIT 1
-        """
-    ).fetchone()
+    """).fetchone()
 
-    latest_articles = db.execute(
-        """
+    latest_articles = conn.execute("""
         SELECT *
         FROM articles
         ORDER BY id DESC
         LIMIT 3
-        """
-    ).fetchall()
+    """).fetchall()
 
-    db.close()
+    conn.close()
 
     return render_template(
         "index.html",
-        user=current_user(),
         latest_crisis=latest_crisis,
         latest_articles=latest_articles,
     )
 
 
 # ============================================================
-# DELEGATE LOGIN
+# COMBINED LOGIN
 # ============================================================
 
 @app.route(
@@ -483,8 +484,6 @@ def home():
     methods=["GET", "POST"]
 )
 def login():
-
-    error = None
 
     if request.method == "POST":
 
@@ -499,62 +498,42 @@ def login():
         )
 
         # ----------------------------------------------------
-        # CHAIR
+        # CHAIR LOGIN
         # ----------------------------------------------------
 
-        if (
-            username.lower() == "chair"
-            and password == CHAIR_PASSWORD
-        ):
+        if username.lower() == "chair":
 
-            session.clear()
+            if password == CHAIR_PASSWORD:
 
-            session["username"] = "__chair__"
+                session.clear()
+
+                session["username"] = "__chair__"
+
+                flash(
+                    "Chair access granted."
+                )
+
+                return redirect(
+                    url_for("home")
+                )
 
             flash(
-                "Chair mode activated.",
-                "success"
+                "Incorrect chair password."
             )
 
-            return redirect(
-                url_for("home")
-            )
-
-        # ----------------------------------------------------
-        # PRESS
-        # ----------------------------------------------------
-
-        if (
-            username in PRESS_PASSWORDS
-            and password == PRESS_PASSWORDS[
-                username
-            ]
-        ):
-
-            session.clear()
-
-            session["username"] = username
-
-            flash(
-                f"Welcome, {username}.",
-                "success"
-            )
-
-            return redirect(
-                url_for("home")
+            return render_template(
+                "login.html"
             )
 
         # ----------------------------------------------------
-        # DELEGATE
+        # DELEGATE LOGIN
         # ----------------------------------------------------
 
         if username in DELEGATES:
 
             if (
-                password
-                == DELEGATES[
-                    username
-                ]["password"]
+                password ==
+                DELEGATES[username]["password"]
             ):
 
                 session.clear()
@@ -562,27 +541,58 @@ def login():
                 session["username"] = username
 
                 flash(
-                    f"Welcome back, {username}.",
-                    "success"
+                    f"Welcome, {username}."
                 )
 
                 return redirect(
-                    url_for("home")
+                    url_for("profile")
                 )
 
-        error = (
-            "Incorrect username or password."
-        )
+            flash(
+                "Incorrect password."
+            )
+
+            return render_template(
+                "login.html"
+            )
+
+        # ----------------------------------------------------
+        # PRESS LOGIN
+        # ----------------------------------------------------
+
+        if username in PRESS_PASSWORDS:
+
+            if (
+                password ==
+                PRESS_PASSWORDS[username]
+            ):
+
+                session.clear()
+
+                session["username"] = username
+
+                flash(
+                    "Press access granted."
+                )
+
+                return redirect(
+                    url_for("articles")
+                )
+
+            flash(
+                "Incorrect password."
+            )
+
+            return render_template(
+                "login.html"
+            )
 
         flash(
-            error,
-            "error"
+            "Account not found."
         )
 
     return render_template(
-        "delegate_login.html",
-        user=current_user(),
-        error=error,
+        "login.html"
     )
 
 
@@ -596,8 +606,6 @@ def login():
 )
 def press_login():
 
-    error = None
-
     if request.method == "POST":
 
         username = request.form.get(
@@ -612,9 +620,8 @@ def press_login():
 
         if (
             username in PRESS_PASSWORDS
-            and password == PRESS_PASSWORDS[
-                username
-            ]
+            and
+            password == PRESS_PASSWORDS[username]
         ):
 
             session.clear()
@@ -622,22 +629,19 @@ def press_login():
             session["username"] = username
 
             flash(
-                f"Welcome, {username}. Press access granted.",
-                "success"
+                "Press access granted."
             )
 
             return redirect(
-                url_for("profile")
+                url_for("articles")
             )
 
-        error = (
-            "Invalid Press Corps credentials."
+        flash(
+            "Invalid press credentials."
         )
 
     return render_template(
-        "press_login.html",
-        user=current_user(),
-        error=error,
+        "press_login.html"
     )
 
 
@@ -651,46 +655,33 @@ def press_login():
 )
 def chair_login():
 
-    error = None
-
     if request.method == "POST":
-
-        username = request.form.get(
-            "username",
-            ""
-        ).strip()
 
         password = request.form.get(
             "password",
             ""
         )
 
-        if (
-            username.lower() == "chair"
-            and password == CHAIR_PASSWORD
-        ):
+        if password == CHAIR_PASSWORD:
 
             session.clear()
 
             session["username"] = "__chair__"
 
             flash(
-                "Chair mode activated.",
-                "success"
+                "Chair access granted."
             )
 
             return redirect(
-                url_for("profile")
+                url_for("crises")
             )
 
-        error = (
-            "Invalid Chair credentials."
+        flash(
+            "Incorrect chair password."
         )
 
     return render_template(
-        "chair_login.html",
-        user=current_user(),
-        error=error,
+        "chair_login.html"
     )
 
 
@@ -704,8 +695,7 @@ def logout():
     session.clear()
 
     flash(
-        "You have been logged out.",
-        "success"
+        "You have been logged out."
     )
 
     return redirect(
@@ -723,224 +713,115 @@ def profile():
 
     user = current_user()
 
-    connection = get_db()
-
-    note_count = 0
-
-    article_count = 0
-
-    crisis_count = 0
-
-    # --------------------------------------------------------
-    # DELEGATE NOTES
-    # --------------------------------------------------------
-
-    if user["role"] == "delegate":
-
-        note_count = connection.execute(
-            """
-            SELECT COUNT(*)
-            FROM notes
-            WHERE username = ?
-            """,
-            (
-                user["username"],
-            )
-        ).fetchone()[0]
-
-    # --------------------------------------------------------
-    # PRESS ARTICLES
-    # --------------------------------------------------------
-
-    if user["role"] == "press":
-
-        article_count = connection.execute(
-            """
-            SELECT COUNT(*)
-            FROM articles
-            WHERE author = ?
-            """,
-            (
-                user["username"],
-            )
-        ).fetchone()[0]
-
-    # --------------------------------------------------------
-    # CHAIR CRISES
-    # --------------------------------------------------------
-
-    if user["role"] == "chair":
-
-        crisis_count = connection.execute(
-            """
-            SELECT COUNT(*)
-            FROM crises
-            """
-        ).fetchone()[0]
-
-        article_count = connection.execute(
-            """
-            SELECT COUNT(*)
-            FROM articles
-            """
-        ).fetchone()[0]
-
-    connection.close()
-
     return render_template(
         "profile.html",
-        user=user,
-        note_count=note_count,
-        article_count=article_count,
-        crisis_count=crisis_count,
+        profile=user
     )
 
 
 # ============================================================
-# NOTES — DELEGATE ONLY
+# NOTES
 # ============================================================
 
 @app.route("/notes")
-@login_required
+@role_required("delegate")
 def notes():
 
     user = current_user()
 
-    if user["role"] != "delegate":
+    conn = get_db()
 
-        flash(
-            "Notes are available to delegates.",
-            "error"
-        )
-
-        return redirect(
-            url_for("profile")
-        )
-
-    connection = get_db()
-
-    all_notes = connection.execute(
-        """
+    notes_list = conn.execute("""
         SELECT *
         FROM notes
         WHERE username = ?
         ORDER BY updated_at DESC
-        """,
-        (
-            user["username"],
-        )
-    ).fetchall()
+    """, (
+        user["username"],
+    )).fetchall()
 
-    selected_note_id = request.args.get(
-        "note",
-        type=int
-    )
-
-    selected_note = None
-
-    if selected_note_id:
-
-        selected_note = connection.execute(
-            """
-            SELECT *
-            FROM notes
-            WHERE id = ?
-            AND username = ?
-            """,
-            (
-                selected_note_id,
-                user["username"],
-            )
-        ).fetchone()
-
-    if selected_note is None and all_notes:
-
-        selected_note = all_notes[0]
-
-    connection.close()
+    conn.close()
 
     return render_template(
         "notes.html",
-        notes=all_notes,
-        selected_note=selected_note,
-        user=user,
+        notes=notes_list
     )
 
 
 # ============================================================
-# CREATE NOTE
+# NEW NOTE
 # ============================================================
 
 @app.route(
     "/notes/new",
-    methods=["POST"]
+    methods=["GET", "POST"]
 )
-@login_required
+@role_required("delegate")
 def new_note():
 
-    user = current_user()
+    if request.method == "POST":
 
-    if user["role"] != "delegate":
+        user = current_user()
 
-        flash(
-            "Only delegates can create notes.",
-            "error"
+        title = request.form.get(
+            "title",
+            ""
+        ).strip()
+
+        content = request.form.get(
+            "content",
+            ""
         )
 
-        return redirect(
-            url_for("profile")
+        if not title:
+
+            flash(
+                "Please enter a title."
+            )
+
+            return render_template(
+                "note_editor.html",
+                note=None
+            )
+
+        now = datetime.now().isoformat(
+            timespec="seconds"
         )
 
-    title = request.form.get(
-        "title",
-        ""
-    ).strip()
+        conn = get_db()
 
-    content = request.form.get(
-        "content",
-        ""
-    )
-
-    if not title:
-
-        title = "Untitled"
-
-    current_time = now_string()
-
-    connection = get_db()
-
-    cursor = connection.execute(
-        """
-        INSERT INTO notes
-        (
-            username,
-            title,
-            content,
-            created_at,
-            updated_at
-        )
-        VALUES (?, ?, ?, ?, ?)
-        """,
-        (
+        conn.execute("""
+            INSERT INTO notes (
+                username,
+                title,
+                content,
+                created_at,
+                updated_at
+            )
+            VALUES (?, ?, ?, ?, ?)
+        """, (
             user["username"],
             title,
             content,
-            current_time,
-            current_time,
+            now,
+            now,
+        ))
+
+        conn.commit()
+
+        conn.close()
+
+        flash(
+            "Note created."
         )
-    )
 
-    connection.commit()
-
-    note_id = cursor.lastrowid
-
-    connection.close()
-
-    return redirect(
-        url_for(
-            "notes",
-            note=note_id
+        return redirect(
+            url_for("notes")
         )
+
+    return render_template(
+        "note_editor.html",
+        note=None
     )
 
 
@@ -950,189 +831,135 @@ def new_note():
 
 @app.route(
     "/notes/<int:note_id>/update",
-    methods=["POST"]
+    methods=["GET", "POST"]
 )
-@login_required
+@role_required("delegate")
 def update_note(note_id):
 
     user = current_user()
 
-    if user["role"] != "delegate":
+    conn = get_db()
 
-        return redirect(
-            url_for("profile")
-        )
-
-    title = request.form.get(
-        "title",
-        ""
-    ).strip()
-
-    content = request.form.get(
-        "content",
-        ""
-    )
-
-    if not title:
-
-        title = "Untitled"
-
-    connection = get_db()
-
-    note = connection.execute(
-        """
+    note = conn.execute("""
         SELECT *
         FROM notes
         WHERE id = ?
         AND username = ?
-        """,
-        (
-            note_id,
-            user["username"],
-        )
-    ).fetchone()
+    """, (
+        note_id,
+        user["username"],
+    )).fetchone()
 
     if note is None:
 
-        connection.close()
+        conn.close()
+
+        abort(404)
+
+    if request.method == "POST":
+
+        title = request.form.get(
+            "title",
+            ""
+        ).strip()
+
+        content = request.form.get(
+            "content",
+            ""
+        )
+
+        if not title:
+
+            flash(
+                "Please enter a title."
+            )
+
+            conn.close()
+
+            return render_template(
+                "note_editor.html",
+                note=note
+            )
+
+        now = datetime.now().isoformat(
+            timespec="seconds"
+        )
+
+        conn.execute("""
+            UPDATE notes
+            SET title = ?,
+                content = ?,
+                updated_at = ?
+            WHERE id = ?
+            AND username = ?
+        """, (
+            title,
+            content,
+            now,
+            note_id,
+            user["username"],
+        ))
+
+        conn.commit()
+
+        conn.close()
 
         flash(
-            "That note could not be found.",
-            "error"
+            "Note updated."
         )
 
         return redirect(
             url_for("notes")
         )
 
-    connection.execute(
-        """
-        UPDATE notes
-        SET title = ?,
-            content = ?,
-            updated_at = ?
-        WHERE id = ?
-        AND username = ?
-        """,
-        (
-            title,
-            content,
-            now_string(),
-            note_id,
-            user["username"],
-        )
-    )
+    conn.close()
 
-    connection.commit()
-
-    connection.close()
-
-    flash(
-        "Note saved.",
-        "success"
-    )
-
-    return redirect(
-        url_for(
-            "notes",
-            note=note_id
-        )
+    return render_template(
+        "note_editor.html",
+        note=note
     )
 
 
 # ============================================================
-# DELETE NOTE — DELEGATE ONLY
+# DELETE NOTE
 # ============================================================
 
 @app.route(
     "/notes/<int:note_id>/delete",
     methods=["POST"]
 )
-@login_required
+@role_required("delegate")
 def delete_note(note_id):
 
     user = current_user()
 
-    # --------------------------------------------------------
-    # ONLY DELEGATES CAN DELETE NOTES
-    # --------------------------------------------------------
+    conn = get_db()
 
-    if user["role"] != "delegate":
-
-        flash(
-            "Only delegates can delete notes.",
-            "error"
-        )
-
-        return redirect(
-            url_for("profile")
-        )
-
-    connection = get_db()
-
-    # --------------------------------------------------------
-    # MAKE SURE THE NOTE EXISTS AND BELONGS TO THIS USER
-    # --------------------------------------------------------
-
-    note = connection.execute(
-        """
-        SELECT id
-        FROM notes
-        WHERE id = ?
-        AND username = ?
-        """,
-        (
-            note_id,
-            user["username"],
-        )
-    ).fetchone()
-
-    if note is None:
-
-        connection.close()
-
-        flash(
-            "That note could not be found.",
-            "error"
-        )
-
-        return redirect(
-            url_for("notes")
-        )
-
-    # --------------------------------------------------------
-    # DELETE NOTE
-    # --------------------------------------------------------
-
-    connection.execute(
-        """
+    conn.execute("""
         DELETE FROM notes
         WHERE id = ?
         AND username = ?
-        """,
-        (
-            note_id,
-            user["username"],
-        )
-    )
+    """, (
+        note_id,
+        user["username"],
+    ))
 
-    connection.commit()
+    conn.commit()
 
-    connection.close()
+    conn.close()
 
     flash(
-        "Note deleted successfully.",
-        "success"
+        "Note deleted."
     )
 
     return redirect(
         url_for("notes")
     )
 
+
 # ============================================================
 # ARTICLES
 # ============================================================
-
 
 @app.route(
     "/articles",
@@ -1140,36 +967,18 @@ def delete_note(note_id):
 )
 def articles():
 
-    connection = get_db()
-
     user = current_user()
-
-    # --------------------------------------------------------
-    # ARTICLE POST
-    # --------------------------------------------------------
 
     if request.method == "POST":
 
-        if user is None:
-
-            connection.close()
-
-            flash(
-                "You must be logged in to publish an article.",
-                "error"
-            )
-
-            return redirect(
-                url_for("login")
-            )
-
-        if user["role"] != "press":
-
-            connection.close()
+        if (
+            user is None
+            or
+            user["role"] != "press"
+        ):
 
             flash(
-                "Only Press delegates can publish articles.",
-                "error"
+                "Only the press desk can publish articles."
             )
 
             return redirect(
@@ -1188,21 +997,18 @@ def articles():
 
         if not title or not body:
 
-            connection.close()
-
             flash(
-                "Please provide both a headline and article.",
-                "error"
+                "Title and article body are required."
             )
 
             return redirect(
                 url_for("articles")
             )
 
-        connection.execute(
-            """
-            INSERT INTO articles
-            (
+        conn = get_db()
+
+        conn.execute("""
+            INSERT INTO articles (
                 author,
                 delegation,
                 title,
@@ -1210,47 +1016,41 @@ def articles():
                 created_at
             )
             VALUES (?, ?, ?, ?, ?)
-            """,
-            (
-                user["username"],
-                user["delegation"],
-                title,
-                body,
-                now_string(),
-            )
-        )
+        """, (
+            user["username"],
+            user.get("delegation"),
+            title,
+            body,
+            datetime.now().isoformat(
+                timespec="seconds"
+            ),
+        ))
 
-        connection.commit()
+        conn.commit()
 
-        connection.close()
+        conn.close()
 
         flash(
-            "Article published.",
-            "success"
+            "Article published."
         )
 
         return redirect(
             url_for("articles")
         )
 
-    # --------------------------------------------------------
-    # GET ARTICLES
-    # --------------------------------------------------------
+    conn = get_db()
 
-    all_articles = connection.execute(
-        """
+    articles_list = conn.execute("""
         SELECT *
         FROM articles
         ORDER BY id DESC
-        """
-    ).fetchall()
+    """).fetchall()
 
-    connection.close()
+    conn.close()
 
     return render_template(
         "articles.html",
-        articles=all_articles,
-        user=user,
+        articles=articles_list
     )
 
 
@@ -1261,43 +1061,32 @@ def articles():
 @app.route(
     "/articles/<int:article_id>"
 )
-def full_article(article_id):
+def article(article_id):
 
-    connection = get_db()
+    conn = get_db()
 
-    article = connection.execute(
-        """
+    article_data = conn.execute("""
         SELECT *
         FROM articles
         WHERE id = ?
-        """,
-        (
-            article_id,
-        )
-    ).fetchone()
+    """, (
+        article_id,
+    )).fetchone()
 
-    connection.close()
+    conn.close()
 
-    if article is None:
+    if article_data is None:
 
-        flash(
-            "Article not found.",
-            "error"
-        )
-
-        return redirect(
-            url_for("articles")
-        )
+        abort(404)
 
     return render_template(
         "article.html",
-        article=article,
-        user=current_user(),
+        article=article_data
     )
 
 
 # ============================================================
-# PRESS PUBLISHING DESK
+# PRESS UPLOAD
 # ============================================================
 
 @app.route(
@@ -1307,9 +1096,9 @@ def full_article(article_id):
 @role_required("press")
 def press_upload():
 
-    user = current_user()
-
     if request.method == "POST":
+
+        user = current_user()
 
         title = request.form.get(
             "title",
@@ -1323,20 +1112,18 @@ def press_upload():
 
         if not title or not body:
 
-            return render_template(
-                "press_upload.html",
-                user=user,
-                error="Please provide both a headline and article.",
-                title=title,
-                content=body,
+            flash(
+                "Title and article body are required."
             )
 
-        connection = get_db()
+            return redirect(
+                url_for("press_upload")
+            )
 
-        connection.execute(
-            """
-            INSERT INTO articles
-            (
+        conn = get_db()
+
+        conn.execute("""
+            INSERT INTO articles (
                 author,
                 delegation,
                 title,
@@ -1344,23 +1131,22 @@ def press_upload():
                 created_at
             )
             VALUES (?, ?, ?, ?, ?)
-            """,
-            (
-                user["username"],
-                user["delegation"],
-                title,
-                body,
-                now_string(),
-            )
-        )
+        """, (
+            user["username"],
+            user.get("delegation"),
+            title,
+            body,
+            datetime.now().isoformat(
+                timespec="seconds"
+            ),
+        ))
 
-        connection.commit()
+        conn.commit()
 
-        connection.close()
+        conn.close()
 
         flash(
-            "Article published successfully.",
-            "success"
+            "Article published."
         )
 
         return redirect(
@@ -1368,11 +1154,7 @@ def press_upload():
         )
 
     return render_template(
-        "press_upload.html",
-        user=user,
-        error=None,
-        title="",
-        content="",
+        "press_upload.html"
     )
 
 
@@ -1387,25 +1169,21 @@ def press_upload():
 @role_required("chair")
 def delete_article(article_id):
 
-    connection = get_db()
+    conn = get_db()
 
-    connection.execute(
-        """
+    conn.execute("""
         DELETE FROM articles
         WHERE id = ?
-        """,
-        (
-            article_id,
-        )
-    )
+    """, (
+        article_id,
+    ))
 
-    connection.commit()
+    conn.commit()
 
-    connection.close()
+    conn.close()
 
     flash(
-        "Article deleted.",
-        "success"
+        "Article deleted."
     )
 
     return redirect(
@@ -1414,165 +1192,137 @@ def delete_article(article_id):
 
 
 # ============================================================
-# CRISIS COMMAND CENTER
+# CRISES — VIEW
 # ============================================================
 
 @app.route(
     "/crises",
-    methods=["GET", "POST"]
+    methods=["GET"]
 )
 def crises():
 
-    connection = get_db()
+    conn = get_db()
 
-    user = current_user()
+    crises_list = conn.execute("""
+        SELECT *
+        FROM crises
+        ORDER BY id DESC
+    """).fetchall()
 
-    # --------------------------------------------------------
-    # PUBLISH CRISIS
-    # --------------------------------------------------------
+    conn.close()
 
-    if request.method == "POST":
+    return render_template(
+        "crises.html",
+        crises=crises_list
+    )
 
-        if (
-            user is None
-            or user["role"] != "chair"
-        ):
 
-            connection.close()
+# ============================================================
+# CRISES — PUBLISH
+#
+# IMPORTANT:
+# This is a separate POST handler.
+# The @role_required("chair") decorator runs BEFORE
+# any crisis can be created.
+# ============================================================
 
-            flash(
-                "Only the Chair can publish crises.",
-                "error"
-            )
+@app.route(
+    "/crises",
+    methods=["POST"]
+)
+@role_required("chair")
+def publish_crisis():
 
-            return redirect(
-                url_for("crises")
-            )
+    title = request.form.get(
+        "title",
+        ""
+    ).strip()
 
-        title = request.form.get(
-            "title",
-            ""
-        ).strip()
+    description = request.form.get(
+        "description",
+        ""
+    ).strip()
 
-        description = request.form.get(
-            "description",
-            ""
-        ).strip()
+    file = request.files.get(
+        "file"
+    )
 
-        uploaded = request.files.get(
-            "file"
-        )
-
-        if not title or not description:
-
-            connection.close()
-
-            flash(
-                "A crisis needs a title and description.",
-                "error"
-            )
-
-            return redirect(
-                url_for("crises")
-            )
-
-        filename = None
-
-        # ----------------------------------------------------
-        # FILE UPLOAD
-        # ----------------------------------------------------
-
-        if (
-            uploaded
-            and uploaded.filename
-        ):
-
-            if not allowed_file(
-                uploaded.filename
-            ):
-
-                connection.close()
-
-                flash(
-                    "That file type is not allowed.",
-                    "error"
-                )
-
-                return redirect(
-                    url_for("crises")
-                )
-
-            safe_name = secure_filename(
-                uploaded.filename
-            )
-
-            timestamp = datetime.now().strftime(
-                "%Y%m%d%H%M%S"
-            )
-
-            filename = (
-                timestamp
-                + "_"
-                + safe_name
-            )
-
-            uploaded.save(
-                os.path.join(
-                    UPLOAD_FOLDER,
-                    filename
-                )
-            )
-
-        connection.execute(
-            """
-            INSERT INTO crises
-            (
-                title,
-                description,
-                filename,
-                created_at
-            )
-            VALUES (?, ?, ?, ?)
-            """,
-            (
-                title,
-                description,
-                filename,
-                now_string(),
-            )
-        )
-
-        connection.commit()
-
-        connection.close()
+    if not title or not description:
 
         flash(
-            "Crisis published.",
-            "success"
+            "Crisis title and description are required."
         )
 
         return redirect(
             url_for("crises")
         )
 
-    # --------------------------------------------------------
-    # GET CRISES
-    # --------------------------------------------------------
+    filename = None
 
-    all_crises = connection.execute(
-        """
-        SELECT *
-        FROM crises
-        ORDER BY id DESC
-        """
-    ).fetchall()
+    if file and file.filename:
 
-    connection.close()
+        if not allowed_file(
+            file.filename
+        ):
 
-    return render_template(
-        "crises.html",
-        crises=all_crises,
-        user=user,
+            flash(
+                "That file type is not allowed."
+            )
+
+            return redirect(
+                url_for("crises")
+            )
+
+        safe_filename = (
+            file.filename
+            .replace("/", "_")
+            .replace("\\", "_")
+        )
+
+        timestamp = datetime.now().strftime(
+            "%Y%m%d%H%M%S"
+        )
+
+        filename = (
+            f"{timestamp}_{safe_filename}"
+        )
+
+        file.save(
+            os.path.join(
+                UPLOAD_FOLDER,
+                filename
+            )
+        )
+
+    conn = get_db()
+
+    conn.execute("""
+        INSERT INTO crises (
+            title,
+            description,
+            filename,
+            created_at
+        )
+        VALUES (?, ?, ?, ?)
+    """, (
+        title,
+        description,
+        filename,
+        datetime.now().isoformat(
+            timespec="seconds"
+        ),
+    ))
+
+    conn.commit()
+
+    conn.close()
+
+    flash(
+        "Crisis published."
+    )
+
+    return redirect(
+        url_for("crises")
     )
 
 
@@ -1587,58 +1337,50 @@ def crises():
 @role_required("chair")
 def delete_crisis(crisis_id):
 
-    connection = get_db()
+    conn = get_db()
 
-    crisis = connection.execute(
-        """
-        SELECT filename
+    crisis = conn.execute("""
+        SELECT *
         FROM crises
         WHERE id = ?
-        """,
-        (
+    """, (
+        crisis_id,
+    )).fetchone()
+
+    if crisis is not None:
+
+        if crisis["filename"]:
+
+            file_path = os.path.join(
+                UPLOAD_FOLDER,
+                crisis["filename"]
+            )
+
+            if os.path.exists(
+                file_path
+            ):
+
+                try:
+                    os.remove(
+                        file_path
+                    )
+
+                except OSError:
+                    pass
+
+        conn.execute("""
+            DELETE FROM crises
+            WHERE id = ?
+        """, (
             crisis_id,
-        )
-    ).fetchone()
+        ))
 
-    # --------------------------------------------------------
-    # DELETE ASSOCIATED FILE
-    # --------------------------------------------------------
+        conn.commit()
 
-    if (
-        crisis
-        and crisis["filename"]
-    ):
-
-        path = os.path.join(
-            UPLOAD_FOLDER,
-            crisis["filename"]
-        )
-
-        if os.path.exists(path):
-
-            os.remove(path)
-
-    # --------------------------------------------------------
-    # DELETE DATABASE ENTRY
-    # --------------------------------------------------------
-
-    connection.execute(
-        """
-        DELETE FROM crises
-        WHERE id = ?
-        """,
-        (
-            crisis_id,
-        )
-    )
-
-    connection.commit()
-
-    connection.close()
+    conn.close()
 
     flash(
-        "Crisis deleted.",
-        "success"
+        "Crisis deleted."
     )
 
     return redirect(
@@ -1647,11 +1389,11 @@ def delete_crisis(crisis_id):
 
 
 # ============================================================
-# SERVE CRISIS FILES
+# UPLOADS
 # ============================================================
 
 @app.route(
-    "/uploads/<filename>"
+    "/uploads/<path:filename>"
 )
 def uploaded_file(filename):
 
@@ -1662,15 +1404,14 @@ def uploaded_file(filename):
 
 
 # ============================================================
-# ERROR HANDLING
+# FILE TOO LARGE
 # ============================================================
 
 @app.errorhandler(413)
 def file_too_large(error):
 
     flash(
-        "The uploaded file is too large. Maximum size is 10 MB.",
-        "error"
+        "The uploaded file is too large. Maximum size is 10 MB."
     )
 
     return redirect(
@@ -1679,30 +1420,20 @@ def file_too_large(error):
 
 
 # ============================================================
-# STARTUP
+# INITIALIZE DATABASE
 # ============================================================
-
-os.makedirs(
-    DATA_DIR,
-    exist_ok=True
-)
-
-os.makedirs(
-    UPLOAD_FOLDER,
-    exist_ok=True
-)
 
 init_db()
 
 
 # ============================================================
-# RUN SERVER
+# RUN
 # ============================================================
 
 if __name__ == "__main__":
 
     app.run(
-        debug=True,
         host="127.0.0.1",
-        port=5000
+        port=5000,
+        debug=True
     )
