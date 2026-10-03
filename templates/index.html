@@ -2,199 +2,165 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>ACC | Arkanian Joint Crisis Committee</title>
-
+    <title>ACC — Arkanian Crisis Committee</title>
 
     <style>
-        /* =====================================================
-           RESET
-        ===================================================== */
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
-
         html {
             scroll-behavior: smooth;
         }
 
-
         body {
+            font-family: Arial, Helvetica, sans-serif;
             background: #050505;
-            color: #ffffff;
-
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
-
+            color: #f5f5f5;
             overflow-x: hidden;
         }
-
 
         a {
             color: inherit;
             text-decoration: none;
         }
 
+        /* =========================
+           BACKGROUND
+        ========================= */
 
-        /* =====================================================
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -5;
+            pointer-events: none;
+
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.018) 1px,
+                    transparent 1px),
+                linear-gradient(90deg,
+                    rgba(255, 255, 255, 0.018) 1px,
+                    transparent 1px);
+
+            background-size: 60px 60px;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -4;
+            pointer-events: none;
+
+            background:
+                radial-gradient(circle at 50% 30%,
+                    rgba(255, 255, 255, 0.045),
+                    transparent 38%);
+        }
+
+        /* =========================
            CURSOR LIGHT
-        ===================================================== */
+        ========================= */
 
         #cursor-light {
-
             position: fixed;
+
+            width: 330px;
+            height: 330px;
 
             left: 0;
             top: 0;
 
-            width: 360px;
-            height: 360px;
-
-            transform:
-                translate(-50%, -50%);
+            transform: translate(-50%, -50%);
 
             pointer-events: none;
-
             z-index: 999999;
 
             border-radius: 50%;
 
             opacity: 0;
 
-            background:
-                radial-gradient(circle,
-                    rgba(255, 255, 255, 0.24) 0%,
-                    rgba(255, 255, 255, 0.14) 18%,
-                    rgba(255, 255, 255, 0.07) 35%,
-                    rgba(255, 255, 255, 0.025) 52%,
-                    rgba(255, 255, 255, 0) 72%);
+            background: radial-gradient(circle,
+                    rgba(255, 255, 255, 0.18) 0%,
+                    rgba(255, 255, 255, 0.10) 18%,
+                    rgba(255, 255, 255, 0.045) 38%,
+                    rgba(255, 255, 255, 0.015) 55%,
+                    transparent 72%);
 
-            transition:
-                opacity 0.1s ease;
+            filter: blur(2px);
+            mix-blend-mode: screen;
 
-            will-change:
-                left,
-                top;
-
+            will-change: left, top;
         }
 
-
-        /* =====================================================
+        /* =========================
            NAVBAR
-        ===================================================== */
+        ========================= */
 
         .navbar {
-
-            height: 76px;
-            width: 100%;
-
-            padding:
-                0 5%;
-
-            display: flex;
-
-            align-items: center;
-            justify-content: space-between;
-
             position: fixed;
-
             top: 0;
             left: 0;
 
-            z-index: 1000;
+            width: 100%;
+            height: 74px;
 
-            background:
-                rgba(5, 5, 5, 0.92);
-
-            backdrop-filter:
-                blur(16px);
-
-            -webkit-backdrop-filter:
-                blur(16px);
-
-            border-bottom:
-                1px solid #202020;
-
-        }
-
-
-        .logo {
-
-            font-size: 24px;
-
-            font-weight: 950;
-
-            letter-spacing: -1px;
-
-            transition:
-                opacity 0.25s ease,
-                transform 0.25s ease;
-
-        }
-
-
-        .logo:hover {
-
-            opacity: 0.7;
-
-            transform:
-                translateY(-2px);
-
-        }
-
-
-        .nav-right {
+            padding: 0 5vw;
 
             display: flex;
-
             align-items: center;
+            justify-content: space-between;
 
-            gap: 32px;
+            background: rgba(5, 5, 5, 0.78);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+            z-index: 1000;
         }
 
+        .logo {
+            font-size: 21px;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
 
         .nav-link {
-
             position: relative;
-
-            font-size: 10px;
-
-            font-weight: 900;
-
-            letter-spacing: 1.7px;
 
             color: #888;
 
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1.7px;
+
             transition:
-                color 0.25s ease;
-
+                color 0.25s ease,
+                transform 0.25s ease;
         }
-
 
         .nav-link:hover {
-
             color: white;
-
+            transform: translateY(-2px);
         }
 
-
         .nav-link::after {
-
             content: "";
 
             position: absolute;
-
             left: 0;
             bottom: -7px;
 
@@ -203,802 +169,743 @@
 
             background: white;
 
-            transition:
-                width 0.25s ease;
-
+            transition: width 0.25s ease;
         }
-
 
         .nav-link:hover::after {
-
             width: 100%;
-
         }
 
-
-        /* =====================================================
+        /* =========================
            PROFILE
-        ===================================================== */
+        ========================= */
 
         .profile-wrapper {
-
             position: relative;
-
         }
 
-
         .profile-button {
-
-            width: 42px;
-            height: 42px;
-
-            border:
-                1px solid #3c3c3c;
+            width: 39px;
+            height: 39px;
 
             border-radius: 50%;
 
-            background:
-                #0d0d0d;
+            border: 1px solid #393939;
 
-            color:
-                white;
+            background: #0b0b0b;
 
-            cursor:
-                pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
+            cursor: pointer;
 
             transition:
-                0.25s;
-
+                border-color 0.25s ease,
+                background 0.25s ease,
+                transform 0.25s ease;
         }
-
 
         .profile-button:hover {
-
-            background:
-                white;
-
-            color:
-                black;
-
-            transform:
-                translateY(-2px);
-
+            border-color: #aaa;
+            background: #151515;
+            transform: translateY(-2px);
         }
-
 
         .person-icon {
-
-            position:
-                relative;
-
-            width:
-                15px;
-
-            height:
-                18px;
-
-            display:
-                block;
-
+            position: relative;
+            width: 17px;
+            height: 18px;
         }
-
 
         .person-icon::before {
+            content: "";
 
-            content:
-                "";
+            position: absolute;
 
-            position:
-                absolute;
+            width: 7px;
+            height: 7px;
 
-            width:
-                7px;
+            top: 0;
+            left: 50%;
 
-            height:
-                7px;
+            transform: translateX(-50%);
 
-            border-radius:
-                50%;
+            border-radius: 50%;
 
-            background:
-                currentColor;
-
-            left:
-                4px;
-
-            top:
-                0;
-
+            background: white;
         }
-
 
         .person-icon::after {
+            content: "";
 
-            content:
-                "";
+            position: absolute;
 
-            position:
-                absolute;
+            width: 14px;
+            height: 8px;
 
-            width:
-                15px;
+            bottom: 0;
+            left: 50%;
 
-            height:
-                8px;
+            transform: translateX(-50%);
 
-            border-radius:
-                9px 9px 3px 3px;
+            border-radius: 9px 9px 3px 3px;
 
-            background:
-                currentColor;
-
-            left:
-                0;
-
-            bottom:
-                0;
-
+            background: white;
         }
-
-
-        /* =====================================================
-           PROFILE MENU
-        ===================================================== */
 
         .profile-menu {
+            position: absolute;
 
-            position:
-                absolute;
+            top: 51px;
+            right: 0;
 
-            top:
-                54px;
+            width: 225px;
 
-            right:
-                0;
+            padding: 18px;
 
-            width:
-                260px;
+            background: rgba(10, 10, 10, 0.98);
 
-            padding:
-                20px;
+            border: 1px solid #292929;
+            border-radius: 12px;
 
-            background:
-                #101010;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6);
 
-            border:
-                1px solid #333;
+            opacity: 0;
+            visibility: hidden;
 
-            box-shadow:
-                0 25px 70px rgba(0, 0, 0, .55);
-
-            opacity:
-                0;
-
-            visibility:
-                hidden;
-
-            transform:
-                translateY(-8px);
+            transform: translateY(-8px);
 
             transition:
-                .25s;
-
+                opacity 0.2s ease,
+                transform 0.2s ease,
+                visibility 0.2s ease;
         }
-
 
         .profile-wrapper.open .profile-menu {
-
-            opacity:
-                1;
-
-            visibility:
-                visible;
-
-            transform:
-                translateY(0);
-
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
         }
 
+        .profile-title {
+            color: #666;
 
-        .profile-label {
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.7px;
 
-            color:
-                #666;
-
-            font-size:
-                9px;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                2px;
-
-            margin-bottom:
-                8px;
-
+            margin-bottom: 6px;
         }
-
 
         .profile-name {
-
-            font-size:
-                15px;
-
-            font-weight:
-                900;
-
-            margin-bottom:
-                16px;
-
+            font-size: 16px;
+            font-weight: 800;
         }
 
+        .profile-divider {
+            height: 1px;
+            background: #252525;
+            margin: 16px 0 9px;
+        }
 
-        .profile-menu a {
+        .profile-item {
+            display: block;
 
-            display:
-                block;
+            padding: 9px 0;
 
-            border-top:
-                1px solid #292929;
+            color: #999;
 
-            padding:
-                13px 0;
-
-            font-size:
-                10px;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                1.2px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
 
             transition:
-                color .2s ease,
-                padding-left .2s ease;
-
+                color 0.2s ease,
+                padding-left 0.2s ease;
         }
 
-
-        .profile-menu a:hover {
-
-            color:
-                #999;
-
-            padding-left:
-                5px;
-
+        .profile-item:hover {
+            color: white;
+            padding-left: 5px;
         }
 
-
-        /* =====================================================
+        /* =========================
            HERO
-        ===================================================== */
+        ========================= */
 
         .hero {
-
-            min-height:
-                100vh;
+            min-height: 100vh;
 
             padding:
-                150px 7% 100px;
+                145px 6vw 90px;
 
-            display:
-                flex;
-
-            align-items:
-                center;
-
+            display: flex;
+            align-items: center;
         }
 
-
-        .hero-inner {
-
-            width:
-                100%;
-
-            max-width:
-                1150px;
-
-        }
-
-
-        .eyebrow {
-
-            display:
-                inline-block;
-
-            padding:
-                9px 12px;
-
-            border:
-                1px solid #333;
-
-            color:
-                #777;
-
-            font-size:
-                9px;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                2.5px;
-
-            margin-bottom:
-                30px;
-
-        }
-
-
-        .hero-title {
-
-            width:
-                100%;
-
-            font-size:
-                clamp(62px, 12vw, 165px);
-
-            line-height:
-                .83;
-
-            letter-spacing:
-                -.075em;
-
-            font-weight:
-                950;
-
-        }
-
-
-        .hero-title span {
-
-            display:
-                block;
-
-        }
-
-
-        .hero-description {
-
-            max-width:
-                650px;
-
-            margin-top:
-                38px;
-
-            color:
-                #888;
-
-            font-size:
-                16px;
-
-            line-height:
-                1.8;
-
-        }
-
-
-        .buttons {
-
-            display:
-                flex;
-
-            flex-wrap:
-                wrap;
-
-            gap:
-                12px;
-
-            margin-top:
-                35px;
-
-        }
-
-
-        .button {
-
-            min-height:
-                50px;
-
-            padding:
-                0 22px;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            border:
-                1px solid #3c3c3c;
-
-            font-size:
-                10px;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                1.4px;
-
-            transition:
-                .3s;
-
-        }
-
-
-        .button.primary {
-
-            background:
-                white;
-
-            color:
-                black;
-
-            border-color:
-                white;
-
-        }
-
-
-        .button:hover {
-
-            background:
-                white;
-
-            color:
-                black;
-
-            border-color:
-                white;
-
-            transform:
-                translateY(-4px);
-
-        }
-
-
-        /* =====================================================
-           ABOUT
-        ===================================================== */
-
-        .section {
-
-            border-top:
-                1px solid #191919;
-
-            padding:
-                110px 7%;
-
-        }
-
-
-        .section-label {
-
-            color:
-                #666;
-
-            font-size:
-                9px;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                2.5px;
-
-            margin-bottom:
-                18px;
-
-        }
-
-
-        .section-title {
-
-            font-size:
-                clamp(42px, 6vw, 80px);
-
-            line-height:
-                .9;
-
-            letter-spacing:
-                -.06em;
-
-            margin-bottom:
-                50px;
-
-        }
-
-
-        .cards {
-
-            display:
-                grid;
+        .hero-container {
+            width: min(1240px, 100%);
+            margin: 0 auto;
+
+            display: grid;
 
             grid-template-columns:
-                repeat(3, 1fr);
+                minmax(0, 1.15fr) minmax(320px, 0.85fr);
 
-            gap:
-                15px;
+            gap: 80px;
 
+            align-items: center;
         }
 
+        /* =========================
+           HERO LEFT
+        ========================= */
 
-        .card {
+        .hero-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
 
-            min-height:
-                280px;
+            margin-bottom: 27px;
 
-            padding:
-                30px;
+            color: #777;
 
-            background:
-                #090909;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
 
-            border:
-                1px solid #242424;
+        .hero-label::before {
+            content: "";
+
+            width: 31px;
+            height: 1px;
+
+            background: #777;
+        }
+
+        .hero-heading {
+            max-width: 760px;
+
+            font-size: clamp(54px, 7vw, 100px);
+            line-height: 0.92;
+
+            font-weight: 900;
+
+            letter-spacing: -0.065em;
+        }
+
+        .hero-heading .muted {
+            color: #686868;
+        }
+
+        .hero-description {
+            max-width: 570px;
+
+            margin-top: 32px;
+
+            color: #8b8b8b;
+
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+
+            gap: 11px;
+
+            margin-top: 34px;
+        }
+
+        .action {
+            min-height: 46px;
+
+            padding: 0 20px;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 3px;
+            border: 1px solid #353535;
+
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.1px;
 
             transition:
-                .3s;
+                transform 0.25s ease,
+                background 0.25s ease,
+                color 0.25s ease,
+                border-color 0.25s ease;
+        }
+
+        .action.primary {
+            color: #050505;
+            background: white;
+            border-color: white;
+        }
+
+        .action.secondary {
+            color: #999;
+            background: transparent;
+        }
+
+        .action:hover {
+            transform: translateY(-4px);
+        }
+
+        .action.primary:hover {
+            background: #dcdcdc;
+        }
+
+        .action.secondary:hover {
+            color: white;
+            border-color: #777;
+        }
+
+        /* =========================
+           STATUS PANEL
+        ========================= */
+
+        .status-panel {
+            position: relative;
+
+            min-height: 410px;
+
+            padding: 27px;
+
+            border: 1px solid #292929;
+            border-radius: 14px;
+
+            background:
+                linear-gradient(145deg,
+                    rgba(255, 255, 255, 0.045),
+                    rgba(255, 255, 255, 0.008));
+
+            overflow: hidden;
+
+            transition:
+                transform 0.4s ease,
+                border-color 0.4s ease;
+        }
+
+        .status-panel:hover {
+            transform: translateY(-7px);
+            border-color: #4c4c4c;
+        }
+
+        .status-panel::before {
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+            left: 0;
+            right: 0;
+
+            height: 1px;
+
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.5),
+                    transparent);
+        }
+
+        .panel-grid {
+            position: absolute;
+            inset: 0;
+
+            opacity: 0.6;
+
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.025) 1px,
+                    transparent 1px),
+                linear-gradient(90deg,
+                    rgba(255, 255, 255, 0.025) 1px,
+                    transparent 1px);
+
+            background-size: 35px 35px;
+
+            mask-image: linear-gradient(to bottom,
+                    black,
+                    transparent);
+        }
+
+        .panel-content {
+            position: relative;
+            z-index: 2;
+
+            height: 100%;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            color: #666;
+
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+
+        .panel-code {
+            color: #777;
+        }
+
+        .panel-status {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+
+            color: #aaa;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+
+            border-radius: 50%;
+
+            background: white;
+
+            box-shadow:
+                0 0 7px rgba(255, 255, 255, 0.8);
+
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.35;
+            }
 
         }
 
-
-        .card:hover {
-
-            transform:
-                translateY(-8px);
-
-            border-color:
-                #555;
-
+        .panel-main {
+            margin-top: 55px;
         }
 
+        .panel-label {
+            color: #666;
+
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 2px;
+
+            margin-bottom: 17px;
+        }
+
+        .panel-active {
+            font-size: clamp(48px, 6vw, 76px);
+
+            font-weight: 900;
+            letter-spacing: -0.06em;
+
+            line-height: 0.9;
+        }
+
+        .panel-info {
+            margin-top: 35px;
+
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+
+            border-top: 1px solid #282828;
+        }
+
+        .info-item {
+            padding: 19px 0;
+
+            border-bottom: 1px solid #282828;
+        }
+
+        .info-item:nth-child(odd) {
+            margin-right: 18px;
+        }
+
+        .info-label {
+            color: #555;
+
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 1.3px;
+
+            margin-bottom: 7px;
+        }
+
+        .info-value {
+            color: #ccc;
+
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .panel-footer {
+            padding-top: 20px;
+
+            color: #555;
+
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* =========================
+           LOWER SECTION
+        ========================= */
+
+        .overview {
+            padding: 120px 6vw 140px;
+
+            border-top: 1px solid #181818;
+        }
+
+        .overview-container {
+            width: min(1240px, 100%);
+            margin: 0 auto;
+        }
+
+        .section-label {
+            color: #5f5f5f;
+
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 2px;
+
+            margin-bottom: 17px;
+        }
+
+        .section-heading {
+            max-width: 850px;
+
+            font-size: clamp(37px, 5vw, 65px);
+
+            line-height: 0.96;
+
+            font-weight: 900;
+
+            letter-spacing: -0.055em;
+        }
+
+        .overview-grid {
+            margin-top: 65px;
+
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 12px;
+        }
+
+        .overview-card {
+            min-height: 225px;
+
+            padding: 26px;
+
+            border: 1px solid #242424;
+            border-radius: 10px;
+
+            background: #080808;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            transition:
+                transform 0.3s ease,
+                border-color 0.3s ease,
+                background 0.3s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-7px);
+
+            border-color: #4a4a4a;
+
+            background: #0c0c0c;
+        }
 
         .card-number {
+            color: #4d4d4d;
 
-            color:
-                #555;
-
-            font-size:
-                10px;
-
-            margin-bottom:
-                70px;
-
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
         }
 
+        .card-title {
+            margin-bottom: 9px;
 
-        .card h3 {
+            font-size: 20px;
+            font-weight: 800;
 
-            font-size:
-                24px;
-
-            margin-bottom:
-                15px;
-
+            letter-spacing: -0.03em;
         }
 
+        .card-text {
+            color: #707070;
 
-        .card p {
-
-            color:
-                #777;
-
-            font-size:
-                13px;
-
-            line-height:
-                1.8;
-
+            font-size: 12px;
+            line-height: 1.7;
         }
 
-
-        /* =====================================================
+        /* =========================
            FOOTER
-        ===================================================== */
+        ========================= */
 
         footer {
+            padding: 30px 6vw;
 
-            border-top:
-                1px solid #191919;
+            border-top: 1px solid #181818;
 
-            padding:
-                35px 7%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
 
-            color:
-                #444;
+            color: #505050;
 
-            font-size:
-                9px;
-
-            letter-spacing:
-                1.5px;
-
-            display:
-                flex;
-
-            justify-content:
-                space-between;
-
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1.2px;
         }
 
+        /* =========================
+           RESPONSIVE
+        ========================= */
 
-        /* =====================================================
-           TABLET
-        ===================================================== */
+        @media (max-width: 950px) {
 
-        @media (max-width: 800px) {
-
-            .cards {
-
-                grid-template-columns:
-                    1fr;
-
+            .hero-container {
+                grid-template-columns: 1fr;
+                gap: 55px;
             }
 
-
-            .card {
-
-                min-height:
-                    230px;
-
+            .status-panel {
+                min-height: 350px;
             }
 
-
-            .card-number {
-
-                margin-bottom:
-                    40px;
-
+            .overview-grid {
+                grid-template-columns: 1fr;
             }
 
+            .overview-card {
+                min-height: 190px;
+            }
         }
 
-
-        /* =====================================================
-           MOBILE
-        ===================================================== */
-
-        @media (max-width: 600px) {
+        @media (max-width: 650px) {
 
             .navbar {
-
-                padding:
-                    0 20px;
-
+                height: 68px;
+                padding: 0 20px;
             }
 
+            .nav-right {
+                gap: 16px;
+            }
 
             .nav-link {
-
-                display:
-                    none;
-
+                display: none;
             }
-
 
             .hero {
-
                 padding:
-                    125px 20px 80px;
-
+                    120px 20px 75px;
             }
 
-
-            .hero-title {
-
-                font-size:
-                    clamp(56px,
-                        18vw,
-                        90px);
-
+            .hero-label {
+                font-size: 8px;
+                letter-spacing: 1.4px;
             }
 
+            .hero-heading {
+                font-size: clamp(48px, 15vw, 76px);
+            }
 
             .hero-description {
-
-                font-size:
-                    14px;
-
+                font-size: 13px;
+                margin-top: 25px;
             }
 
-
-            .buttons {
-
-                flex-direction:
-                    column;
-
+            .hero-actions {
+                margin-top: 27px;
             }
 
-
-            .button {
-
-                width:
-                    100%;
-
+            .action {
+                width: 100%;
             }
 
+            .status-panel {
+                min-height: 350px;
+                padding: 22px;
+            }
 
-            .section {
+            .panel-active {
+                font-size: 57px;
+            }
 
+            .overview {
                 padding:
-                    80px 20px;
-
+                    85px 20px 100px;
             }
 
+            .section-heading {
+                font-size: 42px;
+            }
 
             footer {
+                padding: 27px 20px;
 
-                padding:
-                    30px 20px;
+                flex-direction: column;
+                align-items: flex-start;
 
-                flex-direction:
-                    column;
+                gap: 10px;
+            }
+        }
 
-                gap:
-                    10px;
+        @media (prefers-reduced-motion: reduce) {
 
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
             }
 
-
-            .profile-menu {
-
-                position:
-                    fixed;
-
-                top:
-                    75px;
-
-                right:
-                    15px;
-
-                width:
-                    calc(100vw - 30px);
-
+            html {
+                scroll-behavior: auto;
             }
-
         }
     </style>
-
 </head>
 
-
 <body>
-
-
-    <!-- =====================================================
-         CURSOR LIGHT
-    ===================================================== -->
 
     <div id="cursor-light"></div>
 
 
-    <!-- =====================================================
-         NAVBAR
-    ===================================================== -->
+    <!-- =========================
+     NAVIGATION
+========================= -->
 
     <nav class="navbar">
 
-        <a href="/" class="logo">
-            ACC
-        </a>
-
+        <a href="/" class="logo">ACC.</a>
 
         <div class="nav-right">
 
@@ -1010,22 +917,45 @@
                 ARTICLES
             </a>
 
+            <div class="profile-wrapper" id="profileWrapper">
 
-            <div class="profile-wrapper">
-
-                <button type="button" class="profile-button" id="profileButton" aria-label="Account">
-
+                <button class="profile-button" id="profileButton" aria-label="Open account menu" aria-expanded="false">
                     <span class="person-icon"></span>
-
                 </button>
-
 
                 <div class="profile-menu">
 
+                    {% if session.get("press_authenticated") %}
 
-                    {% if session.get("chair_authenticated") %}
+                    <div class="profile-title">
+                        PRESS ACCOUNT
+                    </div>
 
-                    <div class="profile-label">
+                    <div class="profile-name">
+                        {{ session.get("press_name") }}
+                    </div>
+
+                    <div class="profile-title" style="margin-top: 5px;">
+                        {{ session.get("press_publication") }}
+                    </div>
+
+                    <div class="profile-divider"></div>
+
+                    <a href="/articles" class="profile-item">
+                        ARTICLES →
+                    </a>
+
+                    <a href="/press-upload" class="profile-item">
+                        UPLOAD ARTICLE →
+                    </a>
+
+                    <a href="/press-logout" class="profile-item">
+                        LOG OUT →
+                    </a>
+
+                    {% elif session.get("chair_authenticated") %}
+
+                    <div class="profile-title">
                         CHAIR ACCOUNT
                     </div>
 
@@ -1033,52 +963,19 @@
                         CHAIR
                     </div>
 
-                    <a href="/articles">
+                    <div class="profile-divider"></div>
+
+                    <a href="/articles" class="profile-item">
                         ARTICLES →
                     </a>
 
-                    <a href="/chair-logout">
+                    <a href="/chair-logout" class="profile-item">
                         LOG OUT →
                     </a>
-
-
-                    {% elif session.get("press_authenticated") %}
-
-                    <div class="profile-label">
-                        PRESS ACCOUNT
-                    </div>
-
-                    <div class="profile-name">
-
-                        {{ session.get("press_name") }}
-
-                        <br>
-
-                        <span style="
-                                    font-size:11px;
-                                    color:#666;
-                                ">
-                            {{ session.get("press_publication") }}
-                        </span>
-
-                    </div>
-
-                    <a href="/articles">
-                        ARTICLES →
-                    </a>
-
-                    <a href="/press-upload">
-                        UPLOAD ARTICLE →
-                    </a>
-
-                    <a href="/press-logout">
-                        LOG OUT →
-                    </a>
-
 
                     {% else %}
 
-                    <div class="profile-label">
+                    <div class="profile-title">
                         ACCOUNT
                     </div>
 
@@ -1086,16 +983,17 @@
                         NOT SIGNED IN
                     </div>
 
-                    <a href="/press-login">
+                    <div class="profile-divider"></div>
+
+                    <a href="/press-login" class="profile-item">
                         PRESS LOGIN →
                     </a>
 
-                    <a href="/chair-login">
+                    <a href="/chair-login" class="profile-item">
                         CHAIR LOGIN →
                     </a>
 
                     {% endif %}
-
 
                 </div>
 
@@ -1106,157 +1004,256 @@
     </nav>
 
 
-    <!-- =====================================================
-         HERO
-    ===================================================== -->
+    <!-- =========================
+     HERO
+========================= -->
 
-    <section class="hero">
+    <main>
 
-        <div class="hero-inner">
+        <section class="hero">
 
-            <div class="eyebrow">
-                ARKANIAN JOINT CRISIS COMMITTEE
-            </div>
+            <div class="hero-container">
 
+                <div class="hero-left">
 
-            <h1 class="hero-title">
+                    <div class="hero-label">
+                        LIVE CRISIS
+                    </div>
 
-                <span>
-                    ARKANIAN
-                </span>
+                    <h1 class="hero-heading">
+                        ARKANIAN<br>
+                        <span class="muted">CRISIS</span><br>
+                        COMMITTEE
+                    </h1>
 
-                <span>
-                    ACC.
-                </span>
+                    <p class="hero-description">
+                        The situation is developing. Information changes,
+                        decisions have consequences, and every move can
+                        alter the course of the crisis.
+                    </p>
 
-            </h1>
+                    <div class="hero-actions">
 
+                        <a href="/articles" class="action primary">
+                            READ PRESS ARTICLES →
+                        </a>
 
-            <p class="hero-description">
+                        <a href="#overview" class="action secondary">
+                            EXPLORE THE COMMITTEE
+                        </a>
 
-                A live crisis environment built around rapid
-                decision-making, diplomacy, intelligence,
-                consequences and controlled chaos.
+                    </div>
 
-            </p>
-
-
-            <div class="buttons">
-
-                <a href="/articles" class="button primary">
-                    READ PRESS ARTICLES →
-                </a>
-
-
-                <a href="#about" class="button">
-                    EXPLORE THE COMMITTEE
-                </a>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         ABOUT
-    ===================================================== -->
-
-    <section class="section" id="about">
-
-        <div class="section-label">
-            THE COMMITTEE
-        </div>
-
-
-        <h2 class="section-title">
-
-            ONE ROOM.<br>
-            CONSTANTLY CHANGING.
-
-        </h2>
-
-
-        <div class="cards">
-
-
-            <div class="card">
-
-                <div class="card-number">
-                    01
                 </div>
 
-                <h3>
-                    DELEGATES
-                </h3>
 
-                <p>
+                <!-- STATUS PANEL -->
 
-                    Representatives operate inside a rapidly
-                    developing crisis where decisions can change
-                    the situation instantly.
+                <div class="status-panel">
 
-                </p>
+                    <div class="panel-grid"></div>
 
-            </div>
+                    <div class="panel-content">
+
+                        <div class="panel-header">
+
+                            <span class="panel-code">
+                                ACC / 2026
+                            </span>
+
+                            <span class="panel-status">
+                                <span class="status-dot"></span>
+                                ACTIVE
+                            </span>
+
+                        </div>
 
 
-            <div class="card">
+                        <div class="panel-main">
 
-                <div class="card-number">
-                    02
+                            <div class="panel-label">
+                                CRISIS STATUS
+                            </div>
+
+                            <div class="panel-active">
+                                ACTIVE
+                            </div>
+
+
+                            <div class="panel-info">
+
+                                <div class="info-item">
+
+                                    <div class="info-label">
+                                        INFORMATION
+                                    </div>
+
+                                    <div class="info-value">
+                                        DEVELOPING
+                                    </div>
+
+                                </div>
+
+
+                                <div class="info-item">
+
+                                    <div class="info-label">
+                                        COMMITTEE
+                                    </div>
+
+                                    <div class="info-value">
+                                        ACC
+                                    </div>
+
+                                </div>
+
+
+                                <div class="info-item">
+
+                                    <div class="info-label">
+                                        COVERAGE
+                                    </div>
+
+                                    <div class="info-value">
+                                        LIVE
+                                    </div>
+
+                                </div>
+
+
+                                <div class="info-item">
+
+                                    <div class="info-label">
+                                        YEAR
+                                    </div>
+
+                                    <div class="info-value">
+                                        2026
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="panel-footer">
+                            MONITOR THE SITUATION / STAY INFORMED
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <h3>
-                    CRISIS
-                </h3>
-
-                <p>
-
-                    Information develops continuously.
-                    Delegates must interpret events, respond
-                    quickly and adapt their strategy.
-
-                </p>
-
             </div>
 
+        </section>
 
-            <div class="card">
 
-                <div class="card-number">
-                    03
+        <!-- =========================
+     OVERVIEW
+========================= -->
+
+        <section class="overview" id="overview">
+
+            <div class="overview-container">
+
+                <div class="section-label">
+                    THE COMMITTEE
                 </div>
 
-                <h3>
-                    CONSEQUENCES
-                </h3>
+                <h2 class="section-heading">
+                    ONE ROOM.<br>
+                    CONSTANTLY CHANGING.
+                </h2>
 
-                <p>
 
-                    Every decision creates consequences.
-                    Alliances, intelligence and diplomacy can
-                    shift the balance at any moment.
+                <div class="overview-grid">
 
-                </p>
+                    <div class="overview-card">
+
+                        <div class="card-number">
+                            01 / DELEGATES
+                        </div>
+
+                        <div>
+
+                            <div class="card-title">
+                                DECISIONS
+                            </div>
+
+                            <div class="card-text">
+                                Represent your role, assess the situation,
+                                and decide how to respond when circumstances
+                                change.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="overview-card">
+
+                        <div class="card-number">
+                            02 / CRISIS
+                        </div>
+
+                        <div>
+
+                            <div class="card-title">
+                                DEVELOPMENTS
+                            </div>
+
+                            <div class="card-text">
+                                New information can arrive at any moment.
+                                Adapt quickly as the situation develops.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="overview-card">
+
+                        <div class="card-number">
+                            03 / CONSEQUENCES
+                        </div>
+
+                        <div>
+
+                            <div class="card-title">
+                                IMPACT
+                            </div>
+
+                            <div class="card-text">
+                                Every decision matters. What happens next
+                                depends on what happens now.
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
 
+        </section>
 
-        </div>
-
-    </section>
+    </main>
 
 
-    <!-- =====================================================
-         FOOTER
-    ===================================================== -->
+    <!-- =========================
+     FOOTER
+========================= -->
 
     <footer>
 
         <span>
-            ARKANIAN JOINT CRISIS COMMITTEE
+            ARKANIAN CRISIS COMMITTEE
         </span>
 
         <span>
@@ -1266,166 +1263,111 @@
     </footer>
 
 
-    <!-- =====================================================
-         JAVASCRIPT
-    ===================================================== -->
-
     <script>
 
-        /* =================================================
+        /* =========================
            PROFILE MENU
-        ================================================= */
-
-        const profileButton =
-            document.getElementById(
-                "profileButton"
-            );
-
+        ========================= */
 
         const profileWrapper =
-            document.querySelector(
-                ".profile-wrapper"
+            document.getElementById("profileWrapper");
+
+        const profileButton =
+            document.getElementById("profileButton");
+
+        profileButton.addEventListener("click", function (event) {
+
+            event.stopPropagation();
+
+            const open =
+                profileWrapper.classList.toggle("open");
+
+            profileButton.setAttribute(
+                "aria-expanded",
+                open ? "true" : "false"
             );
 
-
-        if (
-            profileButton &&
-            profileWrapper
-        ) {
-
-            profileButton.addEventListener(
-                "click",
-                function (event) {
-
-                    event.stopPropagation();
-
-                    profileWrapper.classList.toggle(
-                        "open"
-                    );
-
-                }
-            );
+        });
 
 
-            document.addEventListener(
-                "click",
-                function (event) {
+        document.addEventListener("click", function (event) {
 
-                    if (
-                        !profileWrapper.contains(
-                            event.target
-                        )
-                    ) {
+            if (!profileWrapper.contains(event.target)) {
 
-                        profileWrapper.classList.remove(
-                            "open"
-                        );
+                profileWrapper.classList.remove("open");
 
-                    }
+                profileButton.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
 
-                }
-            );
+            }
 
-        }
+        });
 
 
-        /* =================================================
+        /* =========================
            CURSOR LIGHT
-        ================================================= */
+        ========================= */
 
         const cursorLight =
-            document.getElementById(
-                "cursor-light"
-            );
-
+            document.getElementById("cursor-light");
 
         let mouseX = 0;
         let mouseY = 0;
 
-        let lightX = 0;
-        let lightY = 0;
+        let currentX = 0;
+        let currentY = 0;
 
-        let mouseDetected = false;
-
-
-        document.addEventListener(
-            "mousemove",
-            function (event) {
-
-                mouseX =
-                    event.clientX;
-
-                mouseY =
-                    event.clientY;
+        let hideTimer;
 
 
-                if (!mouseDetected) {
+        document.addEventListener("mousemove", function (event) {
 
-                    lightX =
-                        mouseX;
+            mouseX = event.clientX;
+            mouseY = event.clientY;
 
-                    lightY =
-                        mouseY;
+            cursorLight.style.opacity = "1";
 
-                    mouseDetected =
-                        true;
+            clearTimeout(hideTimer);
 
-                }
+            hideTimer = setTimeout(function () {
 
+                cursorLight.style.opacity = "0";
 
-                cursorLight.style.opacity =
-                    "1";
+            }, 900);
 
-            }
-        );
+        });
 
 
-        document.addEventListener(
-            "mouseleave",
-            function () {
+        function animateCursor() {
 
-                cursorLight.style.opacity =
-                    "0";
+            currentX +=
+                (mouseX - currentX) * 0.78;
 
-            }
-        );
-
-
-        function animateCursorLight() {
-
-            lightX +=
-                (
-                    mouseX -
-                    lightX
-                ) * 0.72;
-
-
-            lightY +=
-                (
-                    mouseY -
-                    lightY
-                ) * 0.72;
-
+            currentY +=
+                (mouseY - currentY) * 0.78;
 
             cursorLight.style.left =
-                lightX + "px";
-
+                currentX + "px";
 
             cursorLight.style.top =
-                lightY + "px";
+                currentY + "px";
 
-
-            requestAnimationFrame(
-                animateCursorLight
-            );
+            requestAnimationFrame(animateCursor);
 
         }
 
+        animateCursor();
 
-        animateCursorLight();
+
+        document.addEventListener("mouseleave", function () {
+
+            cursorLight.style.opacity = "0";
+
+        });
 
     </script>
-
 
 </body>
 
