@@ -1,0 +1,2752 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.username }} — ACC Profile{% endblock %}
+
+{% block content %}
+
+<section class="profile-page">
+
+    <!-- =========================================================
+         PROFILE HERO
+    ========================================================== -->
+
+    <section class="profile-hero">
+
+        <div class="profile-hero-background">
+
+            <span class="profile-bg-number">
+                01
+            </span>
+
+            <span class="profile-bg-word">
+                IDENTITY
+            </span>
+
+        </div>
+
+
+        <div class="profile-hero-inner">
+
+            <div class="profile-identity">
+
+                <div class="profile-avatar-large" id="profileAvatar">
+
+                    <span>
+                        {{ user.username[0]|upper }}
+                    </span>
+
+                    <div class="profile-avatar-ring"></div>
+
+                </div>
+
+
+                <div class="profile-identity-copy">
+
+                    <div class="profile-eyebrow">
+
+                        <span class="eyebrow-line"></span>
+
+                        ACC IDENTITY
+
+                    </div>
+
+
+                    <h1 class="profile-name">
+                        {{ user.username }}
+                    </h1>
+
+
+                    <div class="profile-role-line">
+
+                        {% if user.role == "delegate" %}
+
+                        <span class="profile-role-badge delegate-badge">
+                            DELEGATE
+                        </span>
+
+                        {% elif user.role == "press" %}
+
+                        <span class="profile-role-badge press-badge">
+                            PRESS CORPS
+                        </span>
+
+                        {% elif user.role == "chair" %}
+
+                        <span class="profile-role-badge chair-badge">
+                            CHAIR
+                        </span>
+
+                        {% else %}
+
+                        <span class="profile-role-badge">
+                            ACC MEMBER
+                        </span>
+
+                        {% endif %}
+
+
+                        <span class="profile-role-divider"></span>
+
+
+                        <span class="profile-delegation">
+                            {{ user.delegation }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-hero-meta">
+
+                <div class="profile-status">
+
+                    <span class="status-dot"></span>
+
+                    <span>
+                        SESSION ACTIVE
+                    </span>
+
+                </div>
+
+
+                <div class="profile-meta-label">
+                    ARKANIAN CRISIS COMMITTEE
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         MAIN PROFILE CONTENT
+    ========================================================== -->
+
+    <section class="profile-main">
+
+        <div class="profile-main-grid">
+
+
+            <!-- =================================================
+                 LEFT COLUMN
+            ================================================== -->
+
+            <div class="profile-primary-column">
+
+
+                <div class="profile-section-heading">
+
+                    <div>
+
+                        <span class="section-index">
+                            01 /
+                        </span>
+
+                        <span class="section-label">
+                            IDENTITY
+                        </span>
+
+                    </div>
+
+                    <span class="section-rule"></span>
+
+                </div>
+
+
+                <!-- IDENTITY CARD -->
+
+                <div class="identity-card">
+
+                    <div class="identity-card-top">
+
+                        <div class="identity-mini-avatar">
+                            {{ user.username[0]|upper }}
+                        </div>
+
+
+                        <div class="identity-card-heading">
+
+                            <span class="identity-small-label">
+                                ACCOUNT HOLDER
+                            </span>
+
+                            <h2>
+                                {{ user.username }}
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="identity-details">
+
+                        <div class="identity-detail-row">
+
+                            <div class="identity-detail-label">
+                                USERNAME
+                            </div>
+
+                            <div class="identity-detail-value">
+                                {{ user.username }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="identity-detail-row">
+
+                            <div class="identity-detail-label">
+                                ROLE
+                            </div>
+
+                            <div class="identity-detail-value">
+
+                                {% if user.role == "delegate" %}
+                                Delegate
+                                {% elif user.role == "press" %}
+                                Press Delegate
+                                {% elif user.role == "chair" %}
+                                Chair
+                                {% else %}
+                                ACC Member
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="identity-detail-row">
+
+                            <div class="identity-detail-label">
+                                DELEGATION
+                            </div>
+
+                            <div class="identity-detail-value">
+                                {{ user.delegation }}
+                            </div>
+
+                        </div>
+
+
+                        <div class="identity-detail-row">
+
+                            <div class="identity-detail-label">
+                                STATUS
+                            </div>
+
+                            <div class="identity-detail-value identity-status-value">
+
+                                <span class="identity-live-dot"></span>
+
+                                ACTIVE
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ROLE DESCRIPTION -->
+
+                <div class="role-description-card">
+
+                    <div class="role-description-number">
+
+                        {% if user.role == "delegate" %}
+                        D
+                        {% elif user.role == "press" %}
+                        P
+                        {% elif user.role == "chair" %}
+                        C
+                        {% else %}
+                        A
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="role-description-content">
+
+                        {% if user.role == "delegate" %}
+
+                        <span class="role-description-label">
+                            DELEGATE ACCESS
+                        </span>
+
+                        <h3>
+                            Your workspace is built for
+                            decision-making.
+                        </h3>
+
+                        <p>
+                            Your private ACC workspace gives you
+                            a place to prepare speeches, record
+                            notes, develop arguments and keep track
+                            of information during committee.
+                        </p>
+
+                        {% elif user.role == "press" %}
+
+                        <span class="role-description-label">
+                            PRESS ACCESS
+                        </span>
+
+                        <h3>
+                            Your workspace is built for reporting.
+                        </h3>
+
+                        <p>
+                            Use your press workspace to prepare
+                            and publish reports for the ACC article
+                            archive. Your published work is available
+                            through the public Articles section.
+                        </p>
+
+                        {% elif user.role == "chair" %}
+
+                        <span class="role-description-label">
+                            CHAIR ACCESS
+                        </span>
+
+                        <h3>
+                            Your workspace controls the committee.
+                        </h3>
+
+                        <p>
+                            Chair access gives you control over
+                            crisis announcements and committee
+                            administration. Published crisis material
+                            appears publicly through the Crisis
+                            Control interface.
+                        </p>
+
+                        {% else %}
+
+                        <span class="role-description-label">
+                            ACC ACCESS
+                        </span>
+
+                        <h3>
+                            Your committee identity is active.
+                        </h3>
+
+                        <p>
+                            Your account is currently active within
+                            the Arkanian Crisis Committee workspace.
+                        </p>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- SECURITY -->
+
+                <div class="profile-section-heading profile-section-heading-spaced">
+
+                    <div>
+
+                        <span class="section-index">
+                            02 /
+                        </span>
+
+                        <span class="section-label">
+                            SECURITY
+                        </span>
+
+                    </div>
+
+                    <span class="section-rule"></span>
+
+                </div>
+
+
+                <div class="security-card">
+
+                    <div class="security-card-header">
+
+                        <div class="security-icon">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+
+
+                        <div>
+
+                            <span class="security-label">
+                                ACCOUNT SECURITY
+                            </span>
+
+                            <h3>
+                                Credentials protected
+                            </h3>
+
+                        </div>
+
+
+                        <div class="security-status">
+                            SECURE
+                        </div>
+
+                    </div>
+
+
+                    <div class="security-card-body">
+
+                        <div class="security-row">
+
+                            <div>
+
+                                <span class="security-row-label">
+                                    PASSWORD
+                                </span>
+
+                                <span class="security-row-value">
+                                    ••••••••••••••••
+                                </span>
+
+                            </div>
+
+                            <span class="security-row-state">
+                                HIDDEN
+                            </span>
+
+                        </div>
+
+
+                        <div class="security-row">
+
+                            <div>
+
+                                <span class="security-row-label">
+                                    SESSION
+                                </span>
+
+                                <span class="security-row-value">
+                                    Current browser session
+                                </span>
+
+                            </div>
+
+                            <span class="security-row-state">
+                                ACTIVE
+                            </span>
+
+                        </div>
+
+
+                        <div class="security-notice">
+
+                            <div class="security-notice-mark">
+                                !
+                            </div>
+
+                            <p>
+                                Never share your ACC password with
+                                another delegate. Your account provides
+                                access to private committee workspace
+                                features.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 RIGHT COLUMN
+            ================================================== -->
+
+            <aside class="profile-sidebar">
+
+                <div class="profile-section-heading">
+
+                    <div>
+
+                        <span class="section-index">
+                            03 /
+                        </span>
+
+                        <span class="section-label">
+                            WORKSPACE
+                        </span>
+
+                    </div>
+
+                    <span class="section-rule"></span>
+
+                </div>
+
+
+                {% if user.role == "delegate" %}
+
+                <!-- NOTES -->
+
+                <a href="{{ url_for('notes') }}" class="workspace-card workspace-card-primary">
+
+                    <div class="workspace-card-background">
+                        <span>NOTES</span>
+                    </div>
+
+
+                    <div class="workspace-card-top">
+
+                        <span class="workspace-card-index">
+                            01
+                        </span>
+
+                        <span class="workspace-card-arrow">
+                            ↗
+                        </span>
+
+                    </div>
+
+
+                    <div class="workspace-card-icon notes-icon">
+
+                        <div class="notes-icon-paper"></div>
+
+                        <div class="notes-icon-lines"></div>
+
+                    </div>
+
+
+                    <div class="workspace-card-content">
+
+                        <span class="workspace-card-label">
+                            PRIVATE WORKSPACE
+                        </span>
+
+                        <h3>
+                            Notes
+                        </h3>
+
+                        <p>
+                            Write speeches, store ideas, prepare
+                            motions, organise research and keep your
+                            committee thoughts in one private workspace.
+                        </p>
+
+                    </div>
+
+
+                    <div class="workspace-card-footer">
+
+                        <span>
+                            OPEN NOTES
+                        </span>
+
+                        <span class="workspace-card-footer-arrow">
+                            →
+                        </span>
+
+                    </div>
+
+                </a>
+
+
+                <!-- ARTICLES -->
+
+                <a href="{{ url_for('articles') }}" class="workspace-card workspace-card-secondary">
+
+                    <div class="workspace-card-top">
+
+                        <span class="workspace-card-index">
+                            02
+                        </span>
+
+                        <span class="workspace-card-arrow">
+                            ↗
+                        </span>
+
+                    </div>
+
+
+                    <div class="workspace-card-content">
+
+                        <span class="workspace-card-label">
+                            PUBLIC ARCHIVE
+                        </span>
+
+                        <h3>
+                            Articles
+                        </h3>
+
+                        <p>
+                            Read reports and developments published
+                            by the ACC Press Corps.
+                        </p>
+
+                    </div>
+
+
+                    <div class="workspace-card-footer">
+
+                        <span>
+                            VIEW ARTICLES
+                        </span>
+
+                        <span class="workspace-card-footer-arrow">
+                            →
+                        </span>
+
+                    </div>
+
+                </a>
+
+
+                {% elif user.role == "press" %}
+
+                <!-- PUBLISH -->
+
+                <a href="{{ url_for('press_upload') }}" class="workspace-card workspace-card-primary">
+
+                    <div class="workspace-card-background">
+                        <span>PUBLISH</span>
+                    </div>
+
+
+                    <div class="workspace-card-top">
+
+                        <span class="workspace-card-index">
+                            01
+                        </span>
+
+                        <span class="workspace-card-arrow">
+                            ↗
+                        </span>
+
+                    </div>
+
+
+                    <div class="workspace-card-icon press-icon">
+
+                        <div class="press-icon-frame"></div>
+
+                        <div class="press-icon-line"></div>
+
+                        <div class="press-icon-line short"></div>
+
+                    </div>
+
+
+                    <div class="workspace-card-content">
+
+                        <span class="workspace-card-label">
+                            PRESS WORKSPACE
+                        </span>
+
+                        <h3>
+                            Publish
+                        </h3>
+
+                        <p>
+                            Write and publish reports to the official
+                            ACC press archive.
+                        </p>
+
+                    </div>
+
+
+                    <div class="workspace-card-footer">
+
+                        <span>
+                            PUBLISH REPORT
+                        </span>
+
+                        <span class="workspace-card-footer-arrow">
+                            →
+                        </span>
+
+                    </div>
+
+                </a>
+
+
+                <!-- ARTICLES -->
+
+                <a href="{{ url_for('articles') }}" class="workspace-card workspace-card-secondary">
+
+                    <div class="workspace-card-top">
+
+                        <span class="workspace-card-index">
+                            02
+                        </span>
+
+                        <span class="workspace-card-arrow">
+                            ↗
+                        </span>
+
+                    </div>
+
+
+                    <div class="workspace-card-content">
+
+                        <span class="workspace-card-label">
+                            PUBLIC ARCHIVE
+                        </span>
+
+                        <h3>
+                            Articles
+                        </h3>
+
+                        <p>
+                            Review the published ACC press archive
+                            and previously released reports.
+                        </p>
+
+                    </div>
+
+
+                    <div class="workspace-card-footer">
+
+                        <span>
+                            VIEW ARTICLES
+                        </span>
+
+                        <span class="workspace-card-footer-arrow">
+                            →
+                        </span>
+
+                    </div>
+
+                </a>
+
+
+                {% elif user.role == "chair" %}
+
+                <!-- CRISIS CONTROL -->
+
+                <a href="{{ url_for('crises') }}" class="workspace-card workspace-card-primary">
+
+                    <div class="workspace-card-background">
+                        <span>CRISIS</span>
+                    </div>
+
+
+                    <div class="workspace-card-top">
+
+                        <span class="workspace-card-index">
+                            01
+                        </span>
+
+                        <span class="workspace-card-arrow">
+                            ↗
+                        </span>
+
+                    </div>
+
+
+                    <div class="workspace-card-icon crisis-icon">
+
+                        <div class="crisis-icon-square"></div>
+
+                        <div class="crisis-icon-line"></div>
+
+                        <div class="crisis-icon-line"></div>
+
+                        <div class="crisis-icon-dot"></div>
+
+                    </div>
+
+
+                    <div class="workspace-card-content">
+
+                        <span class="workspace-card-label">
+                            CHAIR CONTROL
+                        </span>
+
+                        <h3>
+                            Crisis Control
+                        </h3>
+
+                        <p>
+                            Create, publish and manage crisis
+                            developments for the committee.
+                        </p>
+
+                    </div>
+
+
+                    <div class="workspace-card-footer">
+
+                        <span>
+                            OPEN CONTROL
+                        </span>
+
+                        <span class="workspace-card-footer-arrow">
+                            →
+                        </span>
+
+                    </div>
+
+                </a>
+
+
+                <!-- ARTICLES -->
+
+                <a href="{{ url_for('articles') }}" class="workspace-card workspace-card-secondary">
+
+                    <div class="workspace-card-top">
+
+                        <span class="workspace-card-index">
+                            02
+                        </span>
+
+                        <span class="workspace-card-arrow">
+                            ↗
+                        </span>
+
+                    </div>
+
+
+                    <div class="workspace-card-content">
+
+                        <span class="workspace-card-label">
+                            PUBLIC ARCHIVE
+                        </span>
+
+                        <h3>
+                            Articles
+                        </h3>
+
+                        <p>
+                            Monitor the reports being published by
+                            the Press Corps.
+                        </p>
+
+                    </div>
+
+
+                    <div class="workspace-card-footer">
+
+                        <span>
+                            VIEW ARTICLES
+                        </span>
+
+                        <span class="workspace-card-footer-arrow">
+                            →
+                        </span>
+
+                    </div>
+
+                </a>
+
+                {% endif %}
+
+
+                <!-- QUICK NAVIGATION -->
+
+                <div class="quick-links-card">
+
+                    <div class="quick-links-header">
+
+                        <span class="quick-links-label">
+                            QUICK NAVIGATION
+                        </span>
+
+                        <span class="quick-links-symbol">
+                            +
+                        </span>
+
+                    </div>
+
+
+                    <div class="quick-links-list">
+
+                        <a href="{{ url_for('home') }}" class="quick-link">
+
+                            <span class="quick-link-number">
+                                01
+                            </span>
+
+                            <span class="quick-link-name">
+                                Home
+                            </span>
+
+                            <span class="quick-link-arrow">
+                                →
+                            </span>
+
+                        </a>
+
+
+                        <a href="{{ url_for('articles') }}" class="quick-link">
+
+                            <span class="quick-link-number">
+                                02
+                            </span>
+
+                            <span class="quick-link-name">
+                                Articles
+                            </span>
+
+                            <span class="quick-link-arrow">
+                                →
+                            </span>
+
+                        </a>
+
+
+                        <a href="{{ url_for('profile') }}" class="quick-link quick-link-active">
+
+                            <span class="quick-link-number">
+                                03
+                            </span>
+
+                            <span class="quick-link-name">
+                                Profile
+                            </span>
+
+                            <span class="quick-link-arrow">
+                                ●
+                            </span>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <!-- LOGOUT -->
+
+                <div class="profile-logout-card">
+
+                    <div class="logout-card-copy">
+
+                        <span class="logout-label">
+                            END SESSION
+                        </span>
+
+                        <p>
+                            Finished with the committee?
+                        </p>
+
+                    </div>
+
+
+                    <a href="{{ url_for('logout') }}" class="logout-button">
+
+                        <span>
+                            LOG OUT
+                        </span>
+
+                        <span class="logout-arrow">
+                            →
+                        </span>
+
+                    </a>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         PROFILE FOOTER STATEMENT
+    ========================================================== -->
+
+    <section class="profile-statement">
+
+        <div class="profile-statement-number">
+            ACC
+        </div>
+
+
+        <div class="profile-statement-content">
+
+            <span class="profile-statement-label">
+                YOUR COMMITTEE. YOUR ROLE. YOUR RECORD.
+            </span>
+
+            <h2>
+                Make every decision<br>
+                <em>count.</em>
+            </h2>
+
+        </div>
+
+
+        <div class="profile-statement-mark">
+
+            <span></span>
+            <span></span>
+            <span></span>
+
+        </div>
+
+    </section>
+
+</section>
+
+
+<!-- =============================================================
+     PROFILE PAGE STYLES
+============================================================= -->
+
+<style>
+    .profile-page {
+        position: relative;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at 80% 0%,
+                rgba(255, 255, 255, 0.035),
+                transparent 28%);
+    }
+
+
+    .profile-hero {
+        position: relative;
+        min-height: 430px;
+        display: flex;
+        align-items: flex-end;
+        overflow: hidden;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+        background:
+            linear-gradient(180deg,
+                rgba(255, 255, 255, 0.025),
+                transparent);
+    }
+
+
+    .profile-hero-background {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+    }
+
+
+    .profile-bg-number {
+        position: absolute;
+        top: -85px;
+        right: 7%;
+        font-size: clamp(13rem, 25vw, 27rem);
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: -0.08em;
+        color: rgba(255, 255, 255, 0.025);
+        user-select: none;
+    }
+
+
+    .profile-bg-word {
+        position: absolute;
+        left: -20px;
+        bottom: -55px;
+        font-size: clamp(6rem, 17vw, 17rem);
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: -0.08em;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(255, 255, 255, 0.055);
+        user-select: none;
+        white-space: nowrap;
+    }
+
+
+    .profile-hero-inner {
+        position: relative;
+        z-index: 2;
+        width: min(1500px, calc(100% - 80px));
+        margin: 0 auto;
+        padding: 70px 0 72px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 50px;
+    }
+
+
+    .profile-identity {
+        display: flex;
+        align-items: center;
+        gap: 38px;
+        min-width: 0;
+    }
+
+
+    .profile-avatar-large {
+        position: relative;
+        width: 150px;
+        height: 150px;
+        flex: 0 0 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255, 255, 255, 0.42);
+        background:
+            linear-gradient(135deg,
+                rgba(255, 255, 255, 0.10),
+                rgba(255, 255, 255, 0.025));
+        box-shadow:
+            0 25px 70px rgba(0, 0, 0, 0.40),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+        overflow: visible;
+        transition:
+            transform 0.45s cubic-bezier(.2, .8, .2, 1),
+            border-color 0.3s ease;
+        will-change: transform;
+    }
+
+
+    .profile-avatar-large:hover {
+        border-color: rgba(255, 255, 255, 0.8);
+    }
+
+
+    .profile-avatar-large>span {
+        font-size: 4.2rem;
+        line-height: 1;
+        font-weight: 800;
+        letter-spacing: -0.08em;
+        color: #fff;
+    }
+
+
+    .profile-avatar-ring {
+        position: absolute;
+        inset: -9px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        pointer-events: none;
+    }
+
+
+    .profile-avatar-ring::before,
+    .profile-avatar-ring::after {
+        content: "";
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: #050505;
+        border: 1px solid rgba(255, 255, 255, 0.55);
+    }
+
+
+    .profile-avatar-ring::before {
+        top: -4px;
+        left: -4px;
+    }
+
+
+    .profile-avatar-ring::after {
+        right: -4px;
+        bottom: -4px;
+    }
+
+
+    .profile-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.20em;
+        color: rgba(255, 255, 255, 0.48);
+    }
+
+
+    .eyebrow-line {
+        display: block;
+        width: 34px;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.48);
+    }
+
+
+    .profile-name {
+        margin: 0;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        font-size: clamp(4rem, 8vw, 8rem);
+        line-height: 0.88;
+        font-weight: 900;
+        letter-spacing: -0.075em;
+        color: #fff;
+    }
+
+
+    .profile-role-line {
+        margin-top: 26px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+
+
+    .profile-role-badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 30px;
+        padding: 7px 11px;
+        border: 1px solid rgba(255, 255, 255, 0.38);
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.15em;
+        color: #fff;
+    }
+
+
+    .delegate-badge,
+    .chair-badge {
+        background: #fff;
+        color: #050505;
+    }
+
+
+    .press-badge {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+
+    .profile-role-divider {
+        width: 24px;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.20);
+    }
+
+
+    .profile-delegation {
+        max-width: 400px;
+        font-size: 0.82rem;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        color: rgba(255, 255, 255, 0.65);
+        overflow-wrap: anywhere;
+    }
+
+
+    .profile-hero-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 16px;
+        padding-bottom: 5px;
+        flex-shrink: 0;
+    }
+
+
+    .profile-status {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.16em;
+        color: rgba(255, 255, 255, 0.62);
+    }
+
+
+    .status-dot {
+        width: 7px;
+        height: 7px;
+        display: block;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow:
+            0 0 0 4px rgba(255, 255, 255, 0.07);
+        animation: profilePulse 2.2s ease-in-out infinite;
+    }
+
+
+    @keyframes profilePulse {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.4;
+            transform: scale(0.75);
+        }
+
+    }
+
+
+    .profile-meta-label {
+        font-size: 0.60rem;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+        color: rgba(255, 255, 255, 0.25);
+    }
+
+
+    /* =========================================================
+       MAIN
+    ========================================================== */
+
+    .profile-main {
+        width: min(1500px, calc(100% - 80px));
+        margin: 0 auto;
+        padding: 85px 0 100px;
+    }
+
+
+    .profile-main-grid {
+        display: grid;
+        grid-template-columns:
+            minmax(0, 1.55fr) minmax(340px, 0.85fr);
+        gap: 90px;
+        align-items: start;
+    }
+
+
+    .profile-primary-column,
+    .profile-sidebar {
+        min-width: 0;
+    }
+
+
+    .profile-section-heading {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+
+
+    .profile-section-heading>div {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 0 0 auto;
+    }
+
+
+    .section-index {
+        font-size: 0.61rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        color: rgba(255, 255, 255, 0.28);
+    }
+
+
+    .section-label {
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        color: rgba(255, 255, 255, 0.72);
+    }
+
+
+    .section-rule {
+        height: 1px;
+        flex: 1;
+        background: rgba(255, 255, 255, 0.10);
+    }
+
+
+    .profile-section-heading-spaced {
+        margin-top: 78px;
+    }
+
+
+    /* =========================================================
+       IDENTITY
+    ========================================================== */
+
+    .identity-card {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background:
+            linear-gradient(135deg,
+                rgba(255, 255, 255, 0.045),
+                rgba(255, 255, 255, 0.015));
+        transition:
+            border-color 0.3s ease,
+            transform 0.4s cubic-bezier(.2, .8, .2, 1);
+    }
+
+
+    .identity-card:hover {
+        border-color: rgba(255, 255, 255, 0.25);
+        transform: translateY(-3px);
+    }
+
+
+    .identity-card-top {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        padding: 28px 30px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+
+    .identity-mini-avatar {
+        width: 58px;
+        height: 58px;
+        flex: 0 0 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        color: #050505;
+        font-size: 1.55rem;
+        font-weight: 900;
+        letter-spacing: -0.08em;
+    }
+
+
+    .identity-small-label,
+    .security-label,
+    .role-description-label,
+    .workspace-card-label,
+    .quick-links-label,
+    .logout-label {
+        display: block;
+        font-size: 0.59rem;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        color: rgba(255, 255, 255, 0.38);
+    }
+
+
+    .identity-card-heading h2 {
+        margin: 5px 0 0;
+        font-size: 1.35rem;
+        line-height: 1;
+        font-weight: 750;
+        letter-spacing: -0.035em;
+        color: #fff;
+    }
+
+
+    .identity-details {
+        display: grid;
+    }
+
+
+    .identity-detail-row {
+        display: grid;
+        grid-template-columns: 180px minmax(0, 1fr);
+        gap: 25px;
+        align-items: center;
+        min-height: 66px;
+        padding: 15px 30px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+
+    .identity-detail-row:last-child {
+        border-bottom: 0;
+    }
+
+
+    .identity-detail-label {
+        font-size: 0.59rem;
+        font-weight: 800;
+        letter-spacing: 0.15em;
+        color: rgba(255, 255, 255, 0.30);
+    }
+
+
+    .identity-detail-value {
+        font-size: 0.85rem;
+        font-weight: 550;
+        color: rgba(255, 255, 255, 0.83);
+        word-break: break-word;
+    }
+
+
+    .identity-status-value {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 0.68rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+    }
+
+
+    .identity-live-dot {
+        width: 6px;
+        height: 6px;
+        display: block;
+        border-radius: 50%;
+        background: #fff;
+    }
+
+
+    /* =========================================================
+       ROLE DESCRIPTION
+    ========================================================== */
+
+    .role-description-card {
+        margin-top: 24px;
+        display: grid;
+        grid-template-columns: 90px minmax(0, 1fr);
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        background: rgba(255, 255, 255, 0.018);
+        overflow: hidden;
+    }
+
+
+    .role-description-number {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 27px;
+        border-right: 1px solid rgba(255, 255, 255, 0.09);
+        font-size: 2rem;
+        line-height: 1;
+        font-weight: 900;
+        color: rgba(255, 255, 255, 0.15);
+    }
+
+
+    .role-description-content {
+        padding: 29px 31px 32px;
+    }
+
+
+    .role-description-content h3 {
+        margin: 10px 0 12px;
+        max-width: 650px;
+        font-size: clamp(1.45rem, 2.2vw, 2.15rem);
+        line-height: 1.05;
+        font-weight: 750;
+        letter-spacing: -0.045em;
+        color: #fff;
+    }
+
+
+    .role-description-content p {
+        margin: 0;
+        max-width: 700px;
+        font-size: 0.87rem;
+        line-height: 1.8;
+        color: rgba(255, 255, 255, 0.47);
+    }
+
+
+    /* =========================================================
+       SECURITY
+    ========================================================== */
+
+    .security-card {
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        background: rgba(255, 255, 255, 0.018);
+    }
+
+
+    .security-card-header {
+        display: grid;
+        grid-template-columns: 42px minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 18px;
+        padding: 27px 30px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+    }
+
+
+    .security-icon {
+        width: 34px;
+        height: 34px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 3px;
+        align-items: end;
+        padding: 7px;
+        border: 1px solid rgba(255, 255, 255, 0.20);
+    }
+
+
+    .security-icon span {
+        display: block;
+        background: rgba(255, 255, 255, 0.70);
+    }
+
+
+    .security-icon span:nth-child(1) {
+        height: 40%;
+    }
+
+
+    .security-icon span:nth-child(2) {
+        height: 70%;
+    }
+
+
+    .security-icon span:nth-child(3) {
+        height: 100%;
+    }
+
+
+    .security-card-header h3 {
+        margin: 4px 0 0;
+        font-size: 1.05rem;
+        line-height: 1;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+    }
+
+
+    .security-status {
+        padding: 7px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        font-size: 0.57rem;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        color: rgba(255, 255, 255, 0.68);
+    }
+
+
+    .security-card-body {
+        padding: 0 30px 30px;
+    }
+
+
+    .security-row {
+        min-height: 73px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 25px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+
+    .security-row-label {
+        display: block;
+        margin-bottom: 5px;
+        font-size: 0.57rem;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        color: rgba(255, 255, 255, 0.28);
+    }
+
+
+    .security-row-value {
+        display: block;
+        font-size: 0.80rem;
+        color: rgba(255, 255, 255, 0.70);
+    }
+
+
+    .security-row-state {
+        flex: 0 0 auto;
+        font-size: 0.56rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        color: rgba(255, 255, 255, 0.32);
+    }
+
+
+    .security-notice {
+        margin-top: 25px;
+        display: flex;
+        gap: 15px;
+        padding: 17px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+
+    .security-notice-mark {
+        width: 21px;
+        height: 21px;
+        flex: 0 0 21px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        font-size: 0.68rem;
+        font-weight: 800;
+    }
+
+
+    .security-notice p {
+        margin: 0;
+        font-size: 0.69rem;
+        line-height: 1.65;
+        color: rgba(255, 255, 255, 0.38);
+    }
+
+
+    /* =========================================================
+       SIDEBAR
+    ========================================================== */
+
+    .profile-sidebar {
+        position: sticky;
+        top: 100px;
+        min-width: 0;
+    }
+
+
+    /* =========================================================
+       WORKSPACE CARDS
+    ========================================================== */
+
+    .workspace-card {
+        position: relative;
+        display: block;
+        min-height: 340px;
+        margin-bottom: 14px;
+        padding: 29px 29px 88px;
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        color: #fff;
+        text-decoration: none;
+        overflow: hidden;
+        transition:
+            transform 0.45s cubic-bezier(.2, .8, .2, 1),
+            border-color 0.3s ease,
+            background 0.3s ease;
+        will-change: transform;
+    }
+
+
+    .workspace-card:hover {
+        border-color: rgba(255, 255, 255, 0.40);
+        background: rgba(255, 255, 255, 0.035);
+    }
+
+
+    .workspace-card-primary {
+        background:
+            linear-gradient(145deg,
+                rgba(255, 255, 255, 0.065),
+                rgba(255, 255, 255, 0.012));
+    }
+
+
+    .workspace-card-secondary {
+        min-height: 260px;
+        background: rgba(255, 255, 255, 0.012);
+    }
+
+
+    .workspace-card-background {
+        position: absolute;
+        right: -15px;
+        bottom: -45px;
+        pointer-events: none;
+    }
+
+
+    .workspace-card-background span {
+        font-size: 8rem;
+        line-height: 1;
+        font-weight: 900;
+        letter-spacing: -0.09em;
+        color: transparent;
+        -webkit-text-stroke: 1px rgba(255, 255, 255, 0.055);
+    }
+
+
+    .workspace-card-top {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+
+    .workspace-card-index {
+        font-size: 0.58rem;
+        font-weight: 800;
+        letter-spacing: 0.13em;
+        color: rgba(255, 255, 255, 0.35);
+    }
+
+
+    .workspace-card-arrow {
+        font-size: 1.15rem;
+        color: rgba(255, 255, 255, 0.55);
+        transition:
+            transform 0.35s ease,
+            color 0.3s ease;
+    }
+
+
+    .workspace-card:hover .workspace-card-arrow {
+        color: #fff;
+    }
+
+
+    .workspace-card-icon {
+        position: relative;
+        z-index: 2;
+        width: 52px;
+        height: 52px;
+        margin-top: 48px;
+        margin-bottom: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+
+    .workspace-card-content {
+        position: relative;
+        z-index: 2;
+        padding-bottom: 4px;
+    }
+
+
+    .workspace-card-content h3 {
+        margin: 7px 0 12px;
+        font-size: clamp(2.2rem, 4vw, 3.4rem);
+        line-height: 0.9;
+        font-weight: 850;
+        letter-spacing: -0.065em;
+    }
+
+
+    .workspace-card-secondary .workspace-card-content {
+        margin-top: 62px;
+    }
+
+
+    .workspace-card-secondary .workspace-card-content h3 {
+        font-size: 2rem;
+    }
+
+
+    .workspace-card-content p {
+        max-width: 460px;
+        margin: 0;
+        font-size: 0.74rem;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.42);
+    }
+
+
+    /*
+     * The footer is intentionally separated from the paragraph.
+     * The card now has enough bottom padding so text can never
+     * collide with VIEW ARTICLES / OPEN NOTES / PUBLISH REPORT.
+     */
+
+    .workspace-card-footer {
+        position: absolute;
+        z-index: 3;
+        right: 29px;
+        bottom: 27px;
+        left: 29px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.10);
+        font-size: 0.57rem;
+        font-weight: 800;
+        letter-spacing: 0.15em;
+        color: rgba(255, 255, 255, 0.42);
+        background: transparent;
+    }
+
+
+    .workspace-card-footer>span:first-child {
+        min-width: 0;
+    }
+
+
+    .workspace-card-footer-arrow {
+        flex: 0 0 auto;
+        font-size: 1rem;
+        color: rgba(255, 255, 255, 0.60);
+        transition: transform 0.3s ease;
+    }
+
+
+    .workspace-card:hover .workspace-card-footer-arrow {
+        transform: translateX(5px);
+    }
+
+
+    /* =========================================================
+       QUICK LINKS
+    ========================================================== */
+
+    .quick-links-card {
+        margin-top: 38px;
+        border-top: 1px solid rgba(255, 255, 255, 0.13);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+    }
+
+
+    .quick-links-header {
+        min-height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+
+    .quick-links-symbol {
+        font-size: 1.2rem;
+        font-weight: 300;
+        color: rgba(255, 255, 255, 0.35);
+    }
+
+
+    .quick-links-list {
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+
+    .quick-link {
+        min-height: 54px;
+        display: grid;
+        grid-template-columns: 40px minmax(0, 1fr) 25px;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        color: rgba(255, 255, 255, 0.55);
+        text-decoration: none;
+        transition:
+            color 0.25s ease,
+            padding 0.3s ease,
+            background 0.25s ease;
+    }
+
+
+    .quick-link:last-child {
+        border-bottom: 0;
+    }
+
+
+    .quick-link:hover {
+        padding-left: 7px;
+        color: #fff;
+    }
+
+
+    .quick-link-active {
+        color: #fff;
+    }
+
+
+    .quick-link-number {
+        font-size: 0.55rem;
+        font-weight: 800;
+        letter-spacing: 0.10em;
+        color: rgba(255, 255, 255, 0.23);
+    }
+
+
+    .quick-link-name {
+        font-size: 0.73rem;
+        font-weight: 650;
+    }
+
+
+    .quick-link-arrow {
+        font-size: 0.75rem;
+        text-align: right;
+        color: rgba(255, 255, 255, 0.32);
+    }
+
+
+    /* =========================================================
+       LOGOUT
+    ========================================================== */
+
+    .profile-logout-card {
+        margin-top: 38px;
+        padding: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        background: rgba(255, 255, 255, 0.012);
+    }
+
+
+    .logout-card-copy p {
+        margin: 8px 0 18px;
+        font-size: 0.72rem;
+        color: rgba(255, 255, 255, 0.38);
+    }
+
+
+    .logout-button {
+        min-height: 46px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 0 16px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        color: rgba(255, 255, 255, 0.68);
+        text-decoration: none;
+        font-size: 0.59rem;
+        font-weight: 800;
+        letter-spacing: 0.15em;
+        transition:
+            color 0.25s ease,
+            background 0.25s ease,
+            border-color 0.25s ease;
+    }
+
+
+    .logout-button:hover {
+        color: #050505;
+        background: #fff;
+        border-color: #fff;
+    }
+
+
+    .logout-arrow {
+        font-size: 0.95rem;
+        transition: transform 0.25s ease;
+    }
+
+
+    .logout-button:hover .logout-arrow {
+        transform: translateX(4px);
+    }
+
+
+    /* =========================================================
+       BOTTOM STATEMENT
+    ========================================================== */
+
+    .profile-statement {
+        position: relative;
+        min-height: 430px;
+        width: 100%;
+        display: grid;
+        grid-template-columns:
+            1fr minmax(0, 800px) 1fr;
+        align-items: center;
+        padding: 70px max(40px, 7vw);
+        border-top: 1px solid rgba(255, 255, 255, 0.10);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+        overflow: hidden;
+    }
+
+
+    .profile-statement::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(90deg,
+                transparent,
+                rgba(255, 255, 255, 0.025),
+                transparent);
+        pointer-events: none;
+    }
+
+
+    .profile-statement-number {
+        align-self: flex-start;
+        padding-top: 4px;
+        font-size: 0.60rem;
+        font-weight: 800;
+        letter-spacing: 0.20em;
+        color: rgba(255, 255, 255, 0.30);
+    }
+
+
+    .profile-statement-content {
+        position: relative;
+        z-index: 2;
+    }
+
+
+    .profile-statement-label {
+        display: block;
+        margin-bottom: 20px;
+        font-size: 0.61rem;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        color: rgba(255, 255, 255, 0.32);
+    }
+
+
+    .profile-statement-content h2 {
+        margin: 0;
+        font-size: clamp(3rem, 7vw, 7rem);
+        line-height: 0.87;
+        font-weight: 900;
+        letter-spacing: -0.075em;
+        color: #fff;
+    }
+
+
+    .profile-statement-content h2 em {
+        font-style: normal;
+        color: transparent;
+        -webkit-text-stroke:
+            1px rgba(255, 255, 255, 0.55);
+    }
+
+
+    .profile-statement-mark {
+        justify-self: end;
+        align-self: flex-end;
+        display: flex;
+        align-items: flex-end;
+        gap: 7px;
+        height: 100px;
+    }
+
+
+    .profile-statement-mark span {
+        display: block;
+        width: 7px;
+        background: rgba(255, 255, 255, 0.16);
+    }
+
+
+    .profile-statement-mark span:nth-child(1) {
+        height: 35%;
+    }
+
+
+    .profile-statement-mark span:nth-child(2) {
+        height: 65%;
+    }
+
+
+    .profile-statement-mark span:nth-child(3) {
+        height: 100%;
+        background: rgba(255, 255, 255, 0.70);
+    }
+
+
+    /* =========================================================
+       TABLET
+    ========================================================== */
+
+    @media (max-width: 1100px) {
+
+        .profile-hero-inner,
+        .profile-main {
+            width: min(100% - 48px, 950px);
+        }
+
+
+        .profile-main-grid {
+            grid-template-columns: 1fr;
+            gap: 80px;
+        }
+
+
+        .profile-sidebar {
+            position: static;
+        }
+
+
+        .profile-sidebar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            align-items: start;
+        }
+
+
+        .profile-sidebar>.profile-section-heading {
+            grid-column: 1 / -1;
+        }
+
+
+        .profile-sidebar .workspace-card {
+            margin-bottom: 0;
+        }
+
+
+        .profile-sidebar .quick-links-card,
+        .profile-sidebar .profile-logout-card {
+            margin-top: 25px;
+        }
+
+
+        .profile-sidebar .quick-links-card {
+            grid-column: 1;
+        }
+
+
+        .profile-sidebar .profile-logout-card {
+            grid-column: 2;
+        }
+
+    }
+
+
+    /* =========================================================
+       MOBILE
+    ========================================================== */
+
+    @media (max-width: 700px) {
+
+        .profile-hero {
+            min-height: auto;
+        }
+
+
+        .profile-hero-inner,
+        .profile-main {
+            width: calc(100% - 32px);
+        }
+
+
+        .profile-hero-inner {
+            padding: 55px 0 52px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 38px;
+        }
+
+
+        .profile-identity {
+            width: 100%;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 25px;
+        }
+
+
+        .profile-avatar-large {
+            width: 105px;
+            height: 105px;
+            flex-basis: 105px;
+        }
+
+
+        .profile-avatar-large>span {
+            font-size: 3rem;
+        }
+
+
+        .profile-name {
+            font-size: clamp(3.5rem, 17vw, 5.2rem);
+        }
+
+
+        .profile-role-line {
+            margin-top: 19px;
+            gap: 10px;
+        }
+
+
+        .profile-role-divider {
+            display: none;
+        }
+
+
+        .profile-delegation {
+            width: 100%;
+        }
+
+
+        .profile-hero-meta {
+            width: 100%;
+            align-items: flex-start;
+        }
+
+
+        .profile-bg-number {
+            top: 0;
+            right: -40px;
+            font-size: 12rem;
+        }
+
+
+        .profile-bg-word {
+            bottom: -10px;
+            left: -15px;
+            font-size: 6rem;
+        }
+
+
+        .profile-main {
+            padding: 55px 0 70px;
+        }
+
+
+        .profile-main-grid {
+            gap: 60px;
+        }
+
+
+        .identity-card-top {
+            padding: 23px 20px;
+        }
+
+
+        .identity-detail-row {
+            grid-template-columns: 1fr;
+            gap: 7px;
+            min-height: auto;
+            padding: 18px 20px;
+        }
+
+
+        .role-description-card {
+            grid-template-columns: 60px minmax(0, 1fr);
+        }
+
+
+        .role-description-number {
+            padding-top: 23px;
+            font-size: 1.5rem;
+        }
+
+
+        .role-description-content {
+            padding: 23px 20px 25px;
+        }
+
+
+        .security-card-header {
+            grid-template-columns: 38px minmax(0, 1fr);
+            padding: 22px 20px;
+        }
+
+
+        .security-status {
+            display: none;
+        }
+
+
+        .security-card-body {
+            padding: 0 20px 22px;
+        }
+
+
+        .security-row {
+            align-items: flex-start;
+            flex-direction: column;
+            justify-content: center;
+            gap: 8px;
+            padding: 17px 0;
+        }
+
+
+        .security-row-state {
+            display: none;
+        }
+
+
+        .profile-sidebar {
+            display: block;
+        }
+
+
+        .workspace-card {
+            min-height: 310px;
+            padding: 23px 23px 82px;
+        }
+
+
+        .workspace-card-secondary {
+            min-height: 245px;
+        }
+
+
+        .workspace-card-content h3 {
+            font-size: 2.8rem;
+        }
+
+
+        .workspace-card-secondary .workspace-card-content {
+            margin-top: 48px;
+        }
+
+
+        .workspace-card-footer {
+            left: 23px;
+            right: 23px;
+            bottom: 23px;
+        }
+
+
+        .profile-sidebar .quick-links-card,
+        .profile-sidebar .profile-logout-card {
+            margin-top: 30px;
+        }
+
+
+        .profile-statement {
+            min-height: 340px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 50px;
+            padding: 50px 16px;
+        }
+
+
+        .profile-statement-number {
+            padding-top: 0;
+        }
+
+
+        .profile-statement-content h2 {
+            font-size: clamp(3.5rem, 16vw, 6rem);
+        }
+
+
+        .profile-statement-mark {
+            align-self: flex-end;
+        }
+
+    }
+
+
+    /* =========================================================
+       SMALL MOBILE
+    ========================================================== */
+
+    @media (max-width: 430px) {
+
+        .profile-avatar-large {
+            width: 90px;
+            height: 90px;
+            flex-basis: 90px;
+        }
+
+
+        .profile-avatar-large>span {
+            font-size: 2.6rem;
+        }
+
+
+        .profile-name {
+            font-size: 3.35rem;
+        }
+
+
+        .profile-delegation {
+            font-size: 0.75rem;
+        }
+
+
+        .identity-card-heading h2 {
+            font-size: 1.15rem;
+        }
+
+
+        .role-description-card {
+            grid-template-columns: 1fr;
+        }
+
+
+        .role-description-number {
+            min-height: 48px;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 0 20px;
+            border-right: 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+        }
+
+
+        .role-description-content h3 {
+            font-size: 1.45rem;
+        }
+
+
+        .workspace-card {
+            min-height: 285px;
+            padding-bottom: 78px;
+        }
+
+
+        .workspace-card-background span {
+            font-size: 6rem;
+        }
+
+
+        .workspace-card-content h3 {
+            font-size: 2.45rem;
+        }
+
+
+        .workspace-card-content p {
+            font-size: 0.69rem;
+        }
+
+    }
+
+
+    /* =========================================================
+       REDUCED MOTION
+    ========================================================== */
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .profile-avatar-large,
+        .workspace-card,
+        .identity-card,
+        .quick-link,
+        .logout-button,
+        .workspace-card-arrow,
+        .workspace-card-footer-arrow,
+        .logout-arrow {
+            transition: none !important;
+        }
+
+
+        .status-dot {
+            animation: none !important;
+        }
+
+    }
+</style>
+
+
+<!-- =============================================================
+     PROFILE INTERACTION
+============================================================= -->
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        /* =====================================================
+           AVATAR TILT
+           ===================================================== */
+
+        const avatar =
+            document.getElementById("profileAvatar");
+
+
+        if (
+            avatar &&
+            window.matchMedia("(pointer: fine)").matches &&
+            !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ) {
+
+            avatar.addEventListener(
+                "mousemove",
+                function (event) {
+
+                    const rect =
+                        avatar.getBoundingClientRect();
+
+
+                    const x =
+                        event.clientX - rect.left;
+
+                    const y =
+                        event.clientY - rect.top;
+
+
+                    const rotateX =
+                        ((y / rect.height) - 0.5) * -8;
+
+                    const rotateY =
+                        ((x / rect.width) - 0.5) * 8;
+
+
+                    avatar.style.transform =
+                        `perspective(500px)
+                         rotateX(${rotateX}deg)
+                         rotateY(${rotateY}deg)
+                         translateY(-5px)`;
+
+                }
+            );
+
+
+            avatar.addEventListener(
+                "mouseleave",
+                function () {
+
+                    avatar.style.transform = "";
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           WORKSPACE CARD TILT
+           ===================================================== */
+
+        const workspaceCards =
+            document.querySelectorAll(
+                ".workspace-card"
+            );
+
+
+        workspaceCards.forEach(function (card) {
+
+            if (
+                !window.matchMedia("(pointer: fine)").matches ||
+                window.matchMedia("(prefers-reduced-motion: reduce)").matches
+            ) {
+                return;
+            }
+
+
+            card.addEventListener(
+                "mousemove",
+                function (event) {
+
+                    const rect =
+                        card.getBoundingClientRect();
+
+
+                    const x =
+                        event.clientX - rect.left;
+
+                    const y =
+                        event.clientY - rect.top;
+
+
+                    const rotateY =
+                        ((x / rect.width) - 0.5) * 2.2;
+
+                    const rotateX =
+                        ((y / rect.height) - 0.5) * -2.2;
+
+
+                    card.style.transform =
+                        `perspective(900px)
+                         rotateX(${rotateX}deg)
+                         rotateY(${rotateY}deg)
+                         translateY(-7px)`;
+
+                }
+            );
+
+
+            card.addEventListener(
+                "mouseleave",
+                function () {
+
+                    card.style.transform = "";
+
+                }
+            );
+
+        });
+
+
+        /* =====================================================
+           REVEAL
+           ===================================================== */
+
+        const revealItems =
+            document.querySelectorAll(
+                ".identity-card, " +
+                ".role-description-card, " +
+                ".security-card, " +
+                ".workspace-card, " +
+                ".quick-links-card, " +
+                ".profile-logout-card"
+            );
+
+
+        if (
+            "IntersectionObserver" in window &&
+            !window.matchMedia(
+                "(prefers-reduced-motion: reduce)"
+            ).matches
+        ) {
+
+            const observer =
+                new IntersectionObserver(
+                    function (entries, obs) {
+
+                        entries.forEach(
+                            function (entry) {
+
+                                if (
+                                    !entry.isIntersecting
+                                ) {
+                                    return;
+                                }
+
+
+                                entry.target.style.opacity =
+                                    "1";
+
+                                entry.target.style.transform =
+                                    "translateY(0)";
+
+
+                                obs.unobserve(
+                                    entry.target
+                                );
+
+                            }
+                        );
+
+                    },
+                    {
+                        threshold: 0.08
+                    }
+                );
+
+
+            revealItems.forEach(
+                function (item) {
+
+                    item.style.opacity = "0";
+
+                    item.style.transform =
+                        "translateY(16px)";
+
+                    item.style.transition =
+                        "opacity 0.65s ease, transform 0.65s cubic-bezier(.2,.8,.2,1)";
+
+                    observer.observe(item);
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           LOGOUT
+           ===================================================== */
+
+        const logoutButton =
+            document.querySelector(".logout-button");
+
+
+        if (logoutButton) {
+
+            logoutButton.addEventListener(
+                "click",
+                function () {
+
+                    this.style.pointerEvents =
+                        "none";
+
+                    this.style.opacity =
+                        "0.55";
+
+                }
+            );
+
+        }
+
+    });
+
+</script>
+
+{% endblock %}

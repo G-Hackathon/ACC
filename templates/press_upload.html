@@ -1,396 +1,1616 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
+{% block title %}Publish Report — ACC Press{% endblock %}
 
-    <meta charset="UTF-8">
+{% block extra_css %}
+<style>
+    /* =========================================================
+   PRESS PUBLISHING DESK
+   ========================================================= */
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    .publish-page {
+        position: relative;
+        min-height: 100vh;
+        overflow: hidden;
+    }
 
-    <title>ACC — Publish Article</title>
+    /* ---------------------------------------------------------
+   AMBIENT BACKGROUND
+   --------------------------------------------------------- */
 
+    .publish-page::before {
+        content: "";
+        position: absolute;
+        top: -260px;
+        right: -220px;
+        width: 620px;
+        height: 620px;
+        border-radius: 50%;
+        background: radial-gradient(circle,
+                rgba(255, 255, 255, 0.045),
+                transparent 68%);
+        pointer-events: none;
+    }
 
-    <style>
-        * {
+    .publish-page::after {
+        content: "";
+        position: absolute;
+        bottom: 5%;
+        left: -280px;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        background: radial-gradient(circle,
+                rgba(255, 255, 255, 0.025),
+                transparent 70%);
+        pointer-events: none;
+    }
+
+    /* ---------------------------------------------------------
+   MAIN CONTAINER
+   --------------------------------------------------------- */
+
+    .publish-shell {
+        width: min(1380px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 80px 0 130px;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ---------------------------------------------------------
+   PAGE HEADER
+   --------------------------------------------------------- */
+
+    .publish-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 50px;
+        align-items: end;
+        padding-bottom: 55px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .publish-eyebrow {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+    }
+
+    .publish-eyebrow-line {
+        width: 42px;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .publish-title {
+        margin: 0;
+        max-width: 850px;
+
+        color: #ffffff;
+        font-size: clamp(54px, 8vw, 118px);
+        line-height: 0.87;
+        letter-spacing: -0.07em;
+        font-weight: 900;
+    }
+
+    .publish-description {
+        max-width: 650px;
+        margin: 30px 0 0;
+
+        color: rgba(255, 255, 255, 0.43);
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    /* ---------------------------------------------------------
+   PRESS IDENTITY
+   --------------------------------------------------------- */
+
+    .publish-identity {
+        min-width: 240px;
+        padding: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.11);
+        background: rgba(255, 255, 255, 0.025);
+        border-radius: 16px;
+
+        transition:
+            transform 0.3s ease,
+            border-color 0.3s ease,
+            background 0.3s ease;
+    }
+
+    .publish-identity:hover {
+        transform: translateY(-5px);
+        border-color: rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    .identity-label {
+        margin-bottom: 14px;
+
+        color: rgba(255, 255, 255, 0.27);
+        font-size: 8px;
+        font-weight: 900;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+    }
+
+    .identity-row {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
+
+    .identity-avatar {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 42px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 50%;
+
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.04);
+
+        font-size: 13px;
+        font-weight: 900;
+    }
+
+    .identity-name {
+        margin: 0 0 5px;
+
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    .identity-role {
+        margin: 0;
+
+        color: rgba(255, 255, 255, 0.35);
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    /* ---------------------------------------------------------
+   PUBLISH GRID
+   --------------------------------------------------------- */
+
+    .publish-workspace {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 310px;
+        gap: 55px;
+        align-items: start;
+
+        margin-top: 65px;
+    }
+
+    /* ---------------------------------------------------------
+   EDITOR
+   --------------------------------------------------------- */
+
+    .publish-editor {
+        min-width: 0;
+    }
+
+    .publish-editor-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+
+        margin-bottom: 24px;
+    }
+
+    .publish-editor-heading h2 {
+        margin: 0;
+
+        color: #ffffff;
+        font-size: 17px;
+        letter-spacing: -0.025em;
+    }
+
+    .editor-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 8px;
+        font-weight: 900;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+    }
+
+    .editor-status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.25);
+
+        transition:
+            background 0.25s ease,
+            box-shadow 0.25s ease;
+    }
+
+    .editor-status.active .editor-status-dot {
+        background: #ffffff;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    }
+
+    /* ---------------------------------------------------------
+   FORM CARD
+   --------------------------------------------------------- */
+
+    .publish-form-card {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 22px;
+        background:
+            linear-gradient(145deg,
+                rgba(255, 255, 255, 0.035),
+                rgba(255, 255, 255, 0.012));
+        overflow: hidden;
+        box-shadow:
+            0 25px 90px rgba(0, 0, 0, 0.28),
+            inset 0 1px 0 rgba(255, 255, 255, 0.025);
+    }
+
+    /* ---------------------------------------------------------
+   FORM TOP BAR
+   --------------------------------------------------------- */
+
+    .publish-form-toolbar {
+        min-height: 54px;
+        padding: 0 22px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.018);
+    }
+
+    .toolbar-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .toolbar-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .toolbar-dot:nth-child(2) {
+        opacity: 0.65;
+    }
+
+    .toolbar-dot:nth-child(3) {
+        opacity: 0.35;
+    }
+
+    .toolbar-label {
+        margin-left: 8px;
+
+        color: rgba(255, 255, 255, 0.25);
+        font-size: 8px;
+        font-weight: 900;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+    }
+
+    .toolbar-right {
+        color: rgba(255, 255, 255, 0.22);
+        font-size: 8px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    /* ---------------------------------------------------------
+   FORM CONTENT
+   --------------------------------------------------------- */
+
+    .publish-form-content {
+        padding: 38px;
+    }
+
+    .field-group {
+        margin-bottom: 30px;
+    }
+
+    .field-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .field-label-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+
+        margin-bottom: 11px;
+    }
+
+    .field-label {
+        color: rgba(255, 255, 255, 0.48);
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+    }
+
+    .field-hint {
+        color: rgba(255, 255, 255, 0.2);
+        font-size: 9px;
+        font-weight: 700;
+    }
+
+    /* ---------------------------------------------------------
+   INPUTS
+   --------------------------------------------------------- */
+
+    .publish-input,
+    .publish-textarea {
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        outline: none;
+
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.025);
+
+        color: #ffffff;
+        font-family: inherit;
+
+        transition:
+            border-color 0.25s ease,
+            background 0.25s ease,
+            box-shadow 0.25s ease;
+    }
+
+    .publish-input {
+        min-height: 62px;
+        padding: 0 19px;
+
+        font-size: 18px;
+        font-weight: 650;
+        letter-spacing: -0.015em;
+    }
+
+    .publish-textarea {
+        min-height: 500px;
+        padding: 20px;
+
+        resize: vertical;
+
+        font-size: 15px;
+        line-height: 1.85;
+    }
+
+    .publish-input::placeholder,
+    .publish-textarea::placeholder {
+        color: rgba(255, 255, 255, 0.18);
+    }
+
+    .publish-input:hover,
+    .publish-textarea:hover {
+        border-color: rgba(255, 255, 255, 0.17);
+    }
+
+    .publish-input:focus,
+    .publish-textarea:focus {
+        border-color: rgba(255, 255, 255, 0.38);
+        background: rgba(255, 255, 255, 0.035);
+        box-shadow:
+            0 0 0 4px rgba(255, 255, 255, 0.035);
+    }
+
+    /* ---------------------------------------------------------
+   WRITING TOOLBAR
+   --------------------------------------------------------- */
+
+    .writing-tools {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+
+        margin-top: 10px;
+    }
+
+    .writing-tip {
+        color: rgba(255, 255, 255, 0.22);
+        font-size: 9px;
+        line-height: 1.5;
+    }
+
+    .character-counter {
+        white-space: nowrap;
+
+        color: rgba(255, 255, 255, 0.25);
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+    }
+
+    .character-counter strong {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* ---------------------------------------------------------
+   SUBMIT AREA
+   --------------------------------------------------------- */
+
+    .publish-submit-area {
+        margin-top: 32px;
+        padding-top: 28px;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .publish-submit-info {
+        max-width: 400px;
+    }
+
+    .publish-submit-info strong {
+        display: block;
+        margin-bottom: 5px;
+
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+    }
+
+    .publish-submit-info span {
+        color: rgba(255, 255, 255, 0.25);
+        font-size: 10px;
+        line-height: 1.5;
+    }
+
+    .publish-submit-button {
+        min-width: 190px;
+        min-height: 54px;
+
+        border: 1px solid #ffffff;
+        border-radius: 999px;
+
+        background: #ffffff;
+        color: #000000;
+
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.17em;
+        text-transform: uppercase;
+
+        cursor: pointer;
+
+        transition:
+            transform 0.25s ease,
+            box-shadow 0.25s ease,
+            background 0.25s ease,
+            color 0.25s ease;
+    }
+
+    .publish-submit-button:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 35px rgba(255, 255, 255, 0.12);
+    }
+
+    .publish-submit-button:active {
+        transform: translateY(-1px);
+    }
+
+    .publish-submit-button:disabled {
+        opacity: 0.5;
+        cursor: wait;
+        transform: none;
+        box-shadow: none;
+    }
+
+    /* ---------------------------------------------------------
+   SIDE PANEL
+   --------------------------------------------------------- */
+
+    .publish-sidebar {
+        position: sticky;
+        top: 105px;
+    }
+
+    .sidebar-card {
+        padding: 26px;
+
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px;
+
+        background: rgba(255, 255, 255, 0.018);
+
+        margin-bottom: 15px;
+
+        transition:
+            border-color 0.25s ease,
+            transform 0.25s ease;
+    }
+
+    .sidebar-card:hover {
+        border-color: rgba(255, 255, 255, 0.17);
+        transform: translateY(-3px);
+    }
+
+    .sidebar-card:last-child {
+        margin-bottom: 0;
+    }
+
+    .sidebar-label {
+        margin-bottom: 18px;
+
+        color: rgba(255, 255, 255, 0.25);
+        font-size: 8px;
+        font-weight: 900;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+    }
+
+    .sidebar-title {
+        margin: 0 0 11px;
+
+        color: #ffffff;
+        font-size: 17px;
+        line-height: 1.15;
+        letter-spacing: -0.03em;
+    }
+
+    .sidebar-copy {
+        margin: 0;
+
+        color: rgba(255, 255, 255, 0.34);
+        font-size: 11px;
+        line-height: 1.75;
+    }
+
+    /* ---------------------------------------------------------
+   CHECKLIST
+   --------------------------------------------------------- */
+
+    .publish-checklist {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .publish-checklist li {
+        position: relative;
+
+        padding: 12px 0 12px 26px;
+
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+
+        color: rgba(255, 255, 255, 0.38);
+        font-size: 10px;
+        line-height: 1.55;
+    }
+
+    .publish-checklist li:first-child {
+        border-top: 0;
+        padding-top: 0;
+    }
+
+    .publish-checklist li:last-child {
+        padding-bottom: 0;
+    }
+
+    .publish-checklist li::before {
+        content: "✓";
+
+        position: absolute;
+        left: 0;
+        top: 12px;
+
+        color: rgba(255, 255, 255, 0.45);
+        font-size: 10px;
+        font-weight: 900;
+    }
+
+    .publish-checklist li:first-child::before {
+        top: 0;
+    }
+
+    /* ---------------------------------------------------------
+   SHORTCUT
+   --------------------------------------------------------- */
+
+    .shortcut-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+
+        color: rgba(255, 255, 255, 0.3);
+        font-size: 10px;
+    }
+
+    .shortcut-key {
+        min-width: 27px;
+        height: 27px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 7px;
+
+        color: rgba(255, 255, 255, 0.65);
+        background: rgba(255, 255, 255, 0.035);
+
+        font-size: 9px;
+        font-weight: 900;
+    }
+
+    /* ---------------------------------------------------------
+   UNSAVED WARNING
+   --------------------------------------------------------- */
+
+    .unsaved-indicator {
+        display: none;
+        align-items: center;
+        gap: 7px;
+
+        color: rgba(255, 255, 255, 0.42);
+        font-size: 8px;
+        font-weight: 900;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .unsaved-indicator.visible {
+        display: inline-flex;
+    }
+
+    .unsaved-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #ffffff;
+    }
+
+    /* ---------------------------------------------------------
+   RESPONSIVE — TABLET
+   --------------------------------------------------------- */
+
+    @media (max-width: 1000px) {
+        .publish-shell {
+            width: min(100% - 34px, 1380px);
+            padding-top: 55px;
+        }
+
+        .publish-header {
+            grid-template-columns: 1fr;
+            gap: 35px;
+        }
+
+        .publish-identity {
+            width: min(100%, 340px);
+        }
+
+        .publish-workspace {
+            grid-template-columns: 1fr;
+            gap: 35px;
+        }
+
+        .publish-sidebar {
+            position: static;
+
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .sidebar-card {
             margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        }
+    }
+
+    /* ---------------------------------------------------------
+   RESPONSIVE — MOBILE
+   --------------------------------------------------------- */
+
+    @media (max-width: 650px) {
+        .publish-shell {
+            width: calc(100% - 28px);
+            padding: 40px 0 80px;
         }
 
-
-        body {
-            min-height: 100vh;
-
-            background: #050505;
-
-            color: white;
-
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
+        .publish-header {
+            padding-bottom: 35px;
         }
 
-
-        .navbar {
-            height: 76px;
-
-            padding: 0 5vw;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            border-bottom: 1px solid #1d1d1d;
+        .publish-eyebrow {
+            font-size: 8px;
+            letter-spacing: 0.2em;
         }
 
-
-        .logo {
-            font-size: 1.1rem;
-
-            font-weight: 950;
-
-            letter-spacing: 4px;
+        .publish-title {
+            font-size: clamp(46px, 15vw, 72px);
         }
 
-
-        .nav-actions {
-            display: flex;
-
-            gap: 25px;
-        }
-
-
-        .nav-actions a {
-            color: #888;
-
-            font-size: 0.62rem;
-
-            font-weight: 900;
-
-            letter-spacing: 1.5px;
-        }
-
-
-        .nav-actions a:hover {
-            color: white;
-        }
-
-
-        .page {
-            width: min(900px, 88vw);
-
-            margin: 0 auto;
-
-            padding: 110px 0;
-        }
-
-
-        .eyebrow {
-            color: #666;
-
-            font-size: 0.62rem;
-
-            font-weight: 900;
-
-            letter-spacing: 4px;
-        }
-
-
-        h1 {
-            margin-top: 20px;
-
-            font-size: clamp(3.5rem, 10vw, 7rem);
-
-            line-height: 0.85;
-
-            letter-spacing: -5px;
-
-            font-weight: 950;
-        }
-
-
-        .identity {
-            margin-top: 35px;
-
-            padding: 18px;
-
-            background: #0a0a0a;
-
-            border: 1px solid #222;
-        }
-
-
-        .identity-label {
-            color: #555;
-
-            font-size: 0.55rem;
-
-            font-weight: 900;
-
-            letter-spacing: 2px;
-        }
-
-
-        .identity-name {
-            margin-top: 7px;
-
-            font-size: 0.95rem;
-
-            font-weight: 900;
-        }
-
-
-        .identity-publication {
-            margin-top: 4px;
-
-            color: #777;
-
-            font-size: 0.65rem;
-
-            letter-spacing: 1px;
-        }
-
-
-        form {
-            margin-top: 45px;
-        }
-
-
-        label {
-            display: block;
-
-            margin-bottom: 10px;
-
-            color: #666;
-
-            font-size: 0.6rem;
-
-            font-weight: 900;
-
-            letter-spacing: 2px;
-        }
-
-
-        input,
-        textarea {
-            width: 100%;
-
-            background: #090909;
-
-            color: white;
-
-            border: 1px solid #292929;
-
-            outline: none;
-
-            font-family: inherit;
-
-            transition: border-color 0.2s ease;
-        }
-
-
-        input {
-            height: 56px;
-
-            padding: 0 16px;
-
-            font-size: 0.95rem;
-        }
-
-
-        textarea {
-            min-height: 360px;
-
-            padding: 16px;
-
-            resize: vertical;
-
-            font-size: 0.9rem;
-
+        .publish-description {
+            font-size: 12px;
             line-height: 1.7;
         }
 
-
-        input:focus,
-        textarea:focus {
-            border-color: #777;
-        }
-
-
-        .field {
-            margin-bottom: 25px;
-        }
-
-
-        .submit {
+        .publish-identity {
             width: 100%;
-
-            height: 55px;
-
-            border: none;
-
-            background: white;
-
-            color: black;
-
-            cursor: pointer;
-
-            font-size: 0.67rem;
-
-            font-weight: 900;
-
-            letter-spacing: 2px;
-
-            transition:
-                background 0.2s ease,
-                transform 0.2s ease;
         }
 
-
-        .submit:hover {
-            background: #ccc;
-
-            transform: translateY(-2px);
+        .publish-workspace {
+            margin-top: 40px;
         }
 
-
-        .error {
-            margin-bottom: 25px;
-
-            padding: 14px;
-
-            border: 1px solid #3a3a3a;
-
-            color: #aaa;
-
-            font-size: 0.7rem;
+        .publish-form-card {
+            border-radius: 17px;
         }
 
-
-        @media (max-width: 600px) {
-
-            .page {
-                padding: 75px 0;
-            }
-
-
-            .nav-actions a:first-child {
-                display: none;
-            }
-
-
-            textarea {
-                min-height: 300px;
-            }
-
+        .publish-form-toolbar {
+            padding: 0 15px;
         }
-    </style>
 
-</head>
+        .toolbar-label {
+            font-size: 7px;
+        }
+
+        .toolbar-right {
+            display: none;
+        }
+
+        .publish-form-content {
+            padding: 22px 17px;
+        }
+
+        .publish-input {
+            min-height: 56px;
+            font-size: 16px;
+        }
+
+        .publish-textarea {
+            min-height: 420px;
+            padding: 16px;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .field-label-row {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .writing-tools {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .publish-submit-area {
+            align-items: stretch;
+            flex-direction: column;
+        }
+
+        .publish-submit-button {
+            width: 100%;
+        }
+
+        .publish-sidebar {
+            grid-template-columns: 1fr;
+        }
+
+        .sidebar-card {
+            padding: 22px;
+        }
+    }
+
+    /* ---------------------------------------------------------
+   REDUCED MOTION
+   --------------------------------------------------------- */
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .publish-identity,
+        .sidebar-card,
+        .publish-submit-button,
+        .publish-input,
+        .publish-textarea {
+            transition: none;
+        }
+    }
+</style>
+{% endblock %}
 
 
-<body>
+{% block content %}
+
+<div class="publish-page">
+
+    <div class="publish-shell">
+
+        <!-- =================================================
+             PAGE HEADER
+             ================================================== -->
+
+        <header class="publish-header">
+
+            <div>
+
+                <div class="publish-eyebrow">
+                    <span class="publish-eyebrow-line"></span>
+                    ACC PRESS DESK
+                </div>
+
+                <h1 class="publish-title">
+                    PUBLISH<br>
+                    REPORT.
+                </h1>
+
+                <p class="publish-description">
+                    Write and submit an official report to the
+                    Arkanian Crisis Committee Press Archive.
+                    Once published, the article becomes part of
+                    the public committee record.
+                </p>
+
+            </div>
 
 
-    <nav class="navbar">
+            <!-- PRESS IDENTITY -->
 
-        <a href="/" class="logo">
-            ACC
-        </a>
+            <div class="publish-identity">
+
+                <div class="identity-label">
+                    Signed in as
+                </div>
+
+                <div class="identity-row">
+
+                    <div class="identity-avatar">
+                        {{ user.username[0]|upper }}
+                    </div>
+
+                    <div>
+
+                        <p class="identity-name">
+                            {{ user.username }}
+                        </p>
+
+                        <p class="identity-role">
+                            Press Delegate
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
 
 
-        <div class="nav-actions">
+        <!-- =================================================
+             WORKSPACE
+             ================================================== -->
 
-            <a href="/articles">
-                ARTICLES
-            </a>
+        <div class="publish-workspace">
 
-            <a href="/press-logout">
-                LOG OUT
-            </a>
+            <!-- =================================================
+                 EDITOR
+                 ================================================== -->
+
+            <section class="publish-editor">
+
+                <div class="publish-editor-heading">
+
+                    <h2>
+                        New Press Report
+                    </h2>
+
+                    <div class="editor-status" id="editorStatus">
+                        <span class="editor-status-dot"></span>
+                        Ready to write
+                    </div>
+
+                </div>
+
+
+                <!-- FORM -->
+
+                <form method="POST" action="{{ url_for('press_upload') }}" class="publish-form-card" id="publishForm"
+                    autocomplete="off">
+
+                    <!-- FORM TOOLBAR -->
+
+                    <div class="publish-form-toolbar">
+
+                        <div class="toolbar-left">
+
+                            <span class="toolbar-dot"></span>
+                            <span class="toolbar-dot"></span>
+                            <span class="toolbar-dot"></span>
+
+                            <span class="toolbar-label">
+                                Press Desk / New Document
+                            </span>
+
+                        </div>
+
+                        <div class="toolbar-right">
+                            ACC-PRESS
+                        </div>
+
+                    </div>
+
+
+                    <!-- FORM CONTENT -->
+
+                    <div class="publish-form-content">
+
+                        <!-- TITLE -->
+
+                        <div class="field-group">
+
+                            <div class="field-label-row">
+
+                                <label for="title" class="field-label">
+                                    Article headline
+                                </label>
+
+                                <span class="field-hint">
+                                    Keep it clear and factual
+                                </span>
+
+                            </div>
+
+                            <input type="text" id="title" name="title" class="publish-input"
+                                placeholder="Enter your headline..." maxlength="180" required>
+
+                        </div>
+
+
+                        <!-- BODY -->
+
+                        <div class="field-group">
+
+                            <div class="field-label-row">
+
+                                <label for="content" class="field-label">
+                                    Report
+                                </label>
+
+                                <span class="field-hint" id="wordCount">
+                                    0 words
+                                </span>
+
+                            </div>
+
+                            <textarea id="content" name="content" class="publish-textarea" placeholder="Begin reporting...
+
+What happened?
+Who was involved?
+What was said or decided?
+What changed?
+What should delegates know?
+
+Write your report clearly and accurately." maxlength="15000" required></textarea>
+
+                            <div class="writing-tools">
+
+                                <div class="writing-tip">
+                                    Press reporting should remain
+                                    clear, factual and distinguish
+                                    between confirmed information
+                                    and statements made by others.
+                                </div>
+
+                                <div class="character-counter" id="characterCounter">
+                                    <strong>0</strong>
+                                    / 15,000
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- SUBMIT -->
+
+                        <div class="publish-submit-area">
+
+                            <div class="publish-submit-info">
+
+                                <strong>
+                                    Ready to publish?
+                                </strong>
+
+                                <span>
+                                    Your name and delegation will
+                                    automatically appear in the
+                                    public article archive.
+                                </span>
+
+                            </div>
+
+
+                            <div class="unsaved-indicator" id="unsavedIndicator">
+                                <span class="unsaved-dot"></span>
+                                Unsaved changes
+                            </div>
+
+
+                            <button type="submit" class="publish-submit-button" id="publishButton">
+                                Publish Report →
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <!-- =================================================
+                 SIDEBAR
+                 ================================================== -->
+
+            <aside class="publish-sidebar">
+
+                <!-- REPORTING GUIDE -->
+
+                <div class="sidebar-card">
+
+                    <div class="sidebar-label">
+                        Reporting standard
+                    </div>
+
+                    <h2 class="sidebar-title">
+                        Report what happened.
+                    </h2>
+
+                    <p class="sidebar-copy">
+                        A strong crisis report gives delegates
+                        enough information to understand an event
+                        without turning the report into speculation.
+                    </p>
+
+                </div>
+
+
+                <!-- CHECKLIST -->
+
+                <div class="sidebar-card">
+
+                    <div class="sidebar-label">
+                        Before publishing
+                    </div>
+
+                    <ul class="publish-checklist">
+
+                        <li>
+                            Headline accurately describes the report.
+                        </li>
+
+                        <li>
+                            Important facts are clearly stated.
+                        </li>
+
+                        <li>
+                            Statements are attributed to their source.
+                        </li>
+
+                        <li>
+                            Names and delegations are spelled correctly.
+                        </li>
+
+                        <li>
+                            Speculation is clearly separated from fact.
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <!-- SHORTCUTS -->
+
+                <div class="sidebar-card">
+
+                    <div class="sidebar-label">
+                        Keyboard
+                    </div>
+
+                    <div class="shortcut-row">
+
+                        <span>
+                            Submit report
+                        </span>
+
+                        <span class="shortcut-key">
+                            Ctrl
+                        </span>
+
+                    </div>
+
+                    <div class="shortcut-row" style="margin-top:10px;">
+
+                        <span>
+                            Focus editor
+                        </span>
+
+                        <span class="shortcut-key">
+                            /
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ARCHIVE LINK -->
+
+                <div class="sidebar-card">
+
+                    <div class="sidebar-label">
+                        Existing reports
+                    </div>
+
+                    <h2 class="sidebar-title">
+                        Read the archive.
+                    </h2>
+
+                    <p class="sidebar-copy">
+                        Review published reports before filing
+                        your own so you can maintain a consistent
+                        newsroom style.
+                    </p>
+
+                    <a href="{{ url_for('articles') }}" class="article-action" style="margin-top:20px; width:100%;">
+                        Open Archive →
+                    </a>
+
+                </div>
+
+            </aside>
 
         </div>
 
-    </nav>
+    </div>
+
+</div>
+
+{% endblock %}
 
 
-    <main class="page">
+{% block extra_js %}
+<script>
+    /* =========================================================
+       PRESS PUBLISHING DESK JAVASCRIPT
+       ========================================================= */
 
-        <div class="eyebrow">
-            PRESS CORPS / NEW REPORT
-        </div>
+    document.addEventListener("DOMContentLoaded", () => {
 
+        const form =
+            document.getElementById("publishForm");
 
-        <h1>
-            PUBLISH
-            <br>
-            REPORT.
-        </h1>
+        const titleInput =
+            document.getElementById("title");
 
+        const contentInput =
+            document.getElementById("content");
 
-        <div class="identity">
+        const publishButton =
+            document.getElementById("publishButton");
 
-            <div class="identity-label">
-                AUTHENTICATED AS
-            </div>
+        const characterCounter =
+            document.getElementById("characterCounter");
 
-            <div class="identity-name">
-                {{ name }}
-            </div>
+        const wordCount =
+            document.getElementById("wordCount");
 
-            <div class="identity-publication">
-                {{ publication }}
-            </div>
+        const editorStatus =
+            document.getElementById("editorStatus");
 
-        </div>
-
-
-        <form method="POST" action="/press-upload">
-
-            {% if error %}
-
-            <div class="error">
-                {{ error }}
-            </div>
-
-            {% endif %}
+        const unsavedIndicator =
+            document.getElementById("unsavedIndicator");
 
 
-            <div class="field">
+        /* -----------------------------------------------------
+           WORD COUNT
+           ----------------------------------------------------- */
 
-                <label for="title">
-                    HEADLINE
-                </label>
+        function updateWordCount() {
 
-                <input type="text" id="title" name="title" maxlength="200" value="{{ title }}"
-                    placeholder="Enter your headline..." required>
+            if (!contentInput || !wordCount) {
+                return;
+            }
 
-            </div>
+            const text =
+                contentInput.value.trim();
+
+            if (!text) {
+                wordCount.textContent =
+                    "0 words";
+
+                return;
+            }
+
+            const words =
+                text
+                    .split(/\s+/)
+                    .filter(Boolean)
+                    .length;
+
+            wordCount.textContent =
+                words +
+                (words === 1 ? " word" : " words");
+        }
 
 
-            <div class="field">
+        /* -----------------------------------------------------
+           CHARACTER COUNT
+           ----------------------------------------------------- */
 
-                <label for="content">
-                    ARTICLE
-                </label>
+        function updateCharacterCount() {
 
-                <textarea id="content" name="content" placeholder="Write your report..."
-                    required>{{ content }}</textarea>
+            if (!contentInput || !characterCounter) {
+                return;
+            }
 
-            </div>
+            const count =
+                contentInput.value.length;
+
+            characterCounter.innerHTML =
+                "<strong>" +
+                count.toLocaleString() +
+                "</strong> / 15,000";
+        }
 
 
-            <button type="submit" class="submit">
-                PUBLISH ARTICLE →
-            </button>
+        /* -----------------------------------------------------
+           EDITOR STATUS
+           ----------------------------------------------------- */
 
-        </form>
+        function updateEditorStatus() {
 
-    </main>
+            if (!editorStatus) {
+                return;
+            }
 
-</body>
+            const title =
+                titleInput
+                    ? titleInput.value.trim()
+                    : "";
 
-</html>
+            const body =
+                contentInput
+                    ? contentInput.value.trim()
+                    : "";
+
+            const hasContent =
+                title.length > 0 ||
+                body.length > 0;
+
+            if (hasContent) {
+
+                editorStatus.classList.add(
+                    "active"
+                );
+
+                editorStatus.innerHTML =
+                    '<span class="editor-status-dot"></span>' +
+                    'Draft in progress';
+
+            } else {
+
+                editorStatus.classList.remove(
+                    "active"
+                );
+
+                editorStatus.innerHTML =
+                    '<span class="editor-status-dot"></span>' +
+                    'Ready to write';
+            }
+
+            if (
+                unsavedIndicator &&
+                hasContent
+            ) {
+
+                unsavedIndicator.classList.add(
+                    "visible"
+                );
+            }
+        }
+
+
+        /* -----------------------------------------------------
+           INPUT EVENTS
+           ----------------------------------------------------- */
+
+        if (contentInput) {
+
+            contentInput.addEventListener(
+                "input",
+                () => {
+
+                    updateWordCount();
+                    updateCharacterCount();
+                    updateEditorStatus();
+                }
+            );
+        }
+
+
+        if (titleInput) {
+
+            titleInput.addEventListener(
+                "input",
+                updateEditorStatus
+            );
+        }
+
+
+        updateWordCount();
+        updateCharacterCount();
+        updateEditorStatus();
+
+
+        /* -----------------------------------------------------
+           SLASH SHORTCUT
+           ----------------------------------------------------- */
+
+        document.addEventListener(
+            "keydown",
+            (event) => {
+
+                if (
+                    event.key === "/" &&
+                    !event.ctrlKey &&
+                    !event.altKey &&
+                    !event.metaKey
+                ) {
+
+                    const active =
+                        document.activeElement;
+
+                    const isTyping =
+                        active &&
+                        (
+                            active.tagName === "INPUT" ||
+                            active.tagName === "TEXTAREA" ||
+                            active.isContentEditable
+                        );
+
+                    if (!isTyping) {
+
+                        event.preventDefault();
+
+                        if (titleInput) {
+                            titleInput.focus();
+                        }
+                    }
+                }
+            }
+        );
+
+
+        /* -----------------------------------------------------
+           CTRL + ENTER TO PUBLISH
+           ----------------------------------------------------- */
+
+        document.addEventListener(
+            "keydown",
+            (event) => {
+
+                if (
+                    event.ctrlKey &&
+                    event.key === "Enter"
+                ) {
+
+                    event.preventDefault();
+
+                    if (
+                        form &&
+                        typeof form.requestSubmit ===
+                        "function"
+                    ) {
+
+                        form.requestSubmit();
+
+                    } else if (form) {
+
+                        form.submit();
+                    }
+                }
+            }
+        );
+
+
+        /* -----------------------------------------------------
+           FORM SUBMISSION
+           ----------------------------------------------------- */
+
+        let submitted = false;
+
+        if (form) {
+
+            form.addEventListener(
+                "submit",
+                (event) => {
+
+                    if (submitted) {
+
+                        event.preventDefault();
+
+                        return;
+                    }
+
+                    const title =
+                        titleInput
+                            ? titleInput.value.trim()
+                            : "";
+
+                    const body =
+                        contentInput
+                            ? contentInput.value.trim()
+                            : "";
+
+                    if (!title || !body) {
+
+                        return;
+                    }
+
+                    submitted = true;
+
+                    if (publishButton) {
+
+                        publishButton.disabled =
+                            true;
+
+                        publishButton.textContent =
+                            "Publishing…";
+                    }
+
+                    if (unsavedIndicator) {
+
+                        unsavedIndicator.classList.remove(
+                            "visible"
+                        );
+                    }
+                }
+            );
+        }
+
+
+        /* -----------------------------------------------------
+           UNSAVED CHANGES WARNING
+           ----------------------------------------------------- */
+
+        let hasSubmitted = false;
+
+        if (form) {
+
+            form.addEventListener(
+                "submit",
+                () => {
+                    hasSubmitted = true;
+                }
+            );
+        }
+
+        window.addEventListener(
+            "beforeunload",
+            (event) => {
+
+                if (hasSubmitted) {
+                    return;
+                }
+
+                const title =
+                    titleInput
+                        ? titleInput.value.trim()
+                        : "";
+
+                const body =
+                    contentInput
+                        ? contentInput.value.trim()
+                        : "";
+
+                if (title || body) {
+
+                    event.preventDefault();
+
+                    event.returnValue = "";
+                }
+            }
+        );
+
+
+        /* -----------------------------------------------------
+           TEXTAREA AUTO-SCROLL BEHAVIOUR
+           ----------------------------------------------------- */
+
+        if (contentInput) {
+
+            contentInput.addEventListener(
+                "focus",
+                () => {
+
+                    contentInput.style.minHeight =
+                        window.innerWidth <= 650
+                            ? "500px"
+                            : "560px";
+                }
+            );
+        }
+
+
+        /* -----------------------------------------------------
+           PREVENT ACCIDENTAL EMPTY SUBMISSION
+           ----------------------------------------------------- */
+
+        if (form) {
+
+            form.addEventListener(
+                "submit",
+                (event) => {
+
+                    const title =
+                        titleInput
+                            ? titleInput.value.trim()
+                            : "";
+
+                    const body =
+                        contentInput
+                            ? contentInput.value.trim()
+                            : "";
+
+                    if (!title || !body) {
+
+                        event.preventDefault();
+
+                        if (!title && titleInput) {
+                            titleInput.focus();
+                        } else if (contentInput) {
+                            contentInput.focus();
+                        }
+                    }
+                }
+            );
+        }
+
+    });
+</script>
+{% endblock %}

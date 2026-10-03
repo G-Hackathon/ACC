@@ -1,0 +1,1498 @@
+{% extends "base.html" %}
+
+{% block title %}
+Crises — Arkanian Crisis Committee
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .crisis-page {
+        min-height: calc(100vh - 80px);
+        padding: 80px 24px 120px;
+    }
+
+    .crisis-inner {
+        max-width: 1180px;
+        margin: 0 auto;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
+
+    .crisis-header {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 40px;
+        align-items: end;
+        margin-bottom: 55px;
+    }
+
+    .crisis-eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        opacity: 0.45;
+        margin-bottom: 18px;
+        font-weight: 600;
+    }
+
+    .crisis-title {
+        margin: 0;
+        font-size: clamp(64px, 10vw, 145px);
+        line-height: 0.82;
+        letter-spacing: -0.07em;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .crisis-title span {
+        display: block;
+        opacity: 0.25;
+    }
+
+    .crisis-description {
+        max-width: 520px;
+        margin: 25px 0 0;
+        font-size: 15px;
+        line-height: 1.7;
+        opacity: 0.58;
+    }
+
+    .crisis-status {
+        min-width: 230px;
+        padding: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.025);
+        backdrop-filter: blur(12px);
+    }
+
+    .crisis-status-label {
+        font-size: 9px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        opacity: 0.4;
+        margin-bottom: 12px;
+    }
+
+    .crisis-status-value {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .crisis-status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        animation: crisisPulse 1.8s infinite;
+    }
+
+    @keyframes crisisPulse {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.35;
+            transform: scale(0.7);
+        }
+    }
+
+    /* =========================
+       SECTIONS
+    ========================= */
+
+    .crisis-section {
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 42px 0 0;
+        margin-top: 65px;
+    }
+
+    .crisis-section-layout {
+        display: grid;
+        grid-template-columns: 130px 1fr;
+        gap: 35px;
+    }
+
+    .crisis-section-number {
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        opacity: 0.32;
+        padding-top: 7px;
+    }
+
+    .crisis-section-heading {
+        margin: 0;
+        font-size: 35px;
+        letter-spacing: -0.04em;
+        line-height: 1;
+    }
+
+    .crisis-section-subtitle {
+        margin: 12px 0 35px;
+        font-size: 13px;
+        line-height: 1.6;
+        opacity: 0.42;
+    }
+
+    /* =========================
+       CHAIR NOTICE
+    ========================= */
+
+    .chair-only-notice {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 15px 17px;
+        border: 1px solid rgba(255, 255, 255, 0.11);
+        background: rgba(255, 255, 255, 0.025);
+        margin-bottom: 28px;
+    }
+
+    .chair-only-icon {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+
+    .chair-only-text {
+        font-size: 11px;
+        line-height: 1.5;
+        opacity: 0.55;
+    }
+
+    /* =========================
+       FORM
+    ========================= */
+
+    .crisis-form {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .crisis-field {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+    }
+
+    .crisis-field-label {
+        font-size: 10px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        opacity: 0.42;
+        font-weight: 600;
+    }
+
+    .crisis-input,
+    .crisis-textarea {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.025);
+        color: inherit;
+        font-family: inherit;
+        outline: none;
+        transition:
+            border-color 0.25s ease,
+            background 0.25s ease,
+            transform 0.25s ease;
+    }
+
+    .crisis-input {
+        height: 58px;
+        padding: 0 18px;
+        font-size: 15px;
+    }
+
+    .crisis-textarea {
+        min-height: 180px;
+        padding: 17px 18px;
+        resize: vertical;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .crisis-input::placeholder,
+    .crisis-textarea::placeholder {
+        color: currentColor;
+        opacity: 0.23;
+    }
+
+    .crisis-input:focus,
+    .crisis-textarea:focus {
+        border-color: rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.045);
+    }
+
+    /* =========================
+       FILE UPLOAD
+    ========================= */
+
+    .crisis-file-zone {
+        position: relative;
+        min-height: 125px;
+        border: 1px dashed rgba(255, 255, 255, 0.16);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition:
+            border-color 0.25s ease,
+            background 0.25s ease;
+    }
+
+    .crisis-file-zone:hover,
+    .crisis-file-zone.dragging {
+        border-color: rgba(255, 255, 255, 0.45);
+        background: rgba(255, 255, 255, 0.035);
+    }
+
+    .crisis-file-zone input {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .crisis-file-content {
+        text-align: center;
+        pointer-events: none;
+    }
+
+    .crisis-file-main {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .crisis-file-sub {
+        margin-top: 7px;
+        font-size: 10px;
+        opacity: 0.35;
+    }
+
+    .crisis-file-name {
+        margin-top: 8px;
+        font-size: 11px;
+        opacity: 0.65;
+    }
+
+    /* =========================
+       FORM FOOTER
+    ========================= */
+
+    .crisis-form-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding-top: 5px;
+    }
+
+    .crisis-counter {
+        font-size: 10px;
+        opacity: 0.3;
+    }
+
+    .crisis-publish-button {
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: #fff;
+        color: #000;
+        padding: 15px 24px;
+        font-family: inherit;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition:
+            transform 0.25s ease,
+            background 0.25s ease,
+            color 0.25s ease;
+    }
+
+    .crisis-publish-button:hover {
+        transform: translateY(-3px);
+        background: transparent;
+        color: #fff;
+    }
+
+    .crisis-publish-button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* =========================
+       PUBLISHED CRISES
+    ========================= */
+
+    .published-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .published-crisis {
+        position: relative;
+        display: grid;
+        grid-template-columns: 70px 1fr auto;
+        gap: 25px;
+        align-items: start;
+        padding: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.02);
+        transition:
+            transform 0.3s ease,
+            border-color 0.3s ease,
+            background 0.3s ease;
+    }
+
+    .published-crisis:hover {
+        border-color: rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.035);
+    }
+
+    .crisis-index {
+        font-size: 11px;
+        letter-spacing: 0.15em;
+        opacity: 0.28;
+        padding-top: 4px;
+    }
+
+    .published-title {
+        margin: 0;
+        font-size: 21px;
+        letter-spacing: -0.025em;
+        line-height: 1.25;
+    }
+
+    .published-description {
+        margin-top: 12px;
+        max-width: 760px;
+        font-size: 13px;
+        line-height: 1.7;
+        opacity: 0.5;
+        white-space: pre-wrap;
+    }
+
+    .published-meta {
+        margin-top: 17px;
+        font-size: 9px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        opacity: 0.28;
+    }
+
+    .crisis-file-link {
+        display: inline-block;
+        margin-top: 17px;
+        color: inherit;
+        text-decoration: none;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        opacity: 0.65;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+        padding-bottom: 4px;
+        transition: opacity 0.2s ease;
+    }
+
+    .crisis-file-link:hover {
+        opacity: 1;
+    }
+
+    .crisis-delete-button {
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: transparent;
+        color: inherit;
+        padding: 9px 13px;
+        font-family: inherit;
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: pointer;
+        opacity: 0.45;
+        transition:
+            opacity 0.2s ease,
+            border-color 0.2s ease,
+            background 0.2s ease;
+    }
+
+    .crisis-delete-button:hover {
+        opacity: 1;
+        border-color: rgba(255, 255, 255, 0.45);
+        background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* =========================
+       EMPTY STATE
+    ========================= */
+
+    .crisis-empty {
+        border: 1px dashed rgba(255, 255, 255, 0.12);
+        padding: 65px 25px;
+        text-align: center;
+    }
+
+    .crisis-empty-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 9px;
+    }
+
+    .crisis-empty-text {
+        font-size: 12px;
+        opacity: 0.35;
+        line-height: 1.6;
+    }
+
+    /* =========================
+       DELETE MODAL
+    ========================= */
+
+    .crisis-modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 25px;
+        background: rgba(0, 0, 0, 0.78);
+        backdrop-filter: blur(12px);
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition:
+            opacity 0.25s ease,
+            visibility 0.25s ease;
+    }
+
+    .crisis-modal-backdrop.open {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    .crisis-modal {
+        width: min(470px, 100%);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: #080808;
+        padding: 32px;
+        box-shadow: 0 30px 100px rgba(0, 0, 0, 0.65);
+        transform: translateY(20px) scale(0.98);
+        transition: transform 0.25s ease;
+    }
+
+    .crisis-modal-backdrop.open .crisis-modal {
+        transform: translateY(0) scale(1);
+    }
+
+    .crisis-modal-eyebrow {
+        font-size: 9px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        opacity: 0.35;
+        margin-bottom: 13px;
+    }
+
+    .crisis-modal-title {
+        margin: 0;
+        font-size: 29px;
+        letter-spacing: -0.04em;
+    }
+
+    .crisis-modal-text {
+        margin: 16px 0 27px;
+        font-size: 13px;
+        line-height: 1.7;
+        opacity: 0.5;
+    }
+
+    .crisis-modal-text strong {
+        color: #fff;
+        opacity: 1;
+    }
+
+    .crisis-modal-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .crisis-modal-button {
+        width: 100%;
+        min-height: 45px;
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: transparent;
+        color: inherit;
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition:
+            background 0.2s ease,
+            color 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+    .crisis-modal-button:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .crisis-modal-button.danger {
+        background: #fff;
+        color: #000;
+    }
+
+    .crisis-modal-button.danger:hover {
+        background: #ddd;
+    }
+
+    .crisis-modal-button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 800px) {
+        .crisis-page {
+            padding: 55px 18px 90px;
+        }
+
+        .crisis-header {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .crisis-status {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .crisis-section-layout {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .crisis-section-number {
+            padding-top: 0;
+        }
+
+        .published-crisis {
+            grid-template-columns: 42px 1fr;
+            gap: 18px;
+        }
+
+        .published-crisis>div:last-child {
+            grid-column: 2;
+        }
+    }
+
+    @media (max-width: 520px) {
+        .crisis-title {
+            font-size: 58px;
+        }
+
+        .crisis-section {
+            margin-top: 50px;
+        }
+
+        .crisis-section-heading {
+            font-size: 29px;
+        }
+
+        .crisis-form-footer {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .crisis-publish-button {
+            width: 100%;
+        }
+
+        .published-crisis {
+            padding: 21px;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .published-crisis>div:last-child {
+            grid-column: auto;
+        }
+
+        .crisis-index {
+            display: none;
+        }
+
+        .crisis-modal {
+            padding: 25px;
+        }
+
+        .crisis-modal-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="crisis-page">
+    <div class="crisis-inner">
+
+        <!-- =========================
+             PAGE HEADER
+        ========================== -->
+
+        <header class="crisis-header">
+
+            <div>
+                {% if user and user.role == "chair" %}
+                <div class="crisis-eyebrow">
+                    Chair Control / Crisis Management
+                </div>
+
+                <h1 class="crisis-title">
+                    CRISIS
+                    <span>Control.</span>
+                </h1>
+
+                <p class="crisis-description">
+                    Publish official developments, directives and
+                    documents for the Arkanian Crisis Committee.
+                </p>
+
+                {% else %}
+                <div class="crisis-eyebrow">
+                    Arkanian Crisis Committee / Live Record
+                </div>
+
+                <h1 class="crisis-title">
+                    Live
+                    <span>Crises.</span>
+                </h1>
+
+                <p class="crisis-description">
+                    Follow the official crisis developments released
+                    by the Chair throughout the committee.
+                </p>
+                {% endif %}
+            </div>
+
+            <div class="crisis-status">
+                <div class="crisis-status-label">
+                    Committee Status
+                </div>
+
+                <div class="crisis-status-value">
+                    <span class="crisis-status-dot"></span>
+                    Live Committee Record
+                </div>
+            </div>
+
+        </header>
+
+
+        <!-- =========================
+             CHAIR PUBLISH SECTION
+        ========================== -->
+
+        {% if user and user.role == "chair" %}
+
+        <section class="crisis-section">
+
+            <div class="crisis-section-layout">
+
+                <div class="crisis-section-number">
+                    01 / Publish
+                </div>
+
+                <div>
+
+                    <h2 class="crisis-section-heading">
+                        Create Crisis
+                    </h2>
+
+                    <p class="crisis-section-subtitle">
+                        Publish an official crisis development to every
+                        delegate in the committee.
+                    </p>
+
+
+                    <div class="chair-only-notice">
+
+                        <div class="chair-only-icon">
+                            ✓
+                        </div>
+
+                        <div class="chair-only-text">
+                            You are authenticated as Chair.
+                            Published crises become immediately visible
+                            to all delegates.
+                        </div>
+
+                    </div>
+
+
+                    <form class="crisis-form" id="crisisForm" method="POST" action="{{ url_for('crises') }}"
+                        enctype="multipart/form-data">
+
+                        <!-- TITLE -->
+
+                        <div class="crisis-field">
+
+                            <label class="crisis-field-label" for="crisisTitle">
+                                Crisis Title
+                            </label>
+
+                            <input type="text" id="crisisTitle" name="title" class="crisis-input" maxlength="120"
+                                placeholder="Enter crisis title..." required>
+
+                        </div>
+
+
+                        <!-- DESCRIPTION -->
+
+                        <div class="crisis-field">
+
+                            <label class="crisis-field-label" for="crisisDescription">
+                                Development
+                            </label>
+
+                            <textarea id="crisisDescription" name="description" class="crisis-textarea" maxlength="5000"
+                                placeholder="Describe the latest development..." required></textarea>
+
+                        </div>
+
+
+                        <!-- FILE -->
+
+                        <div class="crisis-field">
+
+                            <label class="crisis-field-label">
+                                Official File / Optional
+                            </label>
+
+                            <div class="crisis-file-zone" id="crisisFileZone">
+
+                                <input type="file" id="crisisFile" name="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
+
+                                <div class="crisis-file-content">
+
+                                    <div class="crisis-file-main">
+                                        Attach Official Document
+                                    </div>
+
+                                    <div class="crisis-file-sub">
+                                        PDF, DOC, DOCX, PNG, JPG or JPEG
+                                    </div>
+
+                                    <div class="crisis-file-name" id="crisisFileName">
+                                        No file selected
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- FOOTER -->
+
+                        <div class="crisis-form-footer">
+
+                            <div class="crisis-counter" id="crisisCounter">
+                                0 / 5000 characters
+                            </div>
+
+                            <button type="submit" class="crisis-publish-button" id="publishButton">
+                                Publish Crisis →
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+        <!-- =========================
+             PUBLISHED CRISES
+        ========================== -->
+
+        <section class="crisis-section">
+
+            <div class="crisis-section-layout">
+
+                <div class="crisis-section-number">
+                    {% if user and user.role == "chair" %}
+                    02 / Archive
+                    {% else %}
+                    01 / Live Record
+                    {% endif %}
+                </div>
+
+                <div>
+
+                    <h2 class="crisis-section-heading">
+                        Published Crises
+                    </h2>
+
+                    <p class="crisis-section-subtitle">
+                        {% if user and user.role == "chair" %}
+                        Manage the official crisis record.
+                        {% else %}
+                        Official crisis developments released by
+                        the Chair.
+                        {% endif %}
+                    </p>
+
+
+                    {% if crises %}
+
+                    <div class="published-grid">
+
+                        {% for crisis in crises %}
+
+                        <article class="published-crisis" data-crisis-card>
+
+                            <div class="crisis-index">
+                                {{ "%02d"|format(loop.index) }}
+                            </div>
+
+
+                            <div>
+
+                                <h3 class="published-title">
+                                    {{ crisis["title"] }}
+                                </h3>
+
+                                <div class="published-description">
+                                    {{ crisis["description"] }}
+                                </div>
+
+
+                                {% if crisis["filename"] %}
+
+                                <a href="{{ url_for('uploaded_file', filename=crisis['filename']) }}"
+                                    class="crisis-file-link" target="_blank" rel="noopener">
+                                    View Official File →
+                                </a>
+
+                                {% endif %}
+
+
+                                <div class="published-meta">
+
+                                    Published {{ crisis["created_at"] }}
+
+                                    {% if crisis["filename"] %}
+                                    / File Attached
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            {% if user and user.role == "chair" %}
+
+                            <div>
+
+                                <button type="button" class="crisis-delete-button"
+                                    data-delete-url="{{ url_for('delete_crisis', crisis_id=crisis['id']) }}"
+                                    data-crisis-title="{{ crisis['title']|e }}">
+                                    Delete
+                                </button>
+
+                            </div>
+
+                            {% endif %}
+
+                        </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="crisis-empty">
+
+                        <div class="crisis-empty-title">
+                            No crises published
+                        </div>
+
+                        <div class="crisis-empty-text">
+                            {% if user and user.role == "chair" %}
+                            Publish the first official crisis
+                            development above.
+                            {% else %}
+                            The Chair has not published any crisis
+                            developments yet.
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             DELETE MODAL
+        ========================== -->
+
+        {% if user and user.role == "chair" %}
+
+        <div class="crisis-modal-backdrop" id="deleteModal" aria-hidden="true">
+
+            <div class="crisis-modal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+
+                <div class="crisis-modal-eyebrow">
+                    Confirm Command
+                </div>
+
+                <h2 class="crisis-modal-title" id="deleteModalTitle">
+                    Delete Crisis?
+                </h2>
+
+                <p class="crisis-modal-text">
+                    You are about to permanently remove
+                    <strong id="deleteCrisisName"></strong>
+                    from the committee crisis archive.
+                    This action cannot be undone.
+                </p>
+
+
+                <div class="crisis-modal-actions">
+
+                    <button type="button" class="crisis-modal-button" id="cancelDelete">
+                        Cancel
+                    </button>
+
+
+                    <form method="POST" id="deleteForm" style="flex: 1;">
+
+                        <button type="submit" class="crisis-modal-button danger" id="confirmDeleteButton">
+                            Delete Crisis
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        /* =========================
+           PUBLISH FORM
+        ========================== */
+
+        const crisisForm =
+            document.getElementById("crisisForm");
+
+        const publishButton =
+            document.getElementById("publishButton");
+
+        const crisisDescription =
+            document.getElementById("crisisDescription");
+
+        const crisisCounter =
+            document.getElementById("crisisCounter");
+
+
+        if (crisisDescription && crisisCounter) {
+
+            function updateCounter() {
+
+                const length =
+                    crisisDescription.value.length;
+
+                crisisCounter.textContent =
+                    length + " / 5000 characters";
+
+            }
+
+            crisisDescription.addEventListener(
+                "input",
+                updateCounter
+            );
+
+            updateCounter();
+        }
+
+
+        if (crisisForm && publishButton) {
+
+            crisisForm.addEventListener(
+                "submit",
+                function () {
+
+                    publishButton.disabled = true;
+
+                    publishButton.textContent =
+                        "Publishing...";
+
+                }
+            );
+
+        }
+
+
+        /* =========================
+           FILE UPLOAD
+        ========================== */
+
+        const crisisFile =
+            document.getElementById("crisisFile");
+
+        const crisisFileZone =
+            document.getElementById("crisisFileZone");
+
+        const crisisFileName =
+            document.getElementById("crisisFileName");
+
+
+        if (crisisFile && crisisFileName) {
+
+            crisisFile.addEventListener(
+                "change",
+                function () {
+
+                    if (crisisFile.files.length > 0) {
+
+                        crisisFileName.textContent =
+                            crisisFile.files[0].name;
+
+                    } else {
+
+                        crisisFileName.textContent =
+                            "No file selected";
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        if (crisisFileZone && crisisFile) {
+
+            crisisFileZone.addEventListener(
+                "dragover",
+                function (event) {
+
+                    event.preventDefault();
+
+                    crisisFileZone.classList.add(
+                        "dragging"
+                    );
+
+                }
+            );
+
+
+            crisisFileZone.addEventListener(
+                "dragleave",
+                function () {
+
+                    crisisFileZone.classList.remove(
+                        "dragging"
+                    );
+
+                }
+            );
+
+
+            crisisFileZone.addEventListener(
+                "drop",
+                function (event) {
+
+                    event.preventDefault();
+
+                    crisisFileZone.classList.remove(
+                        "dragging"
+                    );
+
+                    if (
+                        event.dataTransfer &&
+                        event.dataTransfer.files.length
+                    ) {
+
+                        try {
+
+                            const dataTransfer =
+                                new DataTransfer();
+
+                            dataTransfer.items.add(
+                                event.dataTransfer.files[0]
+                            );
+
+                            crisisFile.files =
+                                dataTransfer.files;
+
+                            if (crisisFileName) {
+
+                                crisisFileName.textContent =
+                                    event.dataTransfer.files[0].name;
+
+                            }
+
+                        } catch (error) {
+
+                            console.warn(
+                                "Could not set dropped file.",
+                                error
+                            );
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =========================
+           DELETE MODAL
+        ========================== */
+
+        const deleteModal =
+            document.getElementById("deleteModal");
+
+        const deleteForm =
+            document.getElementById("deleteForm");
+
+        const deleteName =
+            document.getElementById("deleteCrisisName");
+
+        const cancelDelete =
+            document.getElementById("cancelDelete");
+
+        const confirmDeleteButton =
+            document.getElementById(
+                "confirmDeleteButton"
+            );
+
+        const deleteButtons =
+            document.querySelectorAll(
+                ".crisis-delete-button"
+            );
+
+
+        deleteButtons.forEach(function (button) {
+
+            button.addEventListener(
+                "click",
+                function () {
+
+                    const deleteUrl =
+                        button.getAttribute(
+                            "data-delete-url"
+                        );
+
+                    const crisisTitle =
+                        button.getAttribute(
+                            "data-crisis-title"
+                        ) || "this crisis";
+
+
+                    if (!deleteUrl) {
+
+                        console.error(
+                            "Delete failed: no delete URL found."
+                        );
+
+                        return;
+                    }
+
+
+                    if (deleteName) {
+
+                        deleteName.textContent =
+                            crisisTitle;
+
+                    }
+
+
+                    if (deleteForm) {
+
+                        deleteForm.setAttribute(
+                            "action",
+                            deleteUrl
+                        );
+
+                        deleteForm.setAttribute(
+                            "method",
+                            "POST"
+                        );
+
+                    }
+
+
+                    if (deleteModal) {
+
+                        deleteModal.classList.add("open");
+
+                        deleteModal.setAttribute(
+                            "aria-hidden",
+                            "false"
+                        );
+
+                        document.body.style.overflow =
+                            "hidden";
+
+                    }
+
+                }
+            );
+
+        });
+
+
+        function closeDeleteModal() {
+
+            if (!deleteModal) {
+                return;
+            }
+
+            deleteModal.classList.remove("open");
+
+            deleteModal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            document.body.style.overflow = "";
+
+
+            if (deleteForm) {
+
+                deleteForm.removeAttribute(
+                    "action"
+                );
+
+            }
+
+        }
+
+
+        if (cancelDelete) {
+
+            cancelDelete.addEventListener(
+                "click",
+                function () {
+
+                    closeDeleteModal();
+
+                }
+            );
+
+        }
+
+
+        if (deleteModal) {
+
+            deleteModal.addEventListener(
+                "click",
+                function (event) {
+
+                    if (
+                        event.target === deleteModal
+                    ) {
+
+                        closeDeleteModal();
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Escape" &&
+                    deleteModal &&
+                    deleteModal.classList.contains("open")
+                ) {
+
+                    closeDeleteModal();
+
+                }
+
+            }
+        );
+
+
+        if (deleteForm) {
+
+            deleteForm.addEventListener(
+                "submit",
+                function (event) {
+
+                    const action =
+                        deleteForm.getAttribute(
+                            "action"
+                        );
+
+
+                    if (!action) {
+
+                        event.preventDefault();
+
+                        console.error(
+                            "Delete blocked: no action URL."
+                        );
+
+                        return;
+
+                    }
+
+
+                    if (confirmDeleteButton) {
+
+                        confirmDeleteButton.disabled =
+                            true;
+
+                        confirmDeleteButton.textContent =
+                            "Deleting...";
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =========================
+           SUBTLE CARD TILT
+        ========================== */
+
+        const crisisCards =
+            document.querySelectorAll(
+                "[data-crisis-card]"
+            );
+
+
+        crisisCards.forEach(function (card) {
+
+            card.addEventListener(
+                "mousemove",
+                function (event) {
+
+                    if (
+                        window.innerWidth < 800
+                    ) {
+                        return;
+                    }
+
+                    const rect =
+                        card.getBoundingClientRect();
+
+                    const x =
+                        event.clientX - rect.left;
+
+                    const y =
+                        event.clientY - rect.top;
+
+                    const centerX =
+                        rect.width / 2;
+
+                    const centerY =
+                        rect.height / 2;
+
+                    const rotateX =
+                        ((y - centerY) / centerY) * -1.2;
+
+                    const rotateY =
+                        ((x - centerX) / centerX) * 1.2;
+
+
+                    card.style.transform =
+                        "perspective(900px) " +
+                        "rotateX(" + rotateX + "deg) " +
+                        "rotateY(" + rotateY + "deg) " +
+                        "translateY(-2px)";
+
+                }
+            );
+
+
+            card.addEventListener(
+                "mouseleave",
+                function () {
+
+                    card.style.transform = "";
+
+                }
+            );
+
+        });
+
+    });
+</script>
+
+{% endblock %}

@@ -1,329 +1,1445 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
+{% block title %}Press Login — Arkanian Crisis Committee{% endblock %}
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block content %}
 
-    <title>Press Login</title>
+<style>
+    /* =========================================================
+       PRESS LOGIN — EDITORIAL / NEWSROOM EXPERIENCE
+       ========================================================= */
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+    .press-login-page {
+        min-height: calc(100vh - 86px);
+        position: relative;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at 78% 18%, rgba(255, 255, 255, .055), transparent 28%),
+            radial-gradient(circle at 15% 82%, rgba(255, 255, 255, .035), transparent 25%),
+            #050505;
+        color: #fff;
+    }
+
+    /* ---------------------------------------------------------
+       BACKGROUND GRID
+       --------------------------------------------------------- */
+
+    .press-login-grid {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: .12;
+        background-image:
+            linear-gradient(rgba(255, 255, 255, .12) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, .12) 1px, transparent 1px);
+        background-size: 72px 72px;
+        mask-image: linear-gradient(to bottom,
+                transparent 0%,
+                black 15%,
+                black 80%,
+                transparent 100%);
+    }
+
+    .press-login-noise {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: .035;
+        background-image:
+            repeating-linear-gradient(0deg,
+                rgba(255, 255, 255, .4) 0px,
+                rgba(255, 255, 255, .4) 1px,
+                transparent 1px,
+                transparent 4px);
+        mix-blend-mode: screen;
+    }
+
+    /* ---------------------------------------------------------
+       GIANT BACKGROUND WORD
+       --------------------------------------------------------- */
+
+    .press-background-word {
+        position: absolute;
+        top: 4%;
+        left: -3%;
+        font-size: clamp(9rem, 22vw, 25rem);
+        line-height: .75;
+        font-weight: 900;
+        letter-spacing: -.09em;
+        color: rgba(255, 255, 255, .025);
+        user-select: none;
+        pointer-events: none;
+        white-space: nowrap;
+    }
+
+    /* ---------------------------------------------------------
+       TOP SYSTEM BAR
+       --------------------------------------------------------- */
+
+    .press-system-bar {
+        position: relative;
+        z-index: 2;
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 24px 5vw 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .press-system-left {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-family: monospace;
+        font-size: .68rem;
+        letter-spacing: .16em;
+        color: rgba(255, 255, 255, .52);
+        text-transform: uppercase;
+    }
+
+    .press-live-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 15px rgba(255, 255, 255, .8);
+        animation: pressPulse 2s infinite;
+    }
+
+    @keyframes pressPulse {
+
+        0%,
+        100% {
+            opacity: .45;
+            transform: scale(.9);
         }
 
-        body {
-            min-height: 100vh;
-            background: #050505;
-            color: white;
-            font-family: Arial, Helvetica, sans-serif;
-            display: flex;
+        50% {
+            opacity: 1;
+            transform: scale(1.15);
+        }
+    }
+
+    .press-system-right {
+        font-family: monospace;
+        font-size: .62rem;
+        letter-spacing: .14em;
+        color: rgba(255, 255, 255, .3);
+        text-transform: uppercase;
+    }
+
+    /* ---------------------------------------------------------
+       MAIN LAYOUT
+       --------------------------------------------------------- */
+
+    .press-login-inner {
+        position: relative;
+        z-index: 2;
+        width: min(1180px, 90%);
+        margin: 0 auto;
+        padding: 70px 0 110px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(380px, .75fr);
+        gap: 90px;
+        align-items: center;
+    }
+
+    /* ---------------------------------------------------------
+       LEFT SIDE — EDITORIAL INTRO
+       --------------------------------------------------------- */
+
+    .press-intro {
+        position: relative;
+    }
+
+    .press-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 28px;
+        font-family: monospace;
+        font-size: .68rem;
+        letter-spacing: .2em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, .52);
+    }
+
+    .press-kicker-line {
+        width: 44px;
+        height: 1px;
+        background: rgba(255, 255, 255, .55);
+    }
+
+    .press-intro h1 {
+        margin: 0;
+        max-width: 850px;
+        font-size: clamp(4rem, 8vw, 8.5rem);
+        line-height: .83;
+        letter-spacing: -.075em;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+    .press-intro h1 span {
+        display: block;
+        color: rgba(255, 255, 255, .32);
+    }
+
+    .press-intro-copy {
+        max-width: 590px;
+        margin-top: 38px;
+        color: rgba(255, 255, 255, .58);
+        font-size: 1rem;
+        line-height: 1.8;
+    }
+
+    .press-intro-copy strong {
+        color: #fff;
+        font-weight: 600;
+    }
+
+    /* ---------------------------------------------------------
+       PRESS DATA STRIP
+       --------------------------------------------------------- */
+
+    .press-data-strip {
+        margin-top: 48px;
+        border-top: 1px solid rgba(255, 255, 255, .14);
+        border-bottom: 1px solid rgba(255, 255, 255, .14);
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .press-data-item {
+        padding: 20px 18px;
+        min-height: 92px;
+        border-right: 1px solid rgba(255, 255, 255, .12);
+    }
+
+    .press-data-item:last-child {
+        border-right: none;
+    }
+
+    .press-data-number {
+        display: block;
+        font-family: monospace;
+        font-size: .66rem;
+        letter-spacing: .16em;
+        color: rgba(255, 255, 255, .35);
+        margin-bottom: 9px;
+    }
+
+    .press-data-value {
+        font-size: .82rem;
+        font-weight: 700;
+        letter-spacing: .05em;
+        text-transform: uppercase;
+    }
+
+    /* ---------------------------------------------------------
+       MANIFESTO
+       --------------------------------------------------------- */
+
+    .press-manifesto {
+        margin-top: 42px;
+        padding-left: 22px;
+        border-left: 2px solid rgba(255, 255, 255, .3);
+    }
+
+    .press-manifesto-label {
+        font-family: monospace;
+        font-size: .6rem;
+        letter-spacing: .2em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, .3);
+        margin-bottom: 10px;
+    }
+
+    .press-manifesto p {
+        margin: 0;
+        max-width: 520px;
+        font-size: .88rem;
+        line-height: 1.65;
+        color: rgba(255, 255, 255, .52);
+    }
+
+    /* ---------------------------------------------------------
+       RIGHT SIDE — LOGIN CARD
+       --------------------------------------------------------- */
+
+    .press-login-card-wrap {
+        perspective: 1400px;
+    }
+
+    .press-login-card {
+        position: relative;
+        overflow: hidden;
+        padding: 42px;
+        border: 1px solid rgba(255, 255, 255, .16);
+        background:
+            linear-gradient(145deg,
+                rgba(255, 255, 255, .075),
+                rgba(255, 255, 255, .025));
+        box-shadow:
+            0 35px 100px rgba(0, 0, 0, .6),
+            inset 0 1px 0 rgba(255, 255, 255, .06);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        transition:
+            transform .35s ease,
+            border-color .35s ease,
+            box-shadow .35s ease;
+    }
+
+    .press-login-card:hover {
+        border-color: rgba(255, 255, 255, .28);
+        box-shadow:
+            0 40px 110px rgba(0, 0, 0, .72),
+            inset 0 1px 0 rgba(255, 255, 255, .09);
+    }
+
+    .press-card-corner {
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        pointer-events: none;
+    }
+
+    .press-card-corner.tl {
+        top: 13px;
+        left: 13px;
+        border-top: 1px solid rgba(255, 255, 255, .45);
+        border-left: 1px solid rgba(255, 255, 255, .45);
+    }
+
+    .press-card-corner.tr {
+        top: 13px;
+        right: 13px;
+        border-top: 1px solid rgba(255, 255, 255, .45);
+        border-right: 1px solid rgba(255, 255, 255, .45);
+    }
+
+    .press-card-corner.bl {
+        bottom: 13px;
+        left: 13px;
+        border-bottom: 1px solid rgba(255, 255, 255, .45);
+        border-left: 1px solid rgba(255, 255, 255, .45);
+    }
+
+    .press-card-corner.br {
+        bottom: 13px;
+        right: 13px;
+        border-bottom: 1px solid rgba(255, 255, 255, .45);
+        border-right: 1px solid rgba(255, 255, 255, .45);
+    }
+
+    /* ---------------------------------------------------------
+       CARD HEADER
+       --------------------------------------------------------- */
+
+    .press-card-header {
+        padding-bottom: 25px;
+        margin-bottom: 28px;
+        border-bottom: 1px solid rgba(255, 255, 255, .12);
+    }
+
+    .press-card-index {
+        font-family: monospace;
+        font-size: .62rem;
+        letter-spacing: .2em;
+        color: rgba(255, 255, 255, .32);
+        margin-bottom: 13px;
+    }
+
+    .press-card-header h2 {
+        margin: 0;
+        font-size: 2rem;
+        line-height: 1;
+        letter-spacing: -.04em;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .press-card-header p {
+        margin: 12px 0 0;
+        color: rgba(255, 255, 255, .42);
+        font-size: .78rem;
+        line-height: 1.55;
+    }
+
+    /* ---------------------------------------------------------
+       ERROR
+       --------------------------------------------------------- */
+
+    .press-login-error {
+        margin-bottom: 22px;
+        padding: 14px 16px;
+        border: 1px solid rgba(255, 255, 255, .2);
+        background: rgba(255, 255, 255, .05);
+        color: #fff;
+        font-family: monospace;
+        font-size: .7rem;
+        line-height: 1.5;
+        letter-spacing: .04em;
+    }
+
+    .press-login-error::before {
+        content: "ERROR / ";
+        color: rgba(255, 255, 255, .35);
+    }
+
+    /* ---------------------------------------------------------
+       FORM
+       --------------------------------------------------------- */
+
+    .press-form {
+        display: flex;
+        flex-direction: column;
+        gap: 21px;
+    }
+
+    .press-field {
+        position: relative;
+    }
+
+    .press-field-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 9px;
+        font-family: monospace;
+        font-size: .62rem;
+        letter-spacing: .17em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, .4);
+    }
+
+    .press-field-index {
+        color: rgba(255, 255, 255, .2);
+    }
+
+    .press-input-wrap {
+        position: relative;
+    }
+
+    .press-input {
+        width: 100%;
+        box-sizing: border-box;
+        min-height: 55px;
+        padding: 0 17px;
+        border: 1px solid rgba(255, 255, 255, .15);
+        outline: none;
+        background: rgba(0, 0, 0, .42);
+        color: #fff;
+        font-family: inherit;
+        font-size: .9rem;
+        transition:
+            border-color .25s ease,
+            background .25s ease,
+            box-shadow .25s ease;
+    }
+
+    .press-input::placeholder {
+        color: rgba(255, 255, 255, .2);
+    }
+
+    .press-input:hover {
+        border-color: rgba(255, 255, 255, .27);
+    }
+
+    .press-input:focus {
+        border-color: rgba(255, 255, 255, .62);
+        background: rgba(255, 255, 255, .035);
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, .035);
+    }
+
+    .press-password-wrap .press-input {
+        padding-right: 65px;
+    }
+
+    .press-password-toggle {
+        position: absolute;
+        top: 50%;
+        right: 13px;
+        transform: translateY(-50%);
+        border: none;
+        background: transparent;
+        color: rgba(255, 255, 255, .4);
+        cursor: pointer;
+        padding: 7px;
+        font-family: monospace;
+        font-size: .58rem;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        transition: color .2s ease;
+    }
+
+    .press-password-toggle:hover {
+        color: #fff;
+    }
+
+    /* ---------------------------------------------------------
+       REMEMBER / SECURITY
+       --------------------------------------------------------- */
+
+    .press-options {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-top: -2px;
+    }
+
+    .press-remember {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        cursor: pointer;
+        font-family: monospace;
+        font-size: .6rem;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, .35);
+    }
+
+    .press-remember input {
+        width: 13px;
+        height: 13px;
+        margin: 0;
+        accent-color: #fff;
+    }
+
+    .press-secure-label {
+        font-family: monospace;
+        font-size: .56rem;
+        letter-spacing: .1em;
+        color: rgba(255, 255, 255, .2);
+        text-transform: uppercase;
+    }
+
+    /* ---------------------------------------------------------
+       SUBMIT BUTTON
+       --------------------------------------------------------- */
+
+    .press-submit {
+        position: relative;
+        min-height: 58px;
+        margin-top: 5px;
+        overflow: hidden;
+        border: 1px solid #fff;
+        background: #fff;
+        color: #050505;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: .76rem;
+        font-weight: 800;
+        letter-spacing: .15em;
+        text-transform: uppercase;
+        transition:
+            background .25s ease,
+            color .25s ease,
+            transform .25s ease;
+    }
+
+    .press-submit::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: #050505;
+        transform: translateX(-101%);
+        transition: transform .35s cubic-bezier(.77, 0, .18, 1);
+    }
+
+    .press-submit:hover::before {
+        transform: translateX(0);
+    }
+
+    .press-submit:hover {
+        color: #fff;
+    }
+
+    .press-submit:active {
+        transform: scale(.985);
+    }
+
+    .press-submit-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 13px;
+    }
+
+    .press-submit-arrow {
+        transition: transform .25s ease;
+    }
+
+    .press-submit:hover .press-submit-arrow {
+        transform: translateX(5px);
+    }
+
+    /* ---------------------------------------------------------
+       CARD FOOTER
+       --------------------------------------------------------- */
+
+    .press-card-footer {
+        margin-top: 24px;
+        padding-top: 19px;
+        border-top: 1px solid rgba(255, 255, 255, .1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .press-card-footer span {
+        font-family: monospace;
+        font-size: .55rem;
+        letter-spacing: .1em;
+        color: rgba(255, 255, 255, .22);
+        text-transform: uppercase;
+    }
+
+    .press-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .press-status-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #fff;
+    }
+
+    /* ---------------------------------------------------------
+       LOWER INFORMATION
+       --------------------------------------------------------- */
+
+    .press-access-info {
+        position: relative;
+        z-index: 2;
+        width: min(1180px, 90%);
+        margin: 0 auto;
+        padding-bottom: 90px;
+    }
+
+    .press-access-heading {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 25px;
+    }
+
+    .press-access-heading-line {
+        width: 50px;
+        height: 1px;
+        background: rgba(255, 255, 255, .25);
+    }
+
+    .press-access-heading span {
+        font-family: monospace;
+        font-size: .6rem;
+        letter-spacing: .2em;
+        color: rgba(255, 255, 255, .32);
+        text-transform: uppercase;
+    }
+
+    .press-access-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border-top: 1px solid rgba(255, 255, 255, .11);
+        border-bottom: 1px solid rgba(255, 255, 255, .11);
+    }
+
+    .press-access-card {
+        padding: 30px 25px;
+        border-right: 1px solid rgba(255, 255, 255, .11);
+        transition:
+            background .3s ease,
+            transform .3s ease;
+    }
+
+    .press-access-card:last-child {
+        border-right: none;
+    }
+
+    .press-access-card:hover {
+        background: rgba(255, 255, 255, .035);
+        transform: translateY(-3px);
+    }
+
+    .press-access-icon {
+        width: 35px;
+        height: 35px;
+        margin-bottom: 22px;
+        border: 1px solid rgba(255, 255, 255, .22);
+        display: grid;
+        place-items: center;
+        font-family: monospace;
+        font-size: .65rem;
+        color: rgba(255, 255, 255, .6);
+    }
+
+    .press-access-card h3 {
+        margin: 0 0 10px;
+        font-size: .88rem;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+    }
+
+    .press-access-card p {
+        margin: 0;
+        color: rgba(255, 255, 255, .35);
+        font-size: .74rem;
+        line-height: 1.65;
+    }
+
+    /* ---------------------------------------------------------
+       RETURN LINK
+       --------------------------------------------------------- */
+
+    .press-return {
+        position: relative;
+        z-index: 2;
+        width: min(1180px, 90%);
+        margin: 0 auto;
+        padding-bottom: 70px;
+    }
+
+    .press-return a {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: rgba(255, 255, 255, .35);
+        text-decoration: none;
+        font-family: monospace;
+        font-size: .6rem;
+        letter-spacing: .15em;
+        text-transform: uppercase;
+        transition:
+            color .2s ease,
+            gap .2s ease;
+    }
+
+    .press-return a:hover {
+        color: #fff;
+        gap: 15px;
+    }
+
+    /* ---------------------------------------------------------
+       LOADING STATE
+       --------------------------------------------------------- */
+
+    .press-submit.loading {
+        pointer-events: none;
+    }
+
+    .press-submit.loading .press-submit-text {
+        opacity: 0;
+    }
+
+    .press-submit.loading::after {
+        content: "AUTHENTICATING...";
+        position: absolute;
+        z-index: 4;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font-family: monospace;
+        font-size: .64rem;
+        letter-spacing: .16em;
+    }
+
+    .press-submit.loading .press-submit-arrow {
+        display: none;
+    }
+
+    /* ---------------------------------------------------------
+       RESPONSIVE — TABLET
+       --------------------------------------------------------- */
+
+    @media (max-width: 1050px) {
+        .press-login-inner {
+            grid-template-columns: 1fr;
+            gap: 55px;
+            width: min(760px, 88%);
+        }
+
+        .press-intro h1 {
+            max-width: 700px;
+        }
+
+        .press-intro-copy {
+            max-width: 650px;
+        }
+
+        .press-login-card-wrap {
+            width: min(580px, 100%);
+            margin: 0 auto;
+        }
+
+        .press-access-info,
+        .press-return {
+            width: min(760px, 88%);
+        }
+    }
+
+    /* ---------------------------------------------------------
+       RESPONSIVE — SMALL TABLET / IPAD
+       --------------------------------------------------------- */
+
+    @media (max-width: 720px) {
+        .press-system-bar {
+            padding-top: 18px;
+        }
+
+        .press-system-right {
+            display: none;
+        }
+
+        .press-login-inner {
+            padding-top: 55px;
+            padding-bottom: 75px;
+        }
+
+        .press-intro h1 {
+            font-size: clamp(3.4rem, 15vw, 6rem);
+        }
+
+        .press-intro-copy {
+            margin-top: 28px;
+            font-size: .9rem;
+        }
+
+        .press-data-strip {
+            grid-template-columns: 1fr;
+        }
+
+        .press-data-item {
+            min-height: auto;
+            border-right: none;
+            border-bottom: 1px solid rgba(255, 255, 255, .12);
+        }
+
+        .press-data-item:last-child {
+            border-bottom: none;
+        }
+
+        .press-login-card {
+            padding: 31px 25px;
+        }
+
+        .press-access-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .press-access-card {
+            border-right: none;
+            border-bottom: 1px solid rgba(255, 255, 255, .11);
+        }
+
+        .press-access-card:last-child {
+            border-bottom: none;
+        }
+    }
+
+    /* ---------------------------------------------------------
+       RESPONSIVE — PHONE
+       --------------------------------------------------------- */
+
+    @media (max-width: 480px) {
+        .press-login-page {
+            min-height: calc(100vh - 72px);
+        }
+
+        .press-system-bar {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .press-login-inner,
+        .press-access-info,
+        .press-return {
+            width: calc(100% - 40px);
+        }
+
+        .press-login-inner {
+            padding-top: 42px;
+        }
+
+        .press-kicker {
+            margin-bottom: 20px;
+            font-size: .58rem;
+        }
+
+        .press-intro h1 {
+            font-size: clamp(3rem, 17vw, 4.8rem);
+        }
+
+        .press-intro-copy {
+            font-size: .83rem;
+            line-height: 1.7;
+        }
+
+        .press-manifesto {
+            padding-left: 15px;
+        }
+
+        .press-login-card {
+            padding: 28px 20px;
+        }
+
+        .press-card-header h2 {
+            font-size: 1.65rem;
+        }
+
+        .press-input {
+            min-height: 52px;
+        }
+
+        .press-options {
+            align-items: flex-start;
             flex-direction: column;
         }
 
-        a {
-            color: inherit;
-            text-decoration: none;
+        .press-secure-label {
+            display: none;
         }
 
-        .top {
-            height: 76px;
-            padding: 0 5%;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            border-bottom: 1px solid #202020;
-        }
-
-        .back {
-            color: #777;
-            font-size: 10px;
-            font-weight: 900;
-            letter-spacing: 1.5px;
-        }
-
-        .back:hover {
-            color: white;
-        }
-
-        .main {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 70px 20px;
-        }
-
-        .box {
-            width: min(100%, 520px);
-        }
-
-        .label {
-            color: #666;
-            font-size: 9px;
-            font-weight: 900;
-            letter-spacing: 3px;
-            margin-bottom: 20px;
-        }
-
-        h1 {
-            font-size: clamp(60px, 11vw, 105px);
-            line-height: .82;
-            letter-spacing: -.07em;
-            margin-bottom: 25px;
-        }
-
-        .description {
-            color: #777;
-            font-size: 14px;
-            line-height: 1.8;
-            margin-bottom: 40px;
-        }
-
-        .form {
-            border-top: 1px solid #222;
-            padding-top: 30px;
-        }
-
-        .delegates {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-
-        .delegate {
-            position: relative;
-        }
-
-        .delegate input {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .delegate label {
-            min-height: 90px;
-            padding: 18px;
-            display: flex;
+        .press-card-footer {
+            align-items: flex-start;
             flex-direction: column;
-            justify-content: flex-end;
-            border: 1px solid #292929;
-            background: #090909;
-            cursor: pointer;
-            transition: .25s;
         }
 
-        .delegate label strong {
-            font-size: 14px;
-            margin-bottom: 5px;
+        .press-background-word {
+            top: 7%;
+            font-size: 7rem;
+        }
+    }
+
+    /* ---------------------------------------------------------
+       REDUCED MOTION
+       --------------------------------------------------------- */
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .press-login-card,
+        .press-submit,
+        .press-submit::before,
+        .press-submit-arrow,
+        .press-access-card,
+        .press-return a {
+            transition: none !important;
         }
 
-        .delegate label span {
-            color: #666;
-            font-size: 9px;
-            letter-spacing: 1px;
+        .press-live-dot {
+            animation: none !important;
         }
-
-        .delegate input:checked+label {
-            background: white;
-            color: black;
-            border-color: white;
-        }
-
-        .delegate input:checked+label span {
-            color: #555;
-        }
-
-        .password-label {
-            display: block;
-            color: #666;
-            font-size: 9px;
-            font-weight: 900;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-        }
-
-        .password {
-            width: 100%;
-            height: 55px;
-            background: #0b0b0b;
-            border: 1px solid #333;
-            color: white;
-            outline: none;
-            padding: 0 15px;
-            margin-bottom: 18px;
-            font-size: 15px;
-        }
-
-        .password:focus {
-            border-color: white;
-        }
-
-        button {
-            width: 100%;
-            height: 55px;
-            background: white;
-            color: black;
-            border: 1px solid white;
-            font-size: 10px;
-            font-weight: 900;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: .25s;
-        }
-
-        button:hover {
-            background: black;
-            color: white;
-        }
-
-        .error {
-            border: 1px solid #444;
-            padding: 13px;
-            margin-bottom: 20px;
-            color: #bbb;
-            font-size: 11px;
-        }
-
-        footer {
-            padding: 25px 5%;
-            border-top: 1px solid #181818;
-            color: #444;
-            font-size: 9px;
-            letter-spacing: 1.5px;
-        }
-
-        @media (max-width: 600px) {
-
-            .top {
-                padding: 0 20px;
-            }
-
-            .main {
-                align-items: flex-start;
-                padding-top: 80px;
-            }
-
-            .delegates {
-                grid-template-columns: 1fr;
-            }
-
-            h1 {
-                font-size: clamp(58px, 18vw, 85px);
-            }
-
-        }
-    </style>
-
-</head>
-
-<body>
+    }
+</style>
 
 
-    <div class="top">
+<div class="press-login-page">
 
-        <a href="/articles" class="back">
-            ← BACK TO ARTICLES
-        </a>
+    <div class="press-login-grid"></div>
+    <div class="press-login-noise"></div>
+
+    <div class="press-background-word">
+        PRESS
+    </div>
+
+
+    <!-- =====================================================
+         SYSTEM BAR
+         ===================================================== -->
+
+    <div class="press-system-bar">
+
+        <div class="press-system-left">
+            <span class="press-live-dot"></span>
+            <span>ACC / PRESS NETWORK</span>
+        </div>
+
+        <div class="press-system-right">
+            EDITORIAL ACCESS // 02
+        </div>
 
     </div>
 
 
-    <main class="main">
+    <!-- =====================================================
+         MAIN LOGIN AREA
+         ===================================================== -->
 
-        <div class="box">
+    <main class="press-login-inner">
 
-            <div class="label">
-                PRESS ACCESS
+        <!-- =================================================
+             EDITORIAL INTRO
+             ================================================= -->
+
+        <section class="press-intro">
+
+            <div class="press-kicker">
+                <span class="press-kicker-line"></span>
+                <span>Arkanian Crisis Committee</span>
             </div>
 
+
             <h1>
-                PRESS<br>LOGIN.
+                PRESS
+                <span>ACCESS.</span>
             </h1>
 
-            <p class="description">
-                Authorized press delegates can publish reports
-                to the ACC press archive.
-            </p>
+
+            <div class="press-intro-copy">
+                The Press Corps documents the committee as events unfold.
+                <strong>Report. Record. Publish.</strong>
+                Access the editorial desk to submit articles and maintain
+                the public record of the crisis.
+            </div>
 
 
-            <form action="/press-login" method="POST" class="form">
+            <div class="press-data-strip">
 
-                {% if error %}
-
-                <div class="error">
-                    {{ error }}
+                <div class="press-data-item">
+                    <span class="press-data-number">01</span>
+                    <span class="press-data-value">Report</span>
                 </div>
 
+                <div class="press-data-item">
+                    <span class="press-data-number">02</span>
+                    <span class="press-data-value">Publish</span>
+                </div>
+
+                <div class="press-data-item">
+                    <span class="press-data-number">03</span>
+                    <span class="press-data-value">Archive</span>
+                </div>
+
+            </div>
+
+
+            <div class="press-manifesto">
+
+                <div class="press-manifesto-label">
+                    Editorial principle
+                </div>
+
+                <p>
+                    The Press Corps exists to create a clear record of
+                    committee developments. Articles should be accurate,
+                    readable, and grounded in events occurring within
+                    the committee.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             LOGIN CARD
+             ================================================= -->
+
+        <section class="press-login-card-wrap">
+
+            <div class="press-login-card" id="pressLoginCard">
+
+                <span class="press-card-corner tl"></span>
+                <span class="press-card-corner tr"></span>
+                <span class="press-card-corner bl"></span>
+                <span class="press-card-corner br"></span>
+
+
+                <div class="press-card-header">
+
+                    <div class="press-card-index">
+                        PRESS / AUTHENTICATION / 002
+                    </div>
+
+                    <h2>
+                        Editorial Desk
+                    </h2>
+
+                    <p>
+                        Sign in using your assigned Press Corps
+                        credentials.
+                    </p>
+
+                </div>
+
+
+                {% if error %}
+                <div class="press-login-error">
+                    {{ error }}
+                </div>
                 {% endif %}
 
 
-                <div class="delegates">
+                <form method="POST" action="{{ url_for('press_login') }}" class="press-form" id="pressLoginForm">
 
-                    <div class="delegate">
+                    <!-- USERNAME -->
 
-                        <input type="radio" id="yukta" name="delegate" value="yukta" required>
+                    <div class="press-field">
 
-                        <label for="yukta">
-
-                            <strong>YUKTA</strong>
-
-                            <span>
-                                AL JAZEERA
-                            </span>
-
+                        <label class="press-field-label" for="press-username">
+                            <span>Press Username</span>
+                            <span class="press-field-index">01</span>
                         </label>
+
+                        <div class="press-input-wrap">
+
+                            <input id="press-username" class="press-input" type="text" name="username"
+                                placeholder="ENTER USERNAME" autocomplete="username" required autofocus>
+
+                        </div>
 
                     </div>
 
 
-                    <div class="delegate">
+                    <!-- PASSWORD -->
 
-                        <input type="radio" id="nandika" name="delegate" value="nandika">
+                    <div class="press-field">
 
-                        <label for="nandika">
-
-                            <strong>NANDIKA</strong>
-
-                            <span>
-                                REUTERS
-                            </span>
-
+                        <label class="press-field-label" for="press-password">
+                            <span>Access Password</span>
+                            <span class="press-field-index">02</span>
                         </label>
 
+                        <div class="press-input-wrap press-password-wrap">
+
+                            <input id="press-password" class="press-input" type="password" name="password"
+                                placeholder="ENTER PASSWORD" autocomplete="current-password" required>
+
+                            <button type="button" class="press-password-toggle" id="pressPasswordToggle"
+                                aria-label="Show password">
+                                SHOW
+                            </button>
+
+                        </div>
+
                     </div>
+
+
+                    <!-- OPTIONS -->
+
+                    <div class="press-options">
+
+                        <label class="press-remember">
+                            <input type="checkbox" name="remember" value="1">
+                            <span>Remember this device</span>
+                        </label>
+
+                        <span class="press-secure-label">
+                            Secure session / ACC
+                        </span>
+
+                    </div>
+
+
+                    <!-- SUBMIT -->
+
+                    <button type="submit" class="press-submit" id="pressSubmit">
+
+                        <span class="press-submit-content">
+
+                            <span class="press-submit-text">
+                                Enter Editorial Desk
+                            </span>
+
+                            <span class="press-submit-arrow">
+                                →
+                            </span>
+
+                        </span>
+
+                    </button>
+
+                </form>
+
+
+                <div class="press-card-footer">
+
+                    <span>
+                        Press Corps Only
+                    </span>
+
+                    <span class="press-status">
+                        <span class="press-status-dot"></span>
+                        Session encrypted
+                    </span>
 
                 </div>
 
+            </div>
 
-                <label for="password" class="password-label">
-                    PRESS PASSWORD
-                </label>
-
-                <input type="password" id="password" name="password" class="password" placeholder="Enter password"
-                    required>
-
-
-                <button type="submit">
-                    ENTER PRESS ARCHIVE →
-                </button>
-
-            </form>
-
-        </div>
+        </section>
 
     </main>
 
 
-    <footer>
-        PRESS ACCESS
-    </footer>
+    <!-- =====================================================
+         ACCESS INFORMATION
+         ===================================================== -->
+
+    <section class="press-access-info">
+
+        <div class="press-access-heading">
+
+            <span class="press-access-heading-line"></span>
+
+            <span>
+                Editorial workspace
+            </span>
+
+        </div>
 
 
-</body>
+        <div class="press-access-grid">
 
-</html>
+            <div class="press-access-card">
+
+                <div class="press-access-icon">
+                    01
+                </div>
+
+                <h3>
+                    Publish
+                </h3>
+
+                <p>
+                    Write and submit articles directly to the
+                    ACC public archive through the editorial desk.
+                </p>
+
+            </div>
+
+
+            <div class="press-access-card">
+
+                <div class="press-access-icon">
+                    02
+                </div>
+
+                <h3>
+                    Document
+                </h3>
+
+                <p>
+                    Record speeches, developments, diplomatic
+                    events, and major changes throughout the crisis.
+                </p>
+
+            </div>
+
+
+            <div class="press-access-card">
+
+                <div class="press-access-icon">
+                    03
+                </div>
+
+                <h3>
+                    Archive
+                </h3>
+
+                <p>
+                    Review previously published reporting through
+                    the central ACC Articles archive.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         RETURN
+         ===================================================== -->
+
+    <div class="press-return">
+
+        <a href="{{ url_for('home') }}">
+            <span>←</span>
+            <span>Return to ACC</span>
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+    /* =========================================================
+       PRESS LOGIN INTERACTIONS
+       ========================================================= */
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const card = document.getElementById("pressLoginCard");
+        const form = document.getElementById("pressLoginForm");
+        const submit = document.getElementById("pressSubmit");
+
+        const password = document.getElementById("press-password");
+        const toggle = document.getElementById("pressPasswordToggle");
+
+
+        /* -----------------------------------------------------
+           PASSWORD VISIBILITY
+           ----------------------------------------------------- */
+
+        if (toggle && password) {
+
+            toggle.addEventListener("click", function () {
+
+                const isPassword =
+                    password.type === "password";
+
+                password.type =
+                    isPassword ? "text" : "password";
+
+                toggle.textContent =
+                    isPassword ? "HIDE" : "SHOW";
+
+                toggle.setAttribute(
+                    "aria-label",
+                    isPassword
+                        ? "Hide password"
+                        : "Show password"
+                );
+
+            });
+
+        }
+
+
+        /* -----------------------------------------------------
+           SUBMIT LOADING STATE
+           ----------------------------------------------------- */
+
+        if (form && submit) {
+
+            form.addEventListener("submit", function () {
+
+                submit.classList.add("loading");
+
+            });
+
+        }
+
+
+        /* -----------------------------------------------------
+           SUBTLE 3D CARD MOVEMENT
+           ----------------------------------------------------- */
+
+        if (
+            card &&
+            window.matchMedia("(pointer: fine)").matches &&
+            !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ) {
+
+            const wrap = card.parentElement;
+
+            wrap.addEventListener("mousemove", function (event) {
+
+                const rect = card.getBoundingClientRect();
+
+                const x =
+                    (event.clientX - rect.left) / rect.width - 0.5;
+
+                const y =
+                    (event.clientY - rect.top) / rect.height - 0.5;
+
+                const rotateY = x * 3;
+                const rotateX = y * -3;
+
+                card.style.transform =
+                    `perspective(1400px)
+                     rotateX(${rotateX}deg)
+                     rotateY(${rotateY}deg)`;
+
+            });
+
+            wrap.addEventListener("mouseleave", function () {
+
+                card.style.transform =
+                    "perspective(1400px) rotateX(0deg) rotateY(0deg)";
+
+            });
+
+        }
+
+
+        /* -----------------------------------------------------
+           KEYBOARD SHORTCUT
+           Press "/" to focus username when not typing
+           ----------------------------------------------------- */
+
+        document.addEventListener("keydown", function (event) {
+
+            if (
+                event.key === "/" &&
+                document.activeElement.tagName !== "INPUT" &&
+                document.activeElement.tagName !== "TEXTAREA"
+            ) {
+
+                event.preventDefault();
+
+                const username =
+                    document.getElementById("press-username");
+
+                if (username) {
+                    username.focus();
+                }
+
+            }
+
+        });
+
+
+        /* -----------------------------------------------------
+           ENTER ON USERNAME → PASSWORD
+           ----------------------------------------------------- */
+
+        const username =
+            document.getElementById("press-username");
+
+        if (username && password) {
+
+            username.addEventListener("keydown", function (event) {
+
+                if (event.key === "Enter") {
+
+                    event.preventDefault();
+                    password.focus();
+
+                }
+
+            });
+
+        }
+
+
+        /* -----------------------------------------------------
+           DOUBLE CLICK PASSWORD TO TOGGLE
+           ----------------------------------------------------- */
+
+        if (password && toggle) {
+
+            password.addEventListener("dblclick", function () {
+                toggle.click();
+            });
+
+        }
+
+    });
+</script>
+
+{% endblock %}

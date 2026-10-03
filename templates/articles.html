@@ -1,1545 +1,75 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
+{% block title %}Articles — Arkanian Crisis Committee{% endblock %}
 
-    <meta charset="UTF-8">
+{% block content %}
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<section class="articles-page">
 
-    <title>Press Articles — ACC</title>
+    <!-- =========================================================
+         ARCHIVE HERO
+         ========================================================= -->
 
+    <header class="articles-hero">
 
-    <style>
-        /* =====================================================
-           RESET
-        ===================================================== */
+        <div class="articles-hero-top">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+            <div class="articles-hero-index">
+                PRESS ARCHIVE // 01
+            </div>
 
+            <div class="articles-hero-status">
 
-        html {
-            scroll-behavior: smooth;
-        }
+                <span class="articles-live-dot"></span>
 
+                <span>
+                    LIVE ARCHIVE
+                </span>
 
-        body {
+            </div>
 
-            background: #090909;
+        </div>
 
-            color: #f5f5f5;
 
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
+        <div class="articles-hero-main">
 
-            min-height: 100vh;
+            <div class="articles-hero-title-wrap">
 
-            overflow-x: hidden;
+                <div class="articles-eyebrow">
+                    ARKANIAN CRISIS COMMITTEE
+                </div>
 
-        }
-
-
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-
-        button {
-            font-family: inherit;
-        }
-
-
-        /* =====================================================
-           CURSOR LIGHT
-        ===================================================== */
-
-        #cursor-light {
-
-            position: fixed;
-
-            width: 320px;
-            height: 320px;
-
-            left: 0;
-            top: 0;
-
-            pointer-events: none;
-
-            z-index: 999999;
-
-            border-radius: 50%;
-
-            transform:
-                translate(-50%, -50%);
-
-            opacity: 0;
-
-            background:
-                radial-gradient(circle,
-                    rgba(255, 255, 255, 0.20) 0%,
-                    rgba(255, 255, 255, 0.11) 18%,
-                    rgba(255, 255, 255, 0.055) 35%,
-                    rgba(255, 255, 255, 0.018) 52%,
-                    rgba(255, 255, 255, 0) 72%);
-
-            filter:
-                blur(2px);
-
-            mix-blend-mode:
-                screen;
-
-            will-change:
-                left,
-                top;
-
-            transition:
-                opacity 0.15s ease;
-
-        }
-
-
-        /* =====================================================
-           NAVBAR
-        ===================================================== */
-
-        .navbar {
-
-            position: sticky;
-
-            top: 0;
-
-            z-index: 1000;
-
-            width: 100%;
-
-            height: 78px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            padding: 0 5vw;
-
-            background:
-                rgba(9, 9, 9, 0.94);
-
-            border-bottom:
-                1px solid #292929;
-
-            backdrop-filter:
-                blur(16px);
-
-            -webkit-backdrop-filter:
-                blur(16px);
-
-        }
-
-
-        .logo {
-
-            font-size: 25px;
-
-            font-weight: 900;
-
-            letter-spacing: -1px;
-
-            transition:
-                transform 0.25s ease,
-                opacity 0.25s ease;
-
-        }
-
-
-        .logo:hover {
-
-            transform:
-                translateY(-2px);
-
-            opacity:
-                0.7;
-
-        }
-
-
-        .nav-right {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 34px;
-
-        }
-
-
-        .nav-links {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 28px;
-
-        }
-
-
-        .nav-link {
-
-            position: relative;
-
-            font-size: 11px;
-
-            font-weight: 800;
-
-            letter-spacing: 1.5px;
-
-            color: #bdbdbd;
-
-            transition:
-                color 0.2s ease;
-
-        }
-
-
-        .nav-link::after {
-
-            content: "";
-
-            position: absolute;
-
-            left: 0;
-
-            bottom: -7px;
-
-            width: 0;
-
-            height: 1px;
-
-            background: #fff;
-
-            transition:
-                width 0.25s ease;
-
-        }
-
-
-        .nav-link:hover {
-
-            color: #fff;
-
-        }
-
-
-        .nav-link:hover::after {
-
-            width: 100%;
-
-        }
-
-
-        /* =====================================================
-           PROFILE
-        ===================================================== */
-
-        .profile-wrapper {
-
-            position: relative;
-
-        }
-
-
-        .profile-button {
-
-            width: 42px;
-
-            height: 42px;
-
-            border:
-                1px solid #444;
-
-            border-radius: 50%;
-
-            background:
-                #111;
-
-            color:
-                white;
-
-            cursor:
-                pointer;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            transition:
-                transform 0.25s ease,
-                border-color 0.25s ease,
-                background 0.25s ease;
-
-        }
-
-
-        .profile-button:hover {
-
-            transform:
-                translateY(-2px);
-
-            border-color:
-                #fff;
-
-            background:
-                #181818;
-
-        }
-
-
-        .person-icon {
-
-            position:
-                relative;
-
-            width:
-                20px;
-
-            height:
-                20px;
-
-            display:
-                block;
-
-        }
-
-
-        .person-icon::before {
-
-            content:
-                "";
-
-            position:
-                absolute;
-
-            width:
-                7px;
-
-            height:
-                7px;
-
-            left:
-                50%;
-
-            top:
-                1px;
-
-            transform:
-                translateX(-50%);
-
-            background:
-                #f5f5f5;
-
-            border-radius:
-                50%;
-
-        }
-
-
-        .person-icon::after {
-
-            content:
-                "";
-
-            position:
-                absolute;
-
-            width:
-                14px;
-
-            height:
-                8px;
-
-            left:
-                50%;
-
-            bottom:
-                1px;
-
-            transform:
-                translateX(-50%);
-
-            background:
-                #f5f5f5;
-
-            border-radius:
-                9px 9px 4px 4px;
-
-        }
-
-
-        /* =====================================================
-           PROFILE MENU
-        ===================================================== */
-
-        .profile-menu {
-
-            position:
-                absolute;
-
-            right:
-                0;
-
-            top:
-                54px;
-
-            width:
-                250px;
-
-            padding:
-                20px;
-
-            background:
-                #101010;
-
-            border:
-                1px solid #333;
-
-            box-shadow:
-                0 25px 70px rgba(0, 0, 0, 0.65);
-
-            opacity:
-                0;
-
-            visibility:
-                hidden;
-
-            transform:
-                translateY(-8px);
-
-            transition:
-                opacity 0.2s ease,
-                transform 0.2s ease,
-                visibility 0.2s ease;
-
-        }
-
-
-        .profile-wrapper.open .profile-menu {
-
-            opacity:
-                1;
-
-            visibility:
-                visible;
-
-            transform:
-                translateY(0);
-
-        }
-
-
-        .profile-heading {
-
-            font-size:
-                9px;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                2px;
-
-            color:
-                #777;
-
-            margin-bottom:
-                7px;
-
-        }
-
-
-        .profile-name {
-
-            font-size:
-                18px;
-
-            font-weight:
-                800;
-
-            margin-bottom:
-                3px;
-
-        }
-
-
-        .profile-publication {
-
-            font-size:
-                11px;
-
-            color:
-                #888;
-
-            margin-bottom:
-                18px;
-
-        }
-
-
-        .profile-menu a {
-
-            display:
-                block;
-
-            padding:
-                11px 0;
-
-            border-top:
-                1px solid #282828;
-
-            font-size:
-                10px;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                1px;
-
-            color:
-                #ccc;
-
-            transition:
-                padding-left 0.2s ease,
-                color 0.2s ease;
-
-        }
-
-
-        .profile-menu a:hover {
-
-            padding-left:
-                6px;
-
-            color:
-                #fff;
-
-        }
-
-
-        /* =====================================================
-           PAGE HEADER
-        ===================================================== */
-
-        .page {
-
-            width:
-                min(1400px, 90%);
-
-            margin:
-                0 auto;
-
-            padding:
-                90px 0 120px;
-
-        }
-
-
-        .eyebrow {
-
-            font-size:
-                10px;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                3px;
-
-            color:
-                #777;
-
-            margin-bottom:
-                18px;
-
-        }
-
-
-        .page-title {
-
-            font-size:
-                clamp(48px, 8vw, 105px);
-
-            line-height:
-                0.9;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                -5px;
-
-            margin-bottom:
-                35px;
-
-        }
-
-
-        .page-intro {
-
-            max-width:
-                680px;
-
-            color:
-                #8d8d8d;
-
-            font-size:
-                15px;
-
-            line-height:
-                1.8;
-
-        }
-
-
-        /* =====================================================
-           STATUS BAR
-        ===================================================== */
-
-        .status-bar {
-
-            margin-top:
-                60px;
-
-            padding:
-                16px 20px;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                space-between;
-
-            gap:
-                20px;
-
-            border-top:
-                1px solid #292929;
-
-            border-bottom:
-                1px solid #292929;
-
-        }
-
-
-        .status-left {
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                12px;
-
-            font-size:
-                9px;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                2px;
-
-        }
-
-
-        .status-dot {
-
-            width:
-                7px;
-
-            height:
-                7px;
-
-            border-radius:
-                50%;
-
-            background:
-                #fff;
-
-            box-shadow:
-                0 0 12px rgba(255, 255, 255, 0.5);
-
-        }
-
-
-        .status-right {
-
-            font-size:
-                9px;
-
-            font-weight:
-                700;
-
-            letter-spacing:
-                1.5px;
-
-            color:
-                #666;
-
-            text-align:
-                right;
-
-        }
-
-
-        .upload-button {
-
-            display:
-                inline-flex;
-
-            align-items:
-                center;
-
-            padding:
-                12px 16px;
-
-            border:
-                1px solid #555;
-
-            background:
-                #fff;
-
-            color:
-                #000;
-
-            font-size:
-                9px;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                1.2px;
-
-            transition:
-                transform 0.2s ease,
-                background 0.2s ease;
-
-        }
-
-
-        .upload-button:hover {
-
-            transform:
-                translateY(-2px);
-
-            background:
-                #ddd;
-
-        }
-
-
-        /* =====================================================
-           ARTICLE GRID
-        ===================================================== */
-
-        .article-grid {
-
-            margin-top:
-                50px;
-
-            display:
-                grid;
-
-            grid-template-columns:
-                repeat(2, minmax(0, 1fr));
-
-            gap:
-                26px;
-
-        }
-
-
-        .article-card-wrapper {
-
-            position:
-                relative;
-
-            min-width:
-                0;
-
-        }
-
-
-        /* =====================================================
-           ARTICLE CARD
-        ===================================================== */
-
-        .article-card {
-
-            position:
-                relative;
-
-            display:
-                flex;
-
-            flex-direction:
-                column;
-
-            height:
-                455px;
-
-            padding:
-                28px;
-
-            overflow:
-                hidden;
-
-            background:
-                #111;
-
-            border:
-                1px solid #292929;
-
-            transition:
-                transform 0.3s ease,
-                border-color 0.3s ease,
-                background 0.3s ease;
-
-        }
-
-
-        .article-card:hover {
-
-            transform:
-                translateY(-8px);
-
-            border-color:
-                #555;
-
-            background:
-                #151515;
-
-        }
-
-
-        .article-top {
-
-            display:
-                flex;
-
-            justify-content:
-                space-between;
-
-            align-items:
-                center;
-
-            gap:
-                20px;
-
-            padding-bottom:
-                20px;
-
-            border-bottom:
-                1px solid #292929;
-
-        }
-
-
-        .article-publication {
-
-            font-size:
-                9px;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                2px;
-
-            color:
-                #fff;
-
-        }
-
-
-        .article-date {
-
-            font-size:
-                9px;
-
-            font-weight:
-                700;
-
-            letter-spacing:
-                1px;
-
-            color:
-                #666;
-
-            text-align:
-                right;
-
-        }
-
-
-        .article-title {
-
-            margin-top:
-                27px;
-
-            font-size:
-                clamp(25px, 3vw, 40px);
-
-            line-height:
-                1.02;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                -1.8px;
-
-            color:
-                #f5f5f5;
-
-        }
-
-
-        .article-preview {
-
-            position:
-                relative;
-
-            margin-top:
-                24px;
-
-            height:
-                175px;
-
-            overflow:
-                hidden;
-
-            color:
-                #999;
-
-            font-size:
-                14px;
-
-            line-height:
-                1.75;
-
-            white-space:
-                pre-line;
-
-        }
-
-
-        .article-preview::after {
-
-            content:
-                "";
-
-            position:
-                absolute;
-
-            left:
-                0;
-
-            right:
-                0;
-
-            bottom:
-                0;
-
-            height:
-                110px;
-
-            background:
-                linear-gradient(to bottom,
-                    rgba(17, 17, 17, 0),
-                    rgba(17, 17, 17, 0.35) 20%,
-                    rgba(17, 17, 17, 0.82) 68%,
-                    #111 100%);
-
-            pointer-events:
-                none;
-
-        }
-
-
-        .article-card:hover .article-preview::after {
-
-            background:
-                linear-gradient(to bottom,
-                    rgba(21, 21, 21, 0),
-                    rgba(21, 21, 21, 0.35) 20%,
-                    rgba(21, 21, 21, 0.82) 68%,
-                    #151515 100%);
-
-        }
-
-
-        .article-bottom {
-
-            margin-top:
-                auto;
-
-            padding-top:
-                20px;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                space-between;
-
-            border-top:
-                1px solid #292929;
-
-        }
-
-
-        .article-author {
-
-            font-size:
-                9px;
-
-            font-weight:
-                700;
-
-            letter-spacing:
-                1px;
-
-            color:
-                #666;
-
-        }
-
-
-        .read-more {
-
-            font-size:
-                9px;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                1.5px;
-
-            color:
-                #fff;
-
-            transition:
-                transform 0.2s ease,
-                opacity 0.2s ease;
-
-        }
-
-
-        .article-card:hover .read-more {
-
-            transform:
-                translateX(5px);
-
-        }
-
-
-        /* =====================================================
-           DELETE
-        ===================================================== */
-
-        .delete-form {
-
-            margin-top:
-                10px;
-
-        }
-
-
-        .delete-button {
-
-            width:
-                100%;
-
-            padding:
-                12px;
-
-            border:
-                1px solid #3a3a3a;
-
-            background:
-                transparent;
-
-            color:
-                #777;
-
-            font-size:
-                9px;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                1.5px;
-
-            cursor:
-                pointer;
-
-            transition:
-                color 0.2s ease,
-                border-color 0.2s ease,
-                background 0.2s ease;
-
-        }
-
-
-        .delete-button:hover {
-
-            color:
-                #fff;
-
-            border-color:
-                #777;
-
-            background:
-                #181818;
-
-        }
-
-
-        /* =====================================================
-           EMPTY
-        ===================================================== */
-
-        .empty-state {
-
-            margin-top:
-                50px;
-
-            padding:
-                90px 30px;
-
-            text-align:
-                center;
-
-            border:
-                1px solid #292929;
-
-            background:
-                #111;
-
-        }
-
-
-        .empty-state h2 {
-
-            font-size:
-                30px;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                -1px;
-
-            margin-bottom:
-                12px;
-
-        }
-
-
-        .empty-state p {
-
-            color:
-                #666;
-
-            font-size:
-                13px;
-
-            line-height:
-                1.7;
-
-        }
-
-
-        /* =====================================================
-           FOOTER
-        ===================================================== */
-
-        footer {
-
-            border-top:
-                1px solid #292929;
-
-            padding:
-                28px 5vw;
-
-            display:
-                flex;
-
-            justify-content:
-                space-between;
-
-            align-items:
-                center;
-
-            color:
-                #555;
-
-            font-size:
-                9px;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                1.5px;
-
-        }
-
-
-        /* =====================================================
-           MOBILE
-        ===================================================== */
-
-        @media (max-width: 800px) {
-
-            .navbar {
-
-                height:
-                    70px;
-
-                padding:
-                    0 6%;
-
-            }
-
-
-            .nav-right {
-
-                gap:
-                    15px;
-
-            }
-
-
-            .nav-links {
-
-                gap:
-                    17px;
-
-            }
-
-
-            .nav-link {
-
-                font-size:
-                    9px;
-
-                letter-spacing:
-                    1px;
-
-            }
-
-
-            .profile-menu {
-
-                right:
-                    -5px;
-
-                width:
-                    min(250px,
-                        calc(100vw - 30px));
-
-            }
-
-
-            .page {
-
-                width:
-                    88%;
-
-                padding-top:
-                    65px;
-
-            }
-
-
-            .page-title {
-
-                letter-spacing:
-                    -3px;
-
-            }
-
-
-            .status-bar {
-
-                align-items:
-                    flex-start;
-
-                flex-direction:
-                    column;
-
-            }
-
-
-            .status-right {
-
-                text-align:
-                    left;
-
-            }
-
-
-            .article-grid {
-
-                grid-template-columns:
-                    1fr;
-
-            }
-
-
-            .article-card {
-
-                height:
-                    440px;
-
-            }
-
-
-            footer {
-
-                flex-direction:
-                    column;
-
-                gap:
-                    10px;
-
-                text-align:
-                    center;
-
-            }
-
-        }
-
-
-        /* =====================================================
-           SMALL PHONES
-        ===================================================== */
-
-        @media (max-width: 500px) {
-
-            .logo {
-
-                font-size:
-                    21px;
-
-            }
-
-
-            .nav-links {
-
-                gap:
-                    11px;
-
-            }
-
-
-            .nav-link {
-
-                display:
-                    none;
-
-            }
-
-
-            .profile-button {
-
-                width:
-                    40px;
-
-                height:
-                    40px;
-
-            }
-
-
-            .page-title {
-
-                font-size:
-                    50px;
-
-            }
-
-
-            .article-card {
-
-                padding:
-                    22px;
-
-                height:
-                    450px;
-
-            }
-
-
-            .article-title {
-
-                font-size:
-                    28px;
-
-            }
-
-
-            .article-preview {
-
-                height:
-                    170px;
-
-            }
-
-        }
-    </style>
-
-</head>
-
-
-<body>
-
-
-    <!-- =====================================================
-         CURSOR LIGHT
-    ===================================================== -->
-
-    <div id="cursor-light"></div>
-
-
-    <!-- =====================================================
-         NAVBAR
-    ===================================================== -->
-
-    <nav class="navbar">
-
-        <a href="{{ url_for('home') }}" class="logo">
-            ACC
-        </a>
-
-
-        <div class="nav-right">
-
-            <div class="nav-links">
-
-                <a href="{{ url_for('home') }}" class="nav-link">
-                    HOME
-                </a>
-
-                <a href="{{ url_for('articles') }}" class="nav-link">
-                    ARTICLES
-                </a>
+                <h1>
+                    PRESS<br>
+                    <span>ARCHIVE.</span>
+                </h1>
 
             </div>
 
 
-            <div class="profile-wrapper" id="profileWrapper">
+            <div class="articles-hero-description">
 
-                <button type="button" class="profile-button" id="profileButton" aria-label="Account">
+                <div class="articles-description-line"></div>
 
-                    <span class="person-icon"></span>
+                <p>
+                    Reports, developments and dispatches from the
+                    Arkanian Crisis Committee Press Corps.
+                </p>
 
-                </button>
+                <div class="articles-hero-meta">
 
+                    <span>
+                        {{ articles|length }}
+                        ARTICLE{% if articles|length != 1 %}S{% endif %}
+                    </span>
 
-                <div class="profile-menu" id="profileMenu">
+                    <span>
+                        /
+                    </span>
 
-                    {% if session.get("chair_authenticated") %}
-
-                    <div class="profile-heading">
-                        CHAIR ACCOUNT
-                    </div>
-
-                    <div class="profile-name">
-                        CHAIR
-                    </div>
-
-                    <a href="{{ url_for('articles') }}">
-                        ARTICLES →
-                    </a>
-
-                    <a href="{{ url_for('chair_logout') }}">
-                        LOG OUT →
-                    </a>
-
-
-                    {% elif session.get("press_authenticated") %}
-
-                    <div class="profile-heading">
-                        PRESS ACCOUNT
-                    </div>
-
-                    <div class="profile-name">
-                        {{ session.get("press_name") }}
-                    </div>
-
-                    <div class="profile-publication">
-                        {{ session.get("press_publication") }}
-                    </div>
-
-                    <a href="{{ url_for('articles') }}">
-                        ARTICLES →
-                    </a>
-
-                    <a href="{{ url_for('press_upload') }}">
-                        UPLOAD ARTICLE →
-                    </a>
-
-                    <a href="{{ url_for('press_logout') }}">
-                        LOG OUT →
-                    </a>
-
-
-                    {% else %}
-
-                    <div class="profile-heading">
-                        ACCOUNT
-                    </div>
-
-                    <div class="profile-name">
-                        NOT SIGNED IN
-                    </div>
-
-                    <a href="{{ url_for('press_login') }}">
-                        PRESS LOGIN →
-                    </a>
-
-                    <a href="{{ url_for('chair_login') }}">
-                        CHAIR LOGIN →
-                    </a>
-
-                    {% endif %}
+                    <span>
+                        PUBLIC
+                    </span>
 
                 </div>
 
@@ -1547,146 +77,262 @@
 
         </div>
 
-    </nav>
 
+        <div class="articles-hero-bottom">
 
-    <!-- =====================================================
-         PAGE
-    ===================================================== -->
+            <span>
+                SCROLL TO EXPLORE
+            </span>
 
-    <main class="page">
+            <span class="articles-scroll-arrow">
+                ↓
+            </span>
 
-        <div class="eyebrow">
-            ARKANIAN JOINT CRISIS COMMITTEE
         </div>
 
-
-        <h1 class="page-title">
-            PRESS<br>
-            ARTICLES.
-        </h1>
+    </header>
 
 
-        <p class="page-intro">
-            The official press archive of the Arkanian Joint Crisis
-            Committee. Read reports, developments, and breaking coverage
-            submitted by authorized press delegates.
-        </p>
+    <!-- =========================================================
+         ACCESS BAR
+         ========================================================= -->
+
+    <section class="articles-access-bar">
+
+        <div class="articles-access-left">
+
+            <span class="articles-access-label">
+                ACCESS
+            </span>
 
 
-        <!-- STATUS -->
+            {% if user %}
 
-        <div class="status-bar">
+            {% if user.role == "chair" %}
 
-            <div class="status-left">
+            <span class="articles-access-value">
+                CHAIR ADMINISTRATION
+            </span>
 
-                <span class="status-dot"></span>
+            {% elif user.role == "press" %}
 
+            <span class="articles-access-value">
+                PRESS DELEGATE
+            </span>
 
-                {% if session.get("chair_authenticated") %}
+            {% elif user.role == "delegate" %}
 
-                <span>
-                    CHAIR MODE / DELETE ENABLED
-                </span>
+            <span class="articles-access-value">
+                DELEGATE
+            </span>
 
-                {% elif session.get("press_authenticated") %}
+            {% endif %}
 
-                <span>
-                    {{ session.get("press_publication") }}
-                    / PRESS DELEGATE
-                </span>
+            {% else %}
 
-                {% else %}
+            <span class="articles-access-value">
+                PUBLIC ARCHIVE
+            </span>
 
-                <span>
-                    PUBLIC ARCHIVE
-                </span>
-
-                {% endif %}
-
-            </div>
-
-
-            <div class="status-right">
-
-                {% if session.get("press_authenticated") %}
-
-                <a href="{{ url_for('press_upload') }}" class="upload-button">
-                    UPLOAD ARTICLE →
-                </a>
-
-                {% elif session.get("chair_authenticated") %}
-
-                CHAIR ACCESS ACTIVE
-
-                {% else %}
-
-                AUTHORIZED PRESS ACCESS ONLY
-
-                {% endif %}
-
-            </div>
+            {% endif %}
 
         </div>
 
 
-        <!-- ARTICLES -->
+        <div class="articles-access-actions">
 
-        {% if articles %}
+            {% if user and user.role == "press" %}
 
-        <div class="article-grid">
+            <a href="{{ url_for('press_upload') }}" class="articles-upload-link">
+                <span>+</span>
+                PUBLISH ARTICLE
+            </a>
 
-            {% for article in articles %}
+            {% elif user and user.role == "chair" %}
 
-            <div class="article-card-wrapper">
+            <a href="{{ url_for('crises') }}" class="articles-upload-link">
+                <span>+</span>
+                MANAGE CRISES
+            </a>
+
+            {% endif %}
+
+        </div>
+
+    </section>
 
 
-                <a href="{{ url_for('full_article', article_id=article.id) }}" class="article-card">
+    <!-- =========================================================
+         SEARCH / FILTER TOOLBAR
+         ========================================================= -->
 
-                    <div class="article-top">
+    {% if articles %}
 
-                        <span class="article-publication">
-                            {{ article.publication }}
-                        </span>
+    <section class="articles-toolbar">
 
-                        <span class="article-date">
-                            {{ article.date }}
-                        </span>
+        <div class="articles-toolbar-search">
 
+            <span class="articles-search-icon">
+                ⌕
+            </span>
+
+            <input type="search" id="articleSearch" class="articles-search-input"
+                placeholder="Search articles, authors, delegations..." autocomplete="off" spellcheck="false"
+                aria-label="Search articles">
+
+            <button type="button" id="clearArticleSearch" class="articles-search-clear" hidden
+                aria-label="Clear article search">
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="articles-toolbar-info">
+
+            <span id="articleResultCount">
+                {{ articles|length }}
+                RESULT{% if articles|length != 1 %}S{% endif %}
+            </span>
+
+            <span class="toolbar-divider">
+                /
+            </span>
+
+            <span>
+                NEWEST FIRST
+            </span>
+
+        </div>
+
+    </section>
+
+    {% endif %}
+
+
+    <!-- =========================================================
+         FEATURED / LATEST ARTICLE
+         ========================================================= -->
+
+    {% if articles %}
+
+    {% set featured = articles[0] %}
+
+    <section class="featured-article" data-searchable="
+                {{ featured.title|lower }}
+                {{ featured.author|lower }}
+                {{ featured.delegation|lower }}
+                {{ featured.body|lower }}
+            ">
+
+        <div class="featured-article-label">
+
+            <span>
+                LATEST DISPATCH
+            </span>
+
+            <span>
+                01
+            </span>
+
+        </div>
+
+
+        <div class="featured-article-grid">
+
+            <div class="featured-article-main">
+
+                <a href="{{ url_for('full_article', article_id=featured.id) }}" class="featured-article-link">
+
+                    <div class="featured-article-kicker">
+                        PRESS CORPS // {{ featured.delegation }}
                     </div>
 
-
-                    <h2 class="article-title">
-                        {{ article.title }}
+                    <h2>
+                        {{ featured.title }}
                     </h2>
 
+                    <div class="featured-article-excerpt">
 
-                    <div class="article-preview">
-                        {{ article.content }}
+                        {% if featured.body %}
+                        {{ featured.body|striptags|truncate(330, True, '…') }}
+                        {% endif %}
+
                     </div>
 
+                    <div class="featured-read-link">
 
-                    <div class="article-bottom">
-
-                        <span class="article-author">
-                            BY {{ article.author }}
+                        <span>
+                            READ FULL REPORT
                         </span>
 
-                        <span class="read-more">
-                            READ FULL ARTICLE →
+                        <span class="featured-read-arrow">
+                            →
                         </span>
 
                     </div>
 
                 </a>
 
+            </div>
 
-                {% if session.get("chair_authenticated") %}
 
-                <form method="POST" action="{{ url_for('delete_article', article_id=article.id) }}" class="delete-form"
-                    onsubmit="return confirm('Delete this article?');">
+            <div class="featured-article-side">
 
-                    <button type="submit" class="delete-button">
+                <div class="featured-number">
+                    01
+                </div>
+
+
+                <div class="featured-meta">
+
+                    <div class="featured-meta-row">
+
+                        <span>
+                            AUTHOR
+                        </span>
+
+                        <strong>
+                            {{ featured.author }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="featured-meta-row">
+
+                        <span>
+                            DELEGATION
+                        </span>
+
+                        <strong>
+                            {{ featured.delegation }}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="featured-meta-row">
+
+                        <span>
+                            PUBLISHED
+                        </span>
+
+                        <strong>
+                            {{ featured.created_at }}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                {% if user and user.role == "chair" %}
+
+                <form method="POST" action="{{ url_for('delete_article', article_id=featured.id) }}"
+                    class="featured-delete-form" onsubmit="return confirm('Delete this article permanently?');">
+
+                    <button type="submit" class="article-delete-button">
                         DELETE ARTICLE
                     </button>
 
@@ -1696,226 +342,2449 @@
 
             </div>
 
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+             ARCHIVE GRID
+             ===================================================== -->
+
+    <section class="article-archive-section">
+
+        <div class="archive-section-header">
+
+            <div class="archive-heading">
+
+                <span class="archive-index">
+                    02
+                </span>
+
+                <h2>
+                    ALL REPORTS
+                </h2>
+
+            </div>
+
+
+            <div class="archive-heading-line"></div>
+
+        </div>
+
+
+        <div class="article-grid" id="articleGrid">
+
+            {% for article in articles %}
+
+            {% if not loop.first %}
+
+            <article class="article-card" data-searchable="
+                                {{ article.title|lower }}
+                                {{ article.author|lower }}
+                                {{ article.delegation|lower }}
+                                {{ article.body|lower }}
+                            " data-article-index="{{ loop.index }}">
+
+                <div class="article-card-number">
+
+                    {{ "%02d"|format(loop.index) }}
+
+                </div>
+
+
+                <div class="article-card-top">
+
+                    <span class="article-card-category">
+                        {{ article.delegation }}
+                    </span>
+
+                    <span class="article-card-date">
+                        {{ article.created_at }}
+                    </span>
+
+                </div>
+
+
+                <a href="{{ url_for('full_article', article_id=article.id) }}" class="article-card-content">
+
+                    <h3>
+                        {{ article.title }}
+                    </h3>
+
+                    <p>
+                        {{ article.body|striptags|truncate(190, True, '…') }}
+                    </p>
+
+                </a>
+
+
+                <div class="article-card-bottom">
+
+                    <div class="article-card-author">
+
+                        <span>
+                            BY
+                        </span>
+
+                        <strong>
+                            {{ article.author }}
+                        </strong>
+
+                    </div>
+
+
+                    <a href="{{ url_for('full_article', article_id=article.id) }}" class="article-card-arrow"
+                        aria-label="Read {{ article.title }}">
+                        ↗
+                    </a>
+
+                </div>
+
+
+                {% if user and user.role == "chair" %}
+
+                <div class="article-card-admin">
+
+                    <form method="POST" action="{{ url_for('delete_article', article_id=article.id) }}"
+                        onsubmit="return confirm('Delete this article permanently?');">
+
+                        <button type="submit" class="article-delete-button">
+                            DELETE
+                        </button>
+
+                    </form>
+
+                </div>
+
+                {% endif %}
+
+            </article>
+
+            {% endif %}
+
             {% endfor %}
 
         </div>
 
 
-        {% else %}
+        <!-- SEARCH EMPTY STATE -->
 
-        <div class="empty-state">
+        <div class="articles-no-results" id="articlesNoResults" hidden>
+
+            <div class="articles-no-results-icon">
+                ⌕
+            </div>
+
+            <h3>
+                NO REPORTS FOUND
+            </h3>
+
+            <p>
+                Try another keyword, author or delegation.
+            </p>
+
+            <button type="button" id="resetArticleSearch">
+                CLEAR SEARCH
+            </button>
+
+        </div>
+
+    </section>
+
+
+    {% else %}
+
+    <!-- =====================================================
+             EMPTY ARCHIVE
+             ===================================================== -->
+
+    <section class="articles-empty">
+
+        <div class="articles-empty-index">
+            02 // ARCHIVE
+        </div>
+
+        <div class="articles-empty-icon">
+            +
+        </div>
+
+        <div class="articles-empty-content">
+
+            <div class="articles-empty-eyebrow">
+                PRESS CORPS
+            </div>
 
             <h2>
-                NO ARTICLES YET.
+                No reports<br>
+                published yet.
             </h2>
 
             <p>
-                The press archive is currently empty.
-                Authorized press delegates can publish articles
-                once they sign in.
+                The archive is currently empty. Once Press
+                Delegates publish their reports, they will
+                appear here.
+            </p>
+
+            {% if user and user.role == "press" %}
+
+            <a href="{{ url_for('press_upload') }}" class="articles-empty-button">
+                PUBLISH FIRST ARTICLE
+                <span>→</span>
+            </a>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+    {% endif %}
+
+
+    <!-- =========================================================
+         PRESS CORPS MANIFESTO
+         ========================================================= -->
+
+    <section class="press-manifesto">
+
+        <div class="press-manifesto-number">
+            03
+        </div>
+
+
+        <div class="press-manifesto-main">
+
+            <div class="press-manifesto-label">
+                THE PRESS CORPS
+            </div>
+
+            <h2>
+                Observe.<br>
+                Record.<br>
+                Report.
+            </h2>
+
+        </div>
+
+
+        <div class="press-manifesto-copy">
+
+            <p>
+                The Press Corps documents the evolving events of
+                the committee, providing delegates with reports,
+                developments and perspectives from inside the crisis.
+            </p>
+
+            <p>
+                Articles published here form part of the public
+                committee archive.
             </p>
 
         </div>
 
-        {% endif %}
-
-    </main>
+    </section>
 
 
-    <!-- =====================================================
-         FOOTER
-    ===================================================== -->
+    <!-- =========================================================
+         FINAL ARCHIVE FOOTER
+         ========================================================= -->
 
-    <footer>
+    <section class="articles-bottom">
 
-        <span>
-            ARKANIAN JOINT CRISIS COMMITTEE
-        </span>
+        <div>
+            ARKANIAN CRISIS COMMITTEE
+        </div>
 
-        <span>
-            PRESS ARCHIVE
-        </span>
+        <div>
+            PRESS ARCHIVE // END
+        </div>
 
-    </footer>
+    </section>
 
+</section>
 
-    <!-- =====================================================
-         JAVASCRIPT
-    ===================================================== -->
-
-    <script>
-
-        /* =================================================
-           PROFILE
-        ================================================= */
-
-        const profileButton =
-            document.getElementById("profileButton");
+{% endblock %}
 
 
-        const profileWrapper =
-            document.getElementById("profileWrapper");
+{% block extra_css %}
+
+<style>
+    /* =========================================================
+       ARTICLES PAGE
+       ========================================================= */
+
+    .articles-page {
+        width: min(1440px, calc(100% - 48px));
+
+        margin: 0 auto;
+
+        padding:
+            70px 0 100px;
+    }
 
 
-        if (
-            profileButton &&
-            profileWrapper
-        ) {
+    /* =========================================================
+       HERO
+       ========================================================= */
 
-            profileButton.addEventListener(
-                "click",
-                function (event) {
+    .articles-hero {
+        position: relative;
 
-                    event.stopPropagation();
+        min-height: 610px;
 
-                    profileWrapper.classList.toggle(
-                        "open"
-                    );
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
 
-                }
-            );
+        padding: 28px 0 30px;
 
+        border-bottom: 1px solid rgba(255, 255, 255, 0.13);
 
-            document.addEventListener(
-                "click",
-                function (event) {
-
-                    if (
-                        !profileWrapper.contains(
-                            event.target
-                        )
-                    ) {
-
-                        profileWrapper.classList.remove(
-                            "open"
-                        );
-
-                    }
-
-                }
-            );
+        overflow: hidden;
+    }
 
 
-            document.addEventListener(
-                "keydown",
-                function (event) {
+    .articles-hero::before {
+        content: "";
 
-                    if (
-                        event.key === "Escape"
-                    ) {
+        position: absolute;
 
-                        profileWrapper.classList.remove(
-                            "open"
-                        );
+        width: 650px;
+        height: 650px;
 
-                    }
+        top: -280px;
+        right: -160px;
 
-                }
-            );
+        border-radius: 50%;
 
+        background:
+            radial-gradient(circle,
+                rgba(255, 255, 255, 0.055),
+                transparent 68%);
+
+        pointer-events: none;
+    }
+
+
+    .articles-hero::after {
+        content: "";
+
+        position: absolute;
+
+        inset: 0;
+
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.018) 1px,
+                transparent 1px),
+            linear-gradient(90deg,
+                rgba(255, 255, 255, 0.018) 1px,
+                transparent 1px);
+
+        background-size: 55px 55px;
+
+        mask-image:
+            linear-gradient(135deg,
+                black,
+                transparent 70%);
+
+        -webkit-mask-image:
+            linear-gradient(135deg,
+                black,
+                transparent 70%);
+
+        pointer-events: none;
+    }
+
+
+    .articles-hero-top,
+    .articles-hero-main,
+    .articles-hero-bottom {
+        position: relative;
+        z-index: 2;
+    }
+
+
+    .articles-hero-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        color: rgba(255, 255, 255, 0.27);
+
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+    }
+
+
+    .articles-hero-status {
+        display: flex;
+        align-items: center;
+
+        gap: 8px;
+    }
+
+
+    .articles-live-dot {
+        width: 6px;
+        height: 6px;
+
+        border-radius: 50%;
+
+        background: #fff;
+
+        box-shadow:
+            0 0 14px rgba(255, 255, 255, 0.45);
+
+        animation:
+            articlesPulse 2.2s ease-in-out infinite;
+    }
+
+
+    @keyframes articlesPulse {
+
+        0%,
+        100% {
+            opacity: 0.35;
+        }
+
+        50% {
+            opacity: 1;
+        }
+
+    }
+
+
+    .articles-hero-main {
+        display: grid;
+        grid-template-columns:
+            minmax(0, 1.25fr) minmax(260px, 0.75fr);
+
+        align-items: end;
+
+        gap: 70px;
+    }
+
+
+    .articles-eyebrow {
+        margin-bottom: 16px;
+
+        color: rgba(255, 255, 255, 0.34);
+
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+    }
+
+
+    .articles-hero h1 {
+        margin: 0;
+
+        color: #fff;
+
+        font-size: clamp(85px, 13vw, 190px);
+
+        line-height: 0.75;
+
+        letter-spacing: -0.085em;
+
+        font-weight: 700;
+    }
+
+
+    .articles-hero h1 span {
+        color: rgba(255, 255, 255, 0.28);
+    }
+
+
+    .articles-hero-description {
+        padding-bottom: 8px;
+    }
+
+
+    .articles-description-line {
+        width: 42px;
+        height: 1px;
+
+        margin-bottom: 20px;
+
+        background: rgba(255, 255, 255, 0.45);
+    }
+
+
+    .articles-hero-description p {
+        max-width: 360px;
+
+        margin: 0;
+
+        color: rgba(255, 255, 255, 0.43);
+
+        font-size: 13px;
+        line-height: 1.8;
+    }
+
+
+    .articles-hero-meta {
+        display: flex;
+        align-items: center;
+
+        gap: 9px;
+
+        margin-top: 25px;
+
+        color: rgba(255, 255, 255, 0.25);
+
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+    }
+
+
+    .articles-hero-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        color: rgba(255, 255, 255, 0.2);
+
+        font-size: 7px;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+    }
+
+
+    .articles-scroll-arrow {
+        font-size: 17px;
+
+        animation:
+            articlesArrowFloat 2s ease-in-out infinite;
+    }
+
+
+    @keyframes articlesArrowFloat {
+
+        0%,
+        100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(5px);
+        }
+
+    }
+
+
+    /* =========================================================
+       ACCESS BAR
+       ========================================================= */
+
+    .articles-access-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        min-height: 65px;
+
+        gap: 20px;
+
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+
+    .articles-access-left {
+        display: flex;
+        align-items: center;
+
+        gap: 15px;
+    }
+
+
+    .articles-access-label {
+        color: rgba(255, 255, 255, 0.22);
+
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+    }
+
+
+    .articles-access-value {
+        color: rgba(255, 255, 255, 0.6);
+
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+    }
+
+
+    .articles-access-actions {
+        display: flex;
+        align-items: center;
+    }
+
+
+    .articles-upload-link {
+        display: inline-flex;
+        align-items: center;
+
+        gap: 9px;
+
+        color: rgba(255, 255, 255, 0.45);
+
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+
+        text-decoration: none;
+
+        transition:
+            color 0.25s ease,
+            transform 0.25s ease;
+    }
+
+
+    .articles-upload-link span {
+        font-size: 17px;
+        font-weight: 300;
+    }
+
+
+    .articles-upload-link:hover {
+        color: #fff;
+
+        transform: translateX(3px);
+    }
+
+
+    /* =========================================================
+       TOOLBAR
+       ========================================================= */
+
+    .articles-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 30px;
+
+        padding: 32px 0 20px;
+    }
+
+
+    .articles-toolbar-search {
+        position: relative;
+
+        width: min(490px, 100%);
+    }
+
+
+    .articles-search-icon {
+        position: absolute;
+
+        left: 13px;
+        top: 50%;
+
+        transform: translateY(-50%);
+
+        color: rgba(255, 255, 255, 0.3);
+
+        font-size: 18px;
+
+        pointer-events: none;
+    }
+
+
+    .articles-search-input {
+        width: 100%;
+        height: 42px;
+
+        padding:
+            0 38px 0 37px;
+
+        border: 1px solid rgba(255, 255, 255, 0.1);
+
+        border-radius: 4px;
+
+        outline: none;
+
+        background: rgba(255, 255, 255, 0.025);
+
+        color: #fff;
+
+        font-family: inherit;
+        font-size: 11px;
+
+        transition:
+            border-color 0.3s ease,
+            background 0.3s ease,
+            box-shadow 0.3s ease;
+    }
+
+
+    .articles-search-input::placeholder {
+        color: rgba(255, 255, 255, 0.22);
+    }
+
+
+    .articles-search-input:focus {
+        border-color: rgba(255, 255, 255, 0.28);
+
+        background: rgba(255, 255, 255, 0.045);
+
+        box-shadow:
+            0 0 0 3px rgba(255, 255, 255, 0.02);
+    }
+
+
+    .articles-search-clear {
+        position: absolute;
+
+        top: 50%;
+        right: 8px;
+
+        width: 25px;
+        height: 25px;
+
+        transform: translateY(-50%);
+
+        border: none;
+
+        background: transparent;
+
+        color: rgba(255, 255, 255, 0.35);
+
+        font-family: inherit;
+        font-size: 18px;
+
+        cursor: pointer;
+    }
+
+
+    .articles-search-clear:hover {
+        color: #fff;
+    }
+
+
+    .articles-toolbar-info {
+        display: flex;
+        align-items: center;
+
+        gap: 9px;
+
+        color: rgba(255, 255, 255, 0.22);
+
+        font-size: 7px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+
+        white-space: nowrap;
+    }
+
+
+    .toolbar-divider {
+        color: rgba(255, 255, 255, 0.1);
+    }
+
+
+    /* =========================================================
+       FEATURED ARTICLE
+       ========================================================= */
+
+    .featured-article {
+        position: relative;
+
+        margin-top: 18px;
+
+        border: 1px solid rgba(255, 255, 255, 0.13);
+
+        background:
+            radial-gradient(circle at 82% 20%,
+                rgba(255, 255, 255, 0.055),
+                transparent 28%),
+            linear-gradient(135deg,
+                rgba(255, 255, 255, 0.045),
+                rgba(255, 255, 255, 0.012));
+
+        overflow: hidden;
+
+        transition:
+            border-color 0.4s ease,
+            transform 0.4s cubic-bezier(.2, .8, .2, 1);
+    }
+
+
+    .featured-article:hover {
+        border-color: rgba(255, 255, 255, 0.25);
+
+        transform: translateY(-4px);
+    }
+
+
+    .featured-article-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 16px 20px;
+
+        border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+
+        color: rgba(255, 255, 255, 0.27);
+
+        font-size: 7px;
+        font-weight: 700;
+        letter-spacing: 0.17em;
+    }
+
+
+    .featured-article-grid {
+        display: grid;
+        grid-template-columns:
+            minmax(0, 1.6fr) minmax(270px, 0.4fr);
+    }
+
+
+    .featured-article-main {
+        min-height: 475px;
+
+        padding: 55px 60px;
+    }
+
+
+    .featured-article-link {
+        display: flex;
+        flex-direction: column;
+
+        height: 100%;
+
+        color: inherit;
+        text-decoration: none;
+    }
+
+
+    .featured-article-kicker {
+        color: rgba(255, 255, 255, 0.3);
+
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+    }
+
+
+    .featured-article-main h2 {
+        max-width: 900px;
+
+        margin: 28px 0 23px;
+
+        color: #fff;
+
+        font-size: clamp(42px, 6vw, 82px);
+
+        line-height: 0.92;
+
+        letter-spacing: -0.065em;
+
+        transition:
+            color 0.3s ease;
+    }
+
+
+    .featured-article-link:hover h2 {
+        color: rgba(255, 255, 255, 0.75);
+    }
+
+
+    .featured-article-excerpt {
+        max-width: 680px;
+
+        color: rgba(255, 255, 255, 0.38);
+
+        font-size: 13px;
+        line-height: 1.8;
+    }
+
+
+    .featured-read-link {
+        display: flex;
+        align-items: center;
+
+        gap: 18px;
+
+        margin-top: auto;
+        padding-top: 40px;
+
+        color: rgba(255, 255, 255, 0.48);
+
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+    }
+
+
+    .featured-read-arrow {
+        font-size: 18px;
+
+        transition:
+            transform 0.35s ease,
+            color 0.35s ease;
+    }
+
+
+    .featured-article-link:hover .featured-read-arrow {
+        transform: translateX(7px);
+
+        color: #fff;
+    }
+
+
+    .featured-article-side {
+        position: relative;
+
+        display: flex;
+        flex-direction: column;
+
+        justify-content: space-between;
+
+        min-height: 475px;
+
+        padding: 30px;
+
+        border-left: 1px solid rgba(255, 255, 255, 0.09);
+
+        background: rgba(0, 0, 0, 0.13);
+    }
+
+
+    .featured-number {
+        color: rgba(255, 255, 255, 0.09);
+
+        font-size: 120px;
+        font-weight: 700;
+
+        line-height: 0.8;
+
+        letter-spacing: -0.08em;
+    }
+
+
+    .featured-meta {
+        display: flex;
+        flex-direction: column;
+
+        gap: 18px;
+    }
+
+
+    .featured-meta-row {
+        display: flex;
+        flex-direction: column;
+
+        gap: 6px;
+
+        padding-bottom: 14px;
+
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+
+    .featured-meta-row span {
+        color: rgba(255, 255, 255, 0.22);
+
+        font-size: 7px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+    }
+
+
+    .featured-meta-row strong {
+        color: rgba(255, 255, 255, 0.55);
+
+        font-size: 10px;
+        font-weight: 500;
+        line-height: 1.4;
+    }
+
+
+    .featured-delete-form {
+        margin-top: 20px;
+    }
+
+
+    /* =========================================================
+       ARCHIVE SECTION
+       ========================================================= */
+
+    .article-archive-section {
+        padding-top: 92px;
+    }
+
+
+    .archive-section-header {
+        display: flex;
+        align-items: center;
+
+        gap: 30px;
+
+        margin-bottom: 24px;
+    }
+
+
+    .archive-heading {
+        display: flex;
+        align-items: center;
+
+        gap: 15px;
+
+        flex-shrink: 0;
+    }
+
+
+    .archive-index {
+        color: rgba(255, 255, 255, 0.22);
+
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+    }
+
+
+    .archive-heading h2 {
+        margin: 0;
+
+        color: rgba(255, 255, 255, 0.75);
+
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+    }
+
+
+    .archive-heading-line {
+        width: 100%;
+        height: 1px;
+
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+
+    /* =========================================================
+       ARTICLE GRID
+       ========================================================= */
+
+    .article-grid {
+        display: grid;
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+
+        gap: 12px;
+    }
+
+
+    .article-card {
+        position: relative;
+
+        display: flex;
+        flex-direction: column;
+
+        min-height: 390px;
+
+        padding: 24px;
+
+        border: 1px solid rgba(255, 255, 255, 0.1);
+
+        background:
+            linear-gradient(145deg,
+                rgba(255, 255, 255, 0.035),
+                rgba(255, 255, 255, 0.008));
+
+        overflow: hidden;
+
+        transition:
+            transform 0.45s cubic-bezier(.2, .8, .2, 1),
+            border-color 0.4s ease,
+            background 0.4s ease;
+    }
+
+
+    .article-card::before {
+        content: "";
+
+        position: absolute;
+
+        width: 180px;
+        height: 180px;
+
+        top: -100px;
+        right: -100px;
+
+        border-radius: 50%;
+
+        background: rgba(255, 255, 255, 0.045);
+
+        filter: blur(35px);
+
+        transition:
+            transform 0.5s ease;
+    }
+
+
+    .article-card:hover {
+        transform: translateY(-7px);
+
+        border-color: rgba(255, 255, 255, 0.27);
+
+        background:
+            linear-gradient(145deg,
+                rgba(255, 255, 255, 0.06),
+                rgba(255, 255, 255, 0.012));
+    }
+
+
+    .article-card:hover::before {
+        transform: scale(1.5);
+    }
+
+
+    .article-card-number {
+        position: absolute;
+
+        top: 19px;
+        right: 21px;
+
+        color: rgba(255, 255, 255, 0.1);
+
+        font-size: 28px;
+        font-weight: 700;
+
+        letter-spacing: -0.05em;
+    }
+
+
+    .article-card-top {
+        position: relative;
+        z-index: 2;
+
+        display: flex;
+        flex-direction: column;
+
+        gap: 7px;
+
+        padding-right: 45px;
+    }
+
+
+    .article-card-category {
+        color: rgba(255, 255, 255, 0.35);
+
+        font-size: 7px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+
+        text-transform: uppercase;
+    }
+
+
+    .article-card-date {
+        color: rgba(255, 255, 255, 0.18);
+
+        font-size: 7px;
+    }
+
+
+    .article-card-content {
+        position: relative;
+        z-index: 2;
+
+        display: block;
+
+        color: inherit;
+        text-decoration: none;
+    }
+
+
+    .article-card-content h3 {
+        margin: 48px 0 16px;
+
+        color: rgba(255, 255, 255, 0.86);
+
+        font-size: 27px;
+        line-height: 1.02;
+
+        letter-spacing: -0.045em;
+
+        transition: color 0.3s ease;
+    }
+
+
+    .article-card:hover .article-card-content h3 {
+        color: #fff;
+    }
+
+
+    .article-card-content p {
+        margin: 0;
+
+        color: rgba(255, 255, 255, 0.3);
+
+        font-size: 11px;
+        line-height: 1.7;
+    }
+
+
+    .article-card-bottom {
+        position: relative;
+        z-index: 2;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 20px;
+
+        margin-top: auto;
+        padding-top: 30px;
+    }
+
+
+    .article-card-author {
+        display: flex;
+        flex-direction: column;
+
+        gap: 5px;
+    }
+
+
+    .article-card-author span {
+        color: rgba(255, 255, 255, 0.18);
+
+        font-size: 7px;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+    }
+
+
+    .article-card-author strong {
+        color: rgba(255, 255, 255, 0.5);
+
+        font-size: 9px;
+        font-weight: 500;
+    }
+
+
+    .article-card-arrow {
+        width: 34px;
+        height: 34px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border: 1px solid rgba(255, 255, 255, 0.12);
+
+        color: rgba(255, 255, 255, 0.35);
+
+        text-decoration: none;
+
+        font-size: 16px;
+
+        transition:
+            transform 0.35s ease,
+            border-color 0.35s ease,
+            color 0.35s ease,
+            background 0.35s ease;
+    }
+
+
+    .article-card:hover .article-card-arrow {
+        transform: translate(3px, -3px);
+
+        color: #fff;
+
+        border-color: rgba(255, 255, 255, 0.4);
+
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+
+    .article-card-admin {
+        position: absolute;
+
+        z-index: 5;
+
+        top: 55px;
+        right: 18px;
+    }
+
+
+    .article-delete-button {
+        padding: 7px 9px;
+
+        border: 1px solid rgba(255, 255, 255, 0.1);
+
+        background: transparent;
+
+        color: rgba(255, 255, 255, 0.25);
+
+        font-family: inherit;
+
+        font-size: 6px;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+
+        cursor: pointer;
+
+        transition:
+            color 0.25s ease,
+            border-color 0.25s ease,
+            background 0.25s ease;
+    }
+
+
+    .article-delete-button:hover {
+        color: #fff;
+
+        border-color: rgba(255, 255, 255, 0.4);
+
+        background: rgba(255, 255, 255, 0.07);
+    }
+
+
+    /* =========================================================
+       NO RESULTS
+       ========================================================= */
+
+    .articles-no-results {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        padding: 110px 20px;
+
+        text-align: center;
+
+        border: 1px solid rgba(255, 255, 255, 0.08);
+
+        background: rgba(255, 255, 255, 0.012);
+    }
+
+
+    .articles-no-results[hidden] {
+        display: none;
+    }
+
+
+    .articles-no-results-icon {
+        color: rgba(255, 255, 255, 0.22);
+
+        font-size: 34px;
+    }
+
+
+    .articles-no-results h3 {
+        margin: 18px 0 7px;
+
+        color: rgba(255, 255, 255, 0.7);
+
+        font-size: 17px;
+
+        letter-spacing: -0.02em;
+    }
+
+
+    .articles-no-results p {
+        margin: 0;
+
+        color: rgba(255, 255, 255, 0.27);
+
+        font-size: 10px;
+    }
+
+
+    .articles-no-results button {
+        margin-top: 20px;
+
+        padding: 9px 12px;
+
+        border: 1px solid rgba(255, 255, 255, 0.15);
+
+        background: transparent;
+
+        color: rgba(255, 255, 255, 0.4);
+
+        font-family: inherit;
+
+        font-size: 7px;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+
+        cursor: pointer;
+    }
+
+
+    .articles-no-results button:hover {
+        color: #fff;
+
+        border-color: rgba(255, 255, 255, 0.4);
+    }
+
+
+    /* =========================================================
+       EMPTY ARCHIVE
+       ========================================================= */
+
+    .articles-empty {
+        position: relative;
+
+        min-height: 520px;
+
+        display: grid;
+        grid-template-columns: 0.3fr 1fr;
+
+        align-items: center;
+
+        margin-top: 30px;
+
+        border: 1px solid rgba(255, 255, 255, 0.1);
+
+        overflow: hidden;
+    }
+
+
+    .articles-empty::before {
+        content: "";
+
+        position: absolute;
+
+        inset: 0;
+
+        background:
+            linear-gradient(135deg,
+                rgba(255, 255, 255, 0.035),
+                transparent 60%);
+    }
+
+
+    .articles-empty-index {
+        position: relative;
+        z-index: 2;
+
+        align-self: stretch;
+
+        display: flex;
+        align-items: flex-start;
+
+        padding: 30px;
+
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+
+        color: rgba(255, 255, 255, 0.2);
+
+        font-size: 7px;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+    }
+
+
+    .articles-empty-icon {
+        position: absolute;
+        z-index: 1;
+
+        right: 9%;
+        top: 12%;
+
+        color: rgba(255, 255, 255, 0.035);
+
+        font-size: 250px;
+        font-weight: 200;
+    }
+
+
+    .articles-empty-content {
+        position: relative;
+        z-index: 2;
+
+        padding: 60px;
+    }
+
+
+    .articles-empty-eyebrow {
+        color: rgba(255, 255, 255, 0.25);
+
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+    }
+
+
+    .articles-empty-content h2 {
+        margin: 20px 0;
+
+        color: #fff;
+
+        font-size: clamp(50px, 7vw, 95px);
+
+        line-height: 0.88;
+
+        letter-spacing: -0.07em;
+    }
+
+
+    .articles-empty-content p {
+        max-width: 470px;
+
+        color: rgba(255, 255, 255, 0.3);
+
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+
+    .articles-empty-button {
+        display: inline-flex;
+        align-items: center;
+
+        gap: 20px;
+
+        margin-top: 27px;
+
+        padding: 13px 15px;
+
+        border: 1px solid rgba(255, 255, 255, 0.2);
+
+        color: rgba(255, 255, 255, 0.55);
+
+        text-decoration: none;
+
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+
+        transition:
+            background 0.3s ease,
+            border-color 0.3s ease,
+            color 0.3s ease,
+            transform 0.3s ease;
+    }
+
+
+    .articles-empty-button span {
+        font-size: 16px;
+
+        transition: transform 0.3s ease;
+    }
+
+
+    .articles-empty-button:hover {
+        color: #fff;
+
+        border-color: rgba(255, 255, 255, 0.45);
+
+        background: rgba(255, 255, 255, 0.05);
+
+        transform: translateY(-2px);
+    }
+
+
+    .articles-empty-button:hover span {
+        transform: translateX(5px);
+    }
+
+
+    /* =========================================================
+       MANIFESTO
+       ========================================================= */
+
+    .press-manifesto {
+        display: grid;
+        grid-template-columns: 90px minmax(0, 1fr) minmax(280px, 0.7fr);
+
+        gap: 35px;
+
+        margin-top: 130px;
+        padding-top: 30px;
+
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+
+    .press-manifesto-number {
+        color: rgba(255, 255, 255, 0.2);
+
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+    }
+
+
+    .press-manifesto-label {
+        color: rgba(255, 255, 255, 0.28);
+
+        font-size: 8px;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+    }
+
+
+    .press-manifesto-main h2 {
+        margin: 20px 0 0;
+
+        color: #fff;
+
+        font-size: clamp(52px, 7vw, 105px);
+
+        line-height: 0.82;
+
+        letter-spacing: -0.075em;
+    }
+
+
+    .press-manifesto-copy {
+        align-self: end;
+
+        padding-bottom: 4px;
+    }
+
+
+    .press-manifesto-copy p {
+        margin: 0 0 17px;
+
+        color: rgba(255, 255, 255, 0.32);
+
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+
+    .press-manifesto-copy p:last-child {
+        margin-bottom: 0;
+    }
+
+
+    /* =========================================================
+       BOTTOM
+       ========================================================= */
+
+    .articles-bottom {
+        display: flex;
+        justify-content: space-between;
+
+        margin-top: 110px;
+        padding-top: 20px;
+
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+        color: rgba(255, 255, 255, 0.18);
+
+        font-size: 7px;
+        font-weight: 700;
+        letter-spacing: 0.17em;
+    }
+
+
+    /* =========================================================
+       TABLET
+       ========================================================= */
+
+    @media (max-width: 1050px) {
+
+        .articles-page {
+            width: min(100% - 32px, 900px);
+
+            padding-top: 50px;
         }
 
 
-        /* =================================================
-           CURSOR LIGHT
-        ================================================= */
-
-        const cursorLight =
-            document.getElementById("cursor-light");
+        .articles-hero {
+            min-height: 500px;
+        }
 
 
-        let mouseX = 0;
-        let mouseY = 0;
-
-        let lightX = 0;
-        let lightY = 0;
-
-        let mouseStarted = false;
+        .articles-hero h1 {
+            font-size: clamp(75px, 13vw, 135px);
+        }
 
 
-        if (cursorLight) {
-
-            document.addEventListener(
-                "mousemove",
-                function (event) {
-
-                    mouseX =
-                        event.clientX;
-
-                    mouseY =
-                        event.clientY;
+        .featured-article-main {
+            padding: 45px;
+        }
 
 
-                    if (!mouseStarted) {
-
-                        lightX =
-                            mouseX;
-
-                        lightY =
-                            mouseY;
-
-                        mouseStarted =
-                            true;
-
-                    }
+        .article-grid {
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+        }
 
 
-                    cursorLight.style.opacity =
-                        "1";
+        .press-manifesto {
+            grid-template-columns:
+                50px minmax(0, 1fr);
+        }
 
-                }
+
+        .press-manifesto-copy {
+            grid-column: 2;
+        }
+
+    }
+
+
+    /* =========================================================
+       MOBILE
+       ========================================================= */
+
+    @media (max-width: 700px) {
+
+        .articles-page {
+            width: calc(100% - 24px);
+
+            padding:
+                35px 0 65px;
+        }
+
+
+        .articles-hero {
+            min-height: 480px;
+
+            padding-top: 18px;
+        }
+
+
+        .articles-hero-main {
+            display: block;
+        }
+
+
+        .articles-hero h1 {
+            font-size: clamp(65px, 19vw, 110px);
+
+            line-height: 0.78;
+        }
+
+
+        .articles-eyebrow {
+            font-size: 7px;
+        }
+
+
+        .articles-hero-description {
+            margin-top: 55px;
+        }
+
+
+        .articles-hero-description p {
+            max-width: 330px;
+
+            font-size: 11px;
+        }
+
+
+        .articles-hero-bottom {
+            font-size: 6px;
+        }
+
+
+        .articles-access-bar {
+            align-items: flex-start;
+            flex-direction: column;
+
+            padding: 17px 0;
+        }
+
+
+        .articles-access-actions {
+            width: 100%;
+        }
+
+
+        .articles-upload-link {
+            width: 100%;
+
+            justify-content: space-between;
+
+            padding-top: 5px;
+        }
+
+
+        .articles-toolbar {
+            align-items: stretch;
+            flex-direction: column;
+
+            gap: 13px;
+
+            padding-top: 22px;
+        }
+
+
+        .articles-toolbar-search {
+            width: 100%;
+        }
+
+
+        .articles-toolbar-info {
+            justify-content: flex-end;
+        }
+
+
+        .featured-article {
+            margin-top: 13px;
+        }
+
+
+        .featured-article-grid {
+            grid-template-columns: 1fr;
+        }
+
+
+        .featured-article-main {
+            min-height: 420px;
+
+            padding: 32px 25px;
+        }
+
+
+        .featured-article-main h2 {
+            font-size: clamp(37px, 10vw, 58px);
+        }
+
+
+        .featured-article-excerpt {
+            font-size: 11px;
+        }
+
+
+        .featured-article-side {
+            min-height: auto;
+
+            padding: 24px;
+
+            border-left: none;
+            border-top: 1px solid rgba(255, 255, 255, 0.09);
+        }
+
+
+        .featured-number {
+            display: none;
+        }
+
+
+        .featured-meta {
+            gap: 12px;
+        }
+
+
+        .featured-delete-form {
+            margin-top: 15px;
+        }
+
+
+        .article-archive-section {
+            padding-top: 65px;
+        }
+
+
+        .article-grid {
+            grid-template-columns: 1fr;
+
+            gap: 9px;
+        }
+
+
+        .article-card {
+            min-height: 350px;
+
+            padding: 22px;
+        }
+
+
+        .article-card-content h3 {
+            font-size: 25px;
+        }
+
+
+        .articles-empty {
+            min-height: 470px;
+
+            display: block;
+        }
+
+
+        .articles-empty-index {
+            min-height: auto;
+
+            padding: 18px;
+
+            border-right: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+
+        .articles-empty-content {
+            padding: 45px 25px;
+        }
+
+
+        .articles-empty-content h2 {
+            font-size: 56px;
+        }
+
+
+        .press-manifesto {
+            display: block;
+
+            margin-top: 90px;
+        }
+
+
+        .press-manifesto-number {
+            margin-bottom: 25px;
+        }
+
+
+        .press-manifesto-copy {
+            margin-top: 45px;
+        }
+
+
+        .press-manifesto-main h2 {
+            font-size: 68px;
+        }
+
+
+        .articles-bottom {
+            flex-direction: column;
+
+            gap: 9px;
+
+            margin-top: 75px;
+        }
+
+    }
+
+
+    /* =========================================================
+       SMALL MOBILE
+       ========================================================= */
+
+    @media (max-width: 420px) {
+
+        .articles-hero h1 {
+            font-size: 67px;
+        }
+
+
+        .featured-article-main {
+            min-height: 390px;
+        }
+
+
+        .featured-article-main h2 {
+            font-size: 36px;
+        }
+
+
+        .press-manifesto-main h2 {
+            font-size: 57px;
+        }
+
+    }
+
+
+    /* =========================================================
+       REDUCED MOTION
+       ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .articles-live-dot,
+        .articles-scroll-arrow,
+        .featured-article,
+        .article-card,
+        .articles-empty-button {
+            animation: none !important;
+            transition: none !important;
+        }
+
+    }
+</style>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+    (function () {
+
+        "use strict";
+
+
+        /* =========================================================
+           SEARCH ELEMENTS
+           ========================================================= */
+
+        const searchInput =
+            document.getElementById("articleSearch");
+
+        const clearButton =
+            document.getElementById(
+                "clearArticleSearch"
+            );
+
+        const resultCount =
+            document.getElementById(
+                "articleResultCount"
+            );
+
+        const noResults =
+            document.getElementById(
+                "articlesNoResults"
+            );
+
+        const resetButton =
+            document.getElementById(
+                "resetArticleSearch"
+            );
+
+        const featuredArticle =
+            document.querySelector(
+                ".featured-article"
+            );
+
+        const articleCards =
+            document.querySelectorAll(
+                ".article-card"
             );
 
 
-            document.addEventListener(
-                "mouseleave",
-                function () {
+        /* =========================================================
+           SEARCH
+           ========================================================= */
 
-                    cursorLight.style.opacity =
-                        "0";
+        function searchArticles() {
 
-                }
-            );
+            if (!searchInput) {
+                return;
+            }
 
 
-            function moveLight() {
+            const query =
+                searchInput.value
+                    .trim()
+                    .toLowerCase();
 
-                lightX +=
+
+            let visibleCards = 0;
+
+            let featuredMatches = true;
+
+
+            /* -----------------------------------------------------
+               Featured article
+               ----------------------------------------------------- */
+
+            if (featuredArticle) {
+
+                const searchable =
                     (
-                        mouseX -
-                        lightX
-                    ) * 0.75;
+                        featuredArticle.dataset.searchable ||
+                        ""
+                    ).toLowerCase();
 
 
-                lightY +=
-                    (
-                        mouseY -
-                        lightY
-                    ) * 0.75;
+                featuredMatches =
+                    !query ||
+                    searchable.includes(query);
 
 
-                cursorLight.style.left =
-                    lightX + "px";
-
-
-                cursorLight.style.top =
-                    lightY + "px";
-
-
-                requestAnimationFrame(
-                    moveLight
-                );
+                featuredArticle.style.display =
+                    featuredMatches
+                        ? ""
+                        : "none";
 
             }
 
 
-            moveLight();
+            /* -----------------------------------------------------
+               Archive cards
+               ----------------------------------------------------- */
+
+            articleCards.forEach(function (card) {
+
+                const searchable =
+                    (
+                        card.dataset.searchable ||
+                        ""
+                    ).toLowerCase();
+
+
+                const matches =
+                    !query ||
+                    searchable.includes(query);
+
+
+                card.style.display =
+                    matches
+                        ? ""
+                        : "none";
+
+
+                if (matches) {
+                    visibleCards++;
+                }
+
+            });
+
+
+            /* -----------------------------------------------------
+               Count
+               ----------------------------------------------------- */
+
+            const totalVisible =
+                visibleCards +
+                (featuredMatches && featuredArticle ? 1 : 0);
+
+
+            if (resultCount) {
+
+                resultCount.textContent =
+                    totalVisible +
+                    " RESULT" +
+                    (
+                        totalVisible === 1
+                            ? ""
+                            : "S"
+                    );
+
+            }
+
+
+            /* -----------------------------------------------------
+               Clear button
+               ----------------------------------------------------- */
+
+            if (clearButton) {
+
+                clearButton.hidden =
+                    !query;
+
+            }
+
+
+            /* -----------------------------------------------------
+               Empty state
+               ----------------------------------------------------- */
+
+            if (noResults) {
+
+                noResults.hidden =
+                    !(query && totalVisible === 0);
+
+            }
 
         }
 
-    </script>
+
+        if (searchInput) {
+
+            searchInput.addEventListener(
+                "input",
+                searchArticles
+            );
+
+        }
 
 
-</body>
+        /* =========================================================
+           CLEAR SEARCH
+           ========================================================= */
 
-</html>
+        function clearSearch() {
+
+            if (!searchInput) {
+                return;
+            }
+
+
+            searchInput.value = "";
+
+            searchArticles();
+
+            searchInput.focus();
+
+        }
+
+
+        if (clearButton) {
+
+            clearButton.addEventListener(
+                "click",
+                clearSearch
+            );
+
+        }
+
+
+        if (resetButton) {
+
+            resetButton.addEventListener(
+                "click",
+                clearSearch
+            );
+
+        }
+
+
+        /* =========================================================
+           KEYBOARD SHORTCUT
+           ========================================================= */
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                /*
+                 * "/" focuses article search unless the user
+                 * is already typing inside an input or textarea.
+                 */
+
+                if (
+                    event.key === "/" &&
+                    document.activeElement &&
+                    ![
+                        "INPUT",
+                        "TEXTAREA"
+                    ].includes(
+                        document.activeElement.tagName
+                    )
+                ) {
+
+                    event.preventDefault();
+
+
+                    if (searchInput) {
+
+                        searchInput.focus();
+
+                    }
+
+                }
+
+
+                if (
+                    event.key === "Escape" &&
+                    searchInput &&
+                    document.activeElement === searchInput
+                ) {
+
+                    clearSearch();
+
+                    searchInput.blur();
+
+                }
+
+            }
+        );
+
+
+        /* =========================================================
+           ARTICLE CARD MOUSE TILT
+           ========================================================= */
+
+        const interactiveCards =
+            document.querySelectorAll(
+                ".article-card, .featured-article"
+            );
+
+
+        interactiveCards.forEach(function (card) {
+
+            card.addEventListener(
+                "mousemove",
+                function (event) {
+
+                    if (window.innerWidth <= 900) {
+                        return;
+                    }
+
+
+                    const rect =
+                        card.getBoundingClientRect();
+
+
+                    const x =
+                        (
+                            event.clientX -
+                            rect.left
+                        ) /
+                        rect.width;
+
+
+                    const y =
+                        (
+                            event.clientY -
+                            rect.top
+                        ) /
+                        rect.height;
+
+
+                    const rotateX =
+                        (0.5 - y) * 1.8;
+
+
+                    const rotateY =
+                        (x - 0.5) * 1.8;
+
+
+                    card.style.transform =
+                        "translateY(-6px) " +
+                        "perspective(1200px) " +
+                        "rotateX(" +
+                        rotateX +
+                        "deg) rotateY(" +
+                        rotateY +
+                        "deg)";
+
+                }
+            );
+
+
+            card.addEventListener(
+                "mouseleave",
+                function () {
+
+                    card.style.transform = "";
+
+                }
+            );
+
+        });
+
+
+        /* =========================================================
+           REVEAL ARTICLES ON SCROLL
+           ========================================================= */
+
+        const revealItems =
+            document.querySelectorAll(
+                ".article-card, .press-manifesto"
+            );
+
+
+        if (
+            "IntersectionObserver" in window &&
+            revealItems.length
+        ) {
+
+            const observer =
+                new IntersectionObserver(
+                    function (entries) {
+
+                        entries.forEach(function (entry) {
+
+                            if (!entry.isIntersecting) {
+                                return;
+                            }
+
+
+                            entry.target.classList.add(
+                                "article-visible"
+                            );
+
+
+                            observer.unobserve(
+                                entry.target
+                            );
+
+                        });
+
+                    },
+                    {
+                        threshold: 0.08
+                    }
+                );
+
+
+            revealItems.forEach(function (item) {
+
+                item.classList.add(
+                    "article-reveal"
+                );
+
+                observer.observe(item);
+
+            });
+
+        }
+
+    })();
+
+</script>
+
+
+<style>
+    /* Scroll reveal is kept here so the
+       archive works even if the shared CSS
+       is later changed. */
+
+    .article-reveal {
+        opacity: 0;
+
+        transform:
+            translateY(18px);
+    }
+
+
+    .article-reveal.article-visible {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+
+        transition:
+            opacity 0.65s ease,
+            transform 0.65s cubic-bezier(.2, .8, .2, 1);
+    }
+
+
+    .article-card:nth-child(2) {
+        transition-delay: 0.05s;
+    }
+
+
+    .article-card:nth-child(3) {
+        transition-delay: 0.1s;
+    }
+
+
+    .article-card:nth-child(4) {
+        transition-delay: 0.15s;
+    }
+
+
+    .article-card:nth-child(5) {
+        transition-delay: 0.2s;
+    }
+
+
+    .article-card:nth-child(6) {
+        transition-delay: 0.25s;
+    }
+
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .article-reveal,
+        .article-reveal.article-visible {
+            opacity: 1;
+            transform: none;
+
+            transition: none;
+        }
+
+    }
+</style>
+
+{% endblock %}

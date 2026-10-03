@@ -1,0 +1,3104 @@
+{% extends "base.html" %}
+
+{% block title %}
+Notes — {{ user.username }}
+{% endblock %}
+
+{% block content %}
+
+<div class="notes-page">
+
+
+    <div class="notes-app">
+
+        <!-- MOBILE TOP BAR -->
+
+        <div class="notes-mobile-bar">
+
+            <button type="button" class="mobile-notes-menu" id="mobileNotesMenu" aria-label="Open notes">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="mobile-notes-title">
+                Notes
+            </div>
+
+            <button type="button" class="mobile-new-note" id="mobileNewNoteButton" aria-label="New note">
+                +
+            </button>
+
+        </div>
+
+
+        <!-- MOBILE SIDEBAR OVERLAY -->
+
+        <div class="notes-sidebar-overlay" id="notesSidebarOverlay"></div>
+
+
+        <!-- SIDEBAR -->
+
+        <aside class="notes-sidebar" id="notesSidebar">
+
+            <div class="notes-sidebar-inner">
+
+                <div class="notes-sidebar-header">
+
+                    <div>
+                        <div class="notes-sidebar-eyebrow">
+                            PRIVATE WORKSPACE
+                        </div>
+
+                        <h1>
+                            Notes
+                        </h1>
+                    </div>
+
+                    <button type="button" class="notes-new-button" id="newNoteButton" aria-label="Create a new note">
+                        <span>+</span>
+                    </button>
+
+                </div>
+
+
+                <!-- SEARCH -->
+
+                <div class="notes-search">
+
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="11" cy="11" r="6.5"></circle>
+                        <path d="M16 16L21 21"></path>
+                    </svg>
+
+                    <input type="search" id="notesSearch" placeholder="Search" autocomplete="off" spellcheck="false">
+
+                    <button type="button" id="clearNotesSearch" class="clear-search" aria-label="Clear search">
+                        ×
+                    </button>
+
+                </div>
+
+
+                <!-- COUNT -->
+
+                <div class="notes-count-row">
+
+                    <span id="notesCountLabel">
+                        {% if notes|length == 1 %}
+                        1 note
+                        {% else %}
+                        {{ notes|length }} notes
+                        {% endif %}
+                    </span>
+
+                </div>
+
+
+                <!-- NOTE LIST -->
+
+                <div class="notes-list" id="notesList">
+
+                    {% if notes %}
+
+                    {% for note in notes %}
+
+                    <a href="{{ url_for('notes', note=note.id) }}"
+                        class="note-list-item {% if selected_note and selected_note.id == note.id %}active{% endif %}"
+                        data-note-title="{{ note.title|lower }}" data-note-content="{{ note.content|lower }}"
+                        data-note-id="{{ note.id }}">
+
+                        <div class="note-list-item-main">
+
+                            <div class="note-list-title">
+                                {{ note.title or "Untitled" }}
+                            </div>
+
+                            <div class="note-list-preview">
+
+                                {% if note.content %}
+                                {{ note.content|replace('\n', ' ')|truncate(72, True, '…') }}
+                                {% else %}
+                                No additional text
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                        <div class="note-list-date">
+
+                            {% if note.updated_at %}
+                            {{ note.updated_at[5:10] }}
+                            {% endif %}
+
+                        </div>
+
+                    </a>
+
+                    {% endfor %}
+
+                    {% else %}
+
+                    <div class="notes-empty-sidebar">
+
+                        <div class="empty-sidebar-icon">
+                            +
+                        </div>
+
+                        <div>
+                            No notes yet.
+                        </div>
+
+                        <span>
+                            Create one to get started.
+                        </span>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- SEARCH EMPTY -->
+
+                <div class="notes-search-empty" id="notesSearchEmpty" hidden>
+
+                    <div class="search-empty-icon">
+                        ⌕
+                    </div>
+
+                    <strong>
+                        No notes found
+                    </strong>
+
+                    <span>
+                        Try a different search.
+                    </span>
+
+                </div>
+
+
+                <!-- SIDEBAR FOOTER -->
+
+                <div class="notes-sidebar-footer">
+
+                    <a href="{{ url_for('profile') }}" class="notes-profile-link">
+
+                        <div class="notes-avatar">
+                            {{ user.username[0]|upper }}
+                        </div>
+
+                        <div class="notes-profile-copy">
+
+                            <strong>
+                                {{ user.username }}
+                            </strong>
+
+                            <span>
+                                {{ user.delegation }}
+                            </span>
+
+                        </div>
+
+                        <span class="notes-footer-arrow">
+                            →
+                        </span>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </aside>
+
+
+        <!-- EDITOR -->
+
+        <main class="notes-editor">
+
+            {% if selected_note %}
+
+            <!-- EDITOR HEADER -->
+
+            <div class="notes-editor-header">
+
+                <div class="editor-left">
+
+                    <button type="button" class="editor-mobile-sidebar" id="editorMobileSidebar"
+                        aria-label="Show notes">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </button>
+
+                    <div class="editor-location">
+                        <span>NOTES</span>
+                        <span class="editor-slash">/</span>
+                        <span>PRIVATE</span>
+                    </div>
+
+                </div>
+
+
+                <div class="editor-actions">
+
+                    <span class="save-status" id="saveStatus">
+                        SAVED
+                    </span>
+
+                    <button type="button" class="editor-delete-button" id="openDeleteModal" aria-label="Delete note">
+
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M4 7h16"></path>
+                            <path d="M9 7V4h6v3"></path>
+                            <path d="M7 7l1 13h8l1-13"></path>
+                            <path d="M10 11v5"></path>
+                            <path d="M14 11v5"></path>
+                        </svg>
+
+                        <span>
+                            Delete
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- EDITOR FORM -->
+
+            <form method="POST" action="{{ url_for('update_note', note_id=selected_note.id) }}" id="noteEditorForm"
+                class="note-editor-form">
+
+                <div class="note-editor-scroll">
+
+                    <input type="text" name="title" id="noteTitle" class="note-title-input"
+                        value="{{ selected_note.title }}" placeholder="Title" maxlength="200" autocomplete="off"
+                        spellcheck="true">
+
+
+                    <div class="note-meta-row">
+
+                        <span>
+                            {% if selected_note.updated_at %}
+                            Last edited {{ selected_note.updated_at }}
+                            {% else %}
+                            New note
+                            {% endif %}
+                        </span>
+
+                        <span class="meta-dot">·</span>
+
+                        <span id="wordCount">
+                            0 words
+                        </span>
+
+                        <span class="meta-dot">·</span>
+
+                        <span id="characterCount">
+                            0 characters
+                        </span>
+
+                    </div>
+
+
+                    <textarea name="content" id="noteContent" class="note-content-input" placeholder="Start writing…"
+                        spellcheck="true">{{ selected_note.content }}</textarea>
+
+                </div>
+
+
+                <!-- EDITOR FOOTER -->
+
+                <div class="note-editor-footer">
+
+                    <div class="editor-footer-left">
+
+                        <span class="keyboard-hint">
+                            <kbd>Ctrl</kbd>
+                            <span>+</span>
+                            <kbd>S</kbd>
+                            <span>to save</span>
+                        </span>
+
+                    </div>
+
+                    <button type="submit" class="save-note-button" id="saveNoteButton">
+                        Save Note
+                    </button>
+
+                </div>
+
+            </form>
+
+
+            <!-- DELETE MODAL -->
+
+            <div class="delete-modal" id="deleteModal" aria-hidden="true">
+
+                <div class="delete-modal-backdrop" id="deleteModalBackdrop"></div>
+
+
+                <div class="delete-modal-box" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+
+                    <div class="delete-modal-icon">
+
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M4 7h16"></path>
+                            <path d="M9 7V4h6v3"></path>
+                            <path d="M7 7l1 13h8l1-13"></path>
+                            <path d="M10 11v5"></path>
+                            <path d="M14 11v5"></path>
+                        </svg>
+
+                    </div>
+
+
+                    <div class="delete-modal-copy">
+
+                        <div class="delete-modal-eyebrow">
+                            PERMANENT ACTION
+                        </div>
+
+                        <h2 id="deleteModalTitle">
+                            Delete this note?
+                        </h2>
+
+                        <p>
+                            “{{ selected_note.title or 'Untitled' }}”
+                            will be permanently deleted.
+                        </p>
+
+                    </div>
+
+
+                    <div class="delete-modal-actions">
+
+                        <button type="button" id="cancelDeleteButton" class="delete-cancel-button">
+                            Cancel
+                        </button>
+
+
+                        <!--
+                            IMPORTANT:
+                            This is now an actual form submission.
+                            No hidden external form.
+                            No form="..." attribute.
+                            No JavaScript submission.
+                        -->
+
+                        <form method="POST" action="{{ url_for('delete_note', note_id=selected_note.id) }}"
+                            class="delete-confirm-form">
+
+                            <button type="submit" class="delete-confirm-button" id="confirmDeleteButton">
+                                Delete Note
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {% else %}
+
+            <!-- WELCOME -->
+
+            <div class="notes-welcome">
+
+                <div class="welcome-mark">
+                    N
+                </div>
+
+                <div class="welcome-eyebrow">
+                    PRIVATE DELEGATE WORKSPACE
+                </div>
+
+                <h2>
+                    Your notes.
+                    <br>
+                    Your strategy.
+                </h2>
+
+                <p>
+                    Keep speeches, arguments, directives,
+                    crisis ideas and private MUN notes in one
+                    place.
+                </p>
+
+                <button type="button" class="welcome-new-note" id="welcomeNewNoteButton">
+                    <span>+</span>
+                    New Note
+                </button>
+
+            </div>
+
+            {% endif %}
+
+        </main>
+
+    </div>
+
+
+</div>
+
+<!-- CREATE NOTE -->
+
+<form method="POST" action="{{ url_for('new_note') }}" id="newNoteForm" style="display:none;">
+    <input type="hidden" name="title" value="New Note">
+
+
+    <input type="hidden" name="content" value="">
+
+</form>
+
+<style>
+    /* =========================================================
+                            PAGE
+       ========================================================= */
+
+    .notes-page {
+        width: 100%;
+        min-height: calc(100vh - 90px);
+        padding: 24px;
+        box-sizing: border-box;
+    }
+
+
+    /* =========================================================
+                         APP SHELL
+       ========================================================= */
+
+    .notes-app {
+        width: 100%;
+        height: calc(100vh - 138px);
+        min-height: 600px;
+
+        display: grid;
+        grid-template-columns: 315px minmax(0, 1fr);
+
+        overflow: hidden;
+
+        border: 1px solid rgba(255, 255, 255, .10);
+
+        background:
+            linear-gradient(135deg,
+                rgba(255, 255, 255, .035),
+                rgba(255, 255, 255, .012));
+
+        box-shadow:
+            0 30px 100px rgba(0, 0, 0, .45);
+    }
+
+
+    /* =========================================================
+                         SIDEBAR
+       ========================================================= */
+
+    .notes-sidebar {
+        min-width: 0;
+        min-height: 0;
+
+        border-right: 1px solid rgba(255, 255, 255, .09);
+
+        background:
+            rgba(255, 255, 255, .018);
+
+        overflow: hidden;
+
+        z-index: 20;
+    }
+
+    .notes-sidebar-inner {
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    /* =========================================================
+                      SIDEBAR HEADER
+       ========================================================= */
+
+    .notes-sidebar-header {
+        flex: 0 0 auto;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 16px;
+
+        padding: 30px 25px 20px;
+
+        box-sizing: border-box;
+    }
+
+    .notes-sidebar-eyebrow,
+    .delete-modal-eyebrow,
+    .welcome-eyebrow {
+        margin-bottom: 8px;
+
+        font-size: 8px;
+        line-height: 1;
+
+        font-weight: 800;
+
+        letter-spacing: .22em;
+
+        color: rgba(255, 255, 255, .40);
+    }
+
+    .notes-sidebar-header h1 {
+        margin: 0;
+
+        font-size: 29px;
+        line-height: 1;
+
+        font-weight: 500;
+
+        letter-spacing: -.04em;
+
+        color: #fff;
+    }
+
+
+    /* =========================================================
+                        NEW BUTTON
+       ========================================================= */
+
+    .notes-new-button {
+        width: 39px;
+        height: 39px;
+
+        flex: 0 0 39px;
+
+        display: grid;
+        place-items: center;
+
+        padding: 0;
+
+        border: 1px solid rgba(255, 255, 255, .22);
+
+        background: transparent;
+
+        color: #fff;
+
+        cursor: pointer;
+
+        transition:
+            background .22s ease,
+            color .22s ease,
+            transform .22s ease,
+            border-color .22s ease;
+    }
+
+    .notes-new-button span {
+        font-size: 25px;
+        line-height: 1;
+
+        font-weight: 300;
+
+        transform: translateY(-1px);
+    }
+
+    .notes-new-button:hover {
+        background: #fff;
+        color: #000;
+
+        border-color: #fff;
+
+        transform: rotate(90deg);
+    }
+
+
+    /* =========================================================
+                         SEARCH
+       ========================================================= */
+
+    .notes-search {
+        position: relative;
+
+        flex: 0 0 auto;
+
+        margin: 0 20px;
+
+        height: 42px;
+
+        display: flex;
+        align-items: center;
+    }
+
+    .notes-search svg {
+        position: absolute;
+
+        left: 13px;
+
+        width: 16px;
+        height: 16px;
+
+        fill: none;
+
+        stroke: rgba(255, 255, 255, .42);
+
+        stroke-width: 1.6;
+
+        pointer-events: none;
+    }
+
+    .notes-search input {
+        width: 100%;
+        height: 100%;
+
+        box-sizing: border-box;
+
+        padding: 0 36px 0 38px;
+
+        border: 1px solid rgba(255, 255, 255, .08);
+
+        outline: none;
+
+        border-radius: 0;
+
+        background: rgba(255, 255, 255, .045);
+
+        color: #fff;
+
+        font-family: inherit;
+        font-size: 13px;
+
+        transition:
+            border-color .2s ease,
+            background .2s ease;
+    }
+
+    .notes-search input::placeholder {
+        color: rgba(255, 255, 255, .34);
+    }
+
+    .notes-search input:focus {
+        border-color: rgba(255, 255, 255, .25);
+
+        background:
+            rgba(255, 255, 255, .065);
+    }
+
+    .clear-search {
+        position: absolute;
+
+        right: 9px;
+
+        width: 25px;
+        height: 25px;
+
+        display: none;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 0;
+
+        border: 0;
+
+        background: transparent;
+
+        color: rgba(255, 255, 255, .55);
+
+        font-size: 19px;
+        line-height: 1;
+
+        cursor: pointer;
+    }
+
+    .clear-search.visible {
+        display: flex;
+    }
+
+    .clear-search:hover {
+        color: #fff;
+    }
+
+
+    /* =========================================================
+                         COUNT
+       ========================================================= */
+
+    .notes-count-row {
+        flex: 0 0 auto;
+
+        padding: 14px 25px 10px;
+
+        color: rgba(255, 255, 255, .32);
+
+        font-size: 9px;
+
+        font-weight: 700;
+
+        letter-spacing: .13em;
+
+        text-transform: uppercase;
+    }
+
+
+    /* =========================================================
+                        NOTE LIST
+       ========================================================= */
+
+    .notes-list {
+        flex: 1 1 auto;
+
+        min-height: 0;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        padding: 4px 10px 14px;
+
+        scrollbar-width: thin;
+
+        scrollbar-color:
+            rgba(255, 255, 255, .16) transparent;
+    }
+
+    .notes-list::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .notes-list::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .notes-list::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, .14);
+    }
+
+
+    /* =========================================================
+                       NOTE ITEM
+       ========================================================= */
+
+    .note-list-item {
+        position: relative;
+
+        display: flex;
+
+        align-items: flex-start;
+
+        justify-content: space-between;
+
+        gap: 12px;
+
+        min-height: 76px;
+
+        padding: 15px 14px;
+
+        margin-bottom: 2px;
+
+        box-sizing: border-box;
+
+        border: 1px solid transparent;
+
+        color: #fff;
+
+        text-decoration: none;
+
+        overflow: hidden;
+
+        transition:
+            background .2s ease,
+            border-color .2s ease,
+            transform .2s ease;
+    }
+
+    .note-list-item::before {
+        content: "";
+
+        position: absolute;
+
+        left: 0;
+        top: 0;
+        bottom: 0;
+
+        width: 2px;
+
+        background: #fff;
+
+        opacity: 0;
+
+        transition: opacity .2s ease;
+    }
+
+    .note-list-item:hover {
+        background:
+            rgba(255, 255, 255, .045);
+
+        border-color:
+            rgba(255, 255, 255, .07);
+
+        transform:
+            translateX(2px);
+    }
+
+    .note-list-item.active {
+        background:
+            rgba(255, 255, 255, .075);
+
+        border-color:
+            rgba(255, 255, 255, .10);
+    }
+
+    .note-list-item.active::before {
+        opacity: 1;
+    }
+
+    .note-list-item-main {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .note-list-title {
+        margin-bottom: 7px;
+
+        overflow: hidden;
+
+        color: rgba(255, 255, 255, .94);
+
+        font-size: 13px;
+        line-height: 1.15;
+
+        font-weight: 700;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .note-list-preview {
+        overflow: hidden;
+
+        color: rgba(255, 255, 255, .36);
+
+        font-size: 11px;
+        line-height: 1.45;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .note-list-date {
+        flex: 0 0 auto;
+
+        padding-top: 1px;
+
+        color: rgba(255, 255, 255, .28);
+
+        font-size: 9px;
+        line-height: 1;
+
+        letter-spacing: .03em;
+    }
+
+
+    /* =========================================================
+                      EMPTY STATES
+       ========================================================= */
+
+    .notes-empty-sidebar,
+    .notes-search-empty {
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+        justify-content: center;
+
+        min-height: 180px;
+
+        padding: 30px;
+
+        box-sizing: border-box;
+
+        text-align: center;
+
+        color: rgba(255, 255, 255, .34);
+
+        font-size: 12px;
+
+        line-height: 1.5;
+    }
+
+    .notes-empty-sidebar span,
+    .notes-search-empty span {
+        margin-top: 4px;
+
+        color: rgba(255, 255, 255, .22);
+
+        font-size: 10px;
+    }
+
+    .empty-sidebar-icon {
+        width: 34px;
+        height: 34px;
+
+        display: grid;
+        place-items: center;
+
+        margin-bottom: 13px;
+
+        border: 1px solid rgba(255, 255, 255, .15);
+
+        color: rgba(255, 255, 255, .55);
+
+        font-size: 20px;
+
+        font-weight: 300;
+    }
+
+    .notes-search-empty[hidden] {
+        display: none;
+    }
+
+    .search-empty-icon {
+        margin-bottom: 10px;
+
+        color: rgba(255, 255, 255, .30);
+
+        font-size: 28px;
+    }
+
+    .notes-search-empty strong {
+        margin-bottom: 5px;
+
+        font-size: 12px;
+
+        font-weight: 700;
+    }
+
+
+    /* =========================================================
+                       SIDEBAR FOOTER
+       ========================================================= */
+
+    .notes-sidebar-footer {
+        flex: 0 0 auto;
+
+        padding: 14px;
+
+        border-top:
+            1px solid rgba(255, 255, 255, .07);
+    }
+
+    .notes-profile-link {
+        display: flex;
+
+        align-items: center;
+
+        gap: 11px;
+
+        padding: 10px;
+
+        color: #fff;
+
+        text-decoration: none;
+
+        transition:
+            background .2s ease,
+            transform .2s ease;
+    }
+
+    .notes-profile-link:hover {
+        background:
+            rgba(255, 255, 255, .045);
+
+        transform:
+            translateY(-1px);
+    }
+
+    .notes-avatar {
+        width: 31px;
+        height: 31px;
+
+        flex: 0 0 31px;
+
+        display: grid;
+        place-items: center;
+
+        border:
+            1px solid rgba(255, 255, 255, .20);
+
+        color: #fff;
+
+        font-size: 10px;
+
+        font-weight: 800;
+    }
+
+    .notes-profile-copy {
+        min-width: 0;
+        flex: 1;
+
+        display: flex;
+        flex-direction: column;
+
+        gap: 3px;
+    }
+
+    .notes-profile-copy strong,
+    .notes-profile-copy span {
+        overflow: hidden;
+
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .notes-profile-copy strong {
+        color:
+            rgba(255, 255, 255, .84);
+
+        font-size: 11px;
+
+        font-weight: 700;
+    }
+
+    .notes-profile-copy span {
+        color:
+            rgba(255, 255, 255, .28);
+
+        font-size: 8px;
+        line-height: 1.2;
+    }
+
+    .notes-footer-arrow {
+        color:
+            rgba(255, 255, 255, .30);
+
+        font-size: 14px;
+
+        transition:
+            color .2s ease,
+            transform .2s ease;
+    }
+
+    .notes-profile-link:hover .notes-footer-arrow {
+        color: #fff;
+
+        transform:
+            translateX(3px);
+    }
+
+
+    /* =========================================================
+                          EDITOR
+       ========================================================= */
+
+    .notes-editor {
+        position: relative;
+
+        min-width: 0;
+        min-height: 0;
+
+        display: flex;
+
+        flex-direction: column;
+
+        overflow: hidden;
+
+        background:
+            radial-gradient(circle at 80% 10%,
+                rgba(255, 255, 255, .025),
+                transparent 32%);
+    }
+
+
+    /* =========================================================
+                      EDITOR HEADER
+       ========================================================= */
+
+    .notes-editor-header {
+        flex: 0 0 67px;
+
+        min-width: 0;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 20px;
+
+        padding: 0 27px;
+
+        box-sizing: border-box;
+
+        border-bottom:
+            1px solid rgba(255, 255, 255, .07);
+    }
+
+    .editor-left,
+    .editor-actions {
+        display: flex;
+        align-items: center;
+    }
+
+    .editor-left {
+        min-width: 0;
+        gap: 15px;
+    }
+
+    .editor-location {
+        display: flex;
+
+        align-items: center;
+
+        gap: 9px;
+
+        color:
+            rgba(255, 255, 255, .31);
+
+        font-size: 8px;
+        line-height: 1;
+
+        font-weight: 800;
+
+        letter-spacing: .18em;
+    }
+
+    .editor-location span:last-child {
+        color:
+            rgba(255, 255, 255, .58);
+    }
+
+    .editor-slash {
+        color:
+            rgba(255, 255, 255, .15) !important;
+    }
+
+    .editor-actions {
+        flex: 0 0 auto;
+        gap: 17px;
+    }
+
+    .save-status {
+        color:
+            rgba(255, 255, 255, .32);
+
+        font-size: 8px;
+
+        font-weight: 800;
+
+        letter-spacing: .15em;
+    }
+
+    .save-status.editing {
+        color: #fff;
+    }
+
+
+    /* =========================================================
+                       DELETE BUTTON
+       ========================================================= */
+
+    .editor-delete-button {
+        height: 34px;
+
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 8px;
+
+        padding: 0 11px;
+
+        border:
+            1px solid rgba(255, 255, 255, .10);
+
+        background: transparent;
+
+        color:
+            rgba(255, 255, 255, .48);
+
+        font-family: inherit;
+
+        font-size: 9px;
+
+        font-weight: 700;
+
+        letter-spacing: .08em;
+
+        text-transform: uppercase;
+
+        cursor: pointer;
+
+        transition:
+            background .2s ease,
+            border-color .2s ease,
+            color .2s ease;
+    }
+
+    .editor-delete-button svg {
+        width: 14px;
+        height: 14px;
+
+        fill: none;
+
+        stroke: currentColor;
+
+        stroke-width: 1.5;
+
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .editor-delete-button:hover {
+        border-color:
+            rgba(255, 255, 255, .30);
+
+        background:
+            rgba(255, 255, 255, .06);
+
+        color: #fff;
+    }
+
+
+    /* =========================================================
+                       EDITOR FORM
+       ========================================================= */
+
+    .note-editor-form {
+        flex: 1 1 auto;
+
+        min-width: 0;
+        min-height: 0;
+
+        display: flex;
+
+        flex-direction: column;
+
+        overflow: hidden;
+    }
+
+    .note-editor-scroll {
+        flex: 1 1 auto;
+
+        min-width: 0;
+        min-height: 0;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        padding:
+            54px clamp(30px, 6vw, 100px) 40px;
+
+        box-sizing: border-box;
+
+        scrollbar-width: thin;
+
+        scrollbar-color:
+            rgba(255, 255, 255, .15) transparent;
+    }
+
+    .note-editor-scroll::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .note-editor-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .note-editor-scroll::-webkit-scrollbar-thumb {
+        background:
+            rgba(255, 255, 255, .12);
+    }
+
+
+    /* =========================================================
+                        TITLE
+       ========================================================= */
+
+    .note-title-input {
+        display: block;
+
+        width: 100%;
+
+        box-sizing: border-box;
+
+        padding: 0;
+        margin: 0;
+
+        border: 0;
+        outline: 0;
+
+        background: transparent;
+
+        color: #fff;
+
+        font-family: inherit;
+
+        font-size:
+            clamp(31px, 4vw, 55px);
+
+        line-height: 1.03;
+
+        font-weight: 500;
+
+        letter-spacing: -.055em;
+    }
+
+    .note-title-input::placeholder {
+        color:
+            rgba(255, 255, 255, .24);
+    }
+
+
+    /* =========================================================
+                         META
+       ========================================================= */
+
+    .note-meta-row {
+        display: flex;
+
+        align-items: center;
+
+        flex-wrap: wrap;
+
+        gap: 7px;
+
+        margin-top: 15px;
+        margin-bottom: 28px;
+
+        color:
+            rgba(255, 255, 255, .25);
+
+        font-size: 9px;
+
+        line-height: 1.4;
+
+        letter-spacing: .03em;
+    }
+
+    .meta-dot {
+        color:
+            rgba(255, 255, 255, .13);
+    }
+
+
+    /* =========================================================
+                       CONTENT
+       ========================================================= */
+
+    .note-content-input {
+        display: block;
+
+        width: 100%;
+
+        min-height: 390px;
+
+        box-sizing: border-box;
+
+        padding: 0;
+        margin: 0;
+
+        border: 0;
+        outline: 0;
+
+        overflow: hidden;
+
+        background: transparent;
+
+        color:
+            rgba(255, 255, 255, .83);
+
+        font-family: inherit;
+
+        font-size: 15px;
+
+        line-height: 1.85;
+
+        font-weight: 400;
+
+        resize: none;
+    }
+
+    .note-content-input::placeholder {
+        color:
+            rgba(255, 255, 255, .20);
+    }
+
+    .note-content-input::selection,
+    .note-title-input::selection {
+        background:
+            rgba(255, 255, 255, .22);
+
+        color: #fff;
+    }
+
+
+    /* =========================================================
+                       EDITOR FOOTER
+       ========================================================= */
+
+    .note-editor-footer {
+        flex: 0 0 65px;
+
+        min-width: 0;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 20px;
+
+        padding: 0 27px;
+
+        box-sizing: border-box;
+
+        border-top:
+            1px solid rgba(255, 255, 255, .07);
+
+        background:
+            rgba(0, 0, 0, .12);
+    }
+
+    .keyboard-hint {
+        display: flex;
+
+        align-items: center;
+
+        gap: 5px;
+
+        color:
+            rgba(255, 255, 255, .22);
+
+        font-size: 9px;
+    }
+
+    .keyboard-hint kbd {
+        min-width: 20px;
+        height: 19px;
+
+        display: inline-grid;
+
+        place-items: center;
+
+        padding: 0 5px;
+
+        box-sizing: border-box;
+
+        border:
+            1px solid rgba(255, 255, 255, .10);
+
+        color:
+            rgba(255, 255, 255, .38);
+
+        font-family: inherit;
+
+        font-size: 8px;
+    }
+
+
+    /* =========================================================
+                       SAVE BUTTON
+       ========================================================= */
+
+    .save-note-button {
+        min-width: 105px;
+        height: 37px;
+
+        padding: 0 16px;
+
+        border:
+            1px solid rgba(255, 255, 255, .22);
+
+        background: #fff;
+
+        color: #000;
+
+        font-family: inherit;
+
+        font-size: 9px;
+
+        font-weight: 800;
+
+        letter-spacing: .10em;
+
+        text-transform: uppercase;
+
+        cursor: pointer;
+
+        transition:
+            background .2s ease,
+            color .2s ease,
+            border-color .2s ease,
+            transform .2s ease;
+    }
+
+    .save-note-button:hover {
+        background: transparent;
+
+        color: #fff;
+
+        border-color:
+            rgba(255, 255, 255, .42);
+
+        transform:
+            translateY(-1px);
+    }
+
+    .save-note-button:disabled {
+        opacity: .65;
+        cursor: wait;
+        transform: none;
+    }
+
+
+    /* =========================================================
+                         WELCOME
+       ========================================================= */
+
+    .notes-welcome {
+        flex: 1;
+
+        min-width: 0;
+        min-height: 0;
+
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+
+        justify-content: center;
+
+        padding: 50px;
+
+        box-sizing: border-box;
+
+        text-align: center;
+    }
+
+    .welcome-mark {
+        width: 48px;
+        height: 48px;
+
+        display: grid;
+        place-items: center;
+
+        margin-bottom: 23px;
+
+        border:
+            1px solid rgba(255, 255, 255, .20);
+
+        color: #fff;
+
+        font-size: 13px;
+
+        font-weight: 800;
+
+        letter-spacing: -.04em;
+    }
+
+    .notes-welcome h2 {
+        margin: 0;
+
+        color: #fff;
+
+        font-size:
+            clamp(37px, 5vw, 66px);
+
+        line-height: .96;
+
+        font-weight: 500;
+
+        letter-spacing: -.065em;
+    }
+
+    .notes-welcome p {
+        max-width: 440px;
+
+        margin: 24px 0 28px;
+
+        color:
+            rgba(255, 255, 255, .38);
+
+        font-size: 12px;
+
+        line-height: 1.7;
+    }
+
+    .welcome-new-note {
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        height: 43px;
+
+        padding: 0 18px;
+
+        border:
+            1px solid rgba(255, 255, 255, .22);
+
+        background: transparent;
+
+        color: #fff;
+
+        font-family: inherit;
+
+        font-size: 9px;
+
+        font-weight: 800;
+
+        letter-spacing: .10em;
+
+        text-transform: uppercase;
+
+        cursor: pointer;
+
+        transition:
+            background .2s ease,
+            color .2s ease,
+            transform .2s ease;
+    }
+
+    .welcome-new-note span {
+        font-size: 18px;
+
+        font-weight: 300;
+
+        line-height: 1;
+    }
+
+    .welcome-new-note:hover {
+        background: #fff;
+
+        color: #000;
+
+        transform:
+            translateY(-2px);
+    }
+
+
+    /* =========================================================
+                      MOBILE BAR
+       ========================================================= */
+
+    .notes-mobile-bar {
+        display: none;
+    }
+
+    .editor-mobile-sidebar {
+        display: none;
+    }
+
+    .notes-sidebar-overlay {
+        display: none;
+    }
+
+
+    /* =========================================================
+                       DELETE MODAL
+       ========================================================= */
+
+    .delete-modal {
+        position: fixed;
+
+        inset: 0;
+
+        z-index: 10000;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        padding: 24px;
+
+        box-sizing: border-box;
+
+        visibility: hidden;
+
+        opacity: 0;
+
+        pointer-events: none;
+
+        transition:
+            opacity .22s ease,
+            visibility .22s ease;
+    }
+
+    .delete-modal.open {
+        visibility: visible;
+
+        opacity: 1;
+
+        pointer-events: auto;
+    }
+
+    .delete-modal-backdrop {
+        position: absolute;
+
+        inset: 0;
+
+        background:
+            rgba(0, 0, 0, .72);
+
+        backdrop-filter:
+            blur(9px);
+
+        -webkit-backdrop-filter:
+            blur(9px);
+    }
+
+    .delete-modal-box {
+        position: relative;
+
+        width:
+            min(440px, 100%);
+
+        box-sizing: border-box;
+
+        padding: 31px;
+
+        border:
+            1px solid rgba(255, 255, 255, .13);
+
+        background:
+            linear-gradient(145deg,
+                rgba(30, 30, 30, .98),
+                rgba(8, 8, 8, .98));
+
+        box-shadow:
+            0 30px 100px rgba(0, 0, 0, .60);
+
+        transform:
+            translateY(15px) scale(.98);
+
+        transition:
+            transform .25s ease;
+    }
+
+    .delete-modal.open .delete-modal-box {
+        transform:
+            translateY(0) scale(1);
+    }
+
+    .delete-modal-icon {
+        width: 40px;
+        height: 40px;
+
+        display: grid;
+        place-items: center;
+
+        margin-bottom: 25px;
+
+        border:
+            1px solid rgba(255, 255, 255, .15);
+
+        color:
+            rgba(255, 255, 255, .70);
+    }
+
+    .delete-modal-icon svg {
+        width: 17px;
+        height: 17px;
+
+        fill: none;
+
+        stroke: currentColor;
+
+        stroke-width: 1.4;
+
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .delete-modal-copy h2 {
+        margin: 0;
+
+        color: #fff;
+
+        font-size: 28px;
+
+        line-height: 1;
+
+        font-weight: 500;
+
+        letter-spacing: -.04em;
+    }
+
+    .delete-modal-copy p {
+        margin: 15px 0 0;
+
+        color:
+            rgba(255, 255, 255, .42);
+
+        font-size: 12px;
+
+        line-height: 1.65;
+
+        overflow-wrap: anywhere;
+    }
+
+    .delete-modal-actions {
+        display: flex;
+
+        justify-content: flex-end;
+
+        align-items: center;
+
+        gap: 9px;
+
+        margin-top: 29px;
+    }
+
+    .delete-cancel-button,
+    .delete-confirm-button {
+        height: 39px;
+
+        padding: 0 16px;
+
+        font-family: inherit;
+
+        font-size: 9px;
+
+        font-weight: 800;
+
+        letter-spacing: .08em;
+
+        text-transform: uppercase;
+
+        cursor: pointer;
+
+        transition:
+            background .2s ease,
+            color .2s ease,
+            border-color .2s ease,
+            transform .2s ease;
+    }
+
+    .delete-cancel-button {
+        border:
+            1px solid rgba(255, 255, 255, .12);
+
+        background: transparent;
+
+        color:
+            rgba(255, 255, 255, .54);
+    }
+
+    .delete-cancel-button:hover {
+        border-color:
+            rgba(255, 255, 255, .28);
+
+        color: #fff;
+    }
+
+    .delete-confirm-form {
+        margin: 0;
+        padding: 0;
+    }
+
+    .delete-confirm-button {
+        display: block;
+
+        border: 1px solid #fff;
+
+        background: #fff;
+
+        color: #000;
+    }
+
+    .delete-confirm-button:hover {
+        background: transparent;
+
+        color: #fff;
+
+        transform:
+            translateY(-1px);
+    }
+
+
+    /* =========================================================
+                        TABLET
+       ========================================================= */
+
+    @media (max-width: 900px) {
+
+        .notes-page {
+            padding: 14px;
+        }
+
+        .notes-app {
+            height: calc(100vh - 112px);
+
+            min-height: 570px;
+
+            grid-template-columns:
+                280px minmax(0, 1fr);
+        }
+
+        .notes-sidebar-header {
+            padding:
+                24px 20px 17px;
+        }
+
+        .notes-count-row {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+
+        .note-editor-scroll {
+            padding:
+                44px clamp(25px, 5vw, 60px) 35px;
+        }
+
+        .notes-editor-header {
+            padding-left: 22px;
+            padding-right: 22px;
+        }
+
+    }
+
+
+    /* =========================================================
+                         MOBILE
+       ========================================================= */
+
+    @media (max-width: 700px) {
+
+        .notes-page {
+            width: 100%;
+
+            padding: 0;
+
+            min-height:
+                calc(100vh - 70px);
+        }
+
+        .notes-app {
+            position: relative;
+
+            width: 100%;
+
+            height:
+                calc(100vh - 70px);
+
+            min-height: 0;
+
+            display: block;
+
+            border: 0;
+
+            box-shadow: none;
+        }
+
+
+        /* MOBILE TOP BAR */
+
+        .notes-mobile-bar {
+            position: relative;
+
+            height: 57px;
+
+            display: grid;
+
+            grid-template-columns:
+                45px 1fr 45px;
+
+            align-items: center;
+
+            border-bottom:
+                1px solid rgba(255, 255, 255, .08);
+
+            background:
+                rgba(0, 0, 0, .40);
+
+            z-index: 30;
+        }
+
+        .mobile-notes-menu,
+        .mobile-new-note {
+            width: 45px;
+            height: 57px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 0;
+
+            border: 0;
+
+            background: transparent;
+
+            color: #fff;
+
+            cursor: pointer;
+        }
+
+        .mobile-notes-menu {
+            flex-direction: column;
+
+            gap: 4px;
+        }
+
+        .mobile-notes-menu span {
+            width: 17px;
+            height: 1px;
+
+            background:
+                rgba(255, 255, 255, .70);
+        }
+
+        .mobile-new-note {
+            font-size: 24px;
+
+            font-weight: 300;
+        }
+
+        .mobile-notes-title {
+            text-align: center;
+
+            color:
+                rgba(255, 255, 255, .85);
+
+            font-size: 12px;
+
+            font-weight: 700;
+
+            letter-spacing: .04em;
+        }
+
+
+        /* MOBILE SIDEBAR */
+
+        .notes-sidebar {
+            position: absolute;
+
+            left: 0;
+            top: 0;
+            bottom: 0;
+
+            width:
+                min(320px, 88vw);
+
+            border-right:
+                1px solid rgba(255, 255, 255, .10);
+
+            transform:
+                translateX(-105%);
+
+            transition:
+                transform .28s cubic-bezier(.2, .8, .2, 1);
+
+            box-shadow:
+                20px 0 70px rgba(0, 0, 0, .45);
+        }
+
+        .notes-sidebar.open {
+            transform:
+                translateX(0);
+        }
+
+        .notes-sidebar-overlay {
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 19;
+
+            display: block;
+
+            background:
+                rgba(0, 0, 0, .60);
+
+            opacity: 0;
+
+            visibility: hidden;
+
+            pointer-events: none;
+
+            transition:
+                opacity .25s ease,
+                visibility .25s ease;
+        }
+
+        .notes-sidebar-overlay.open {
+            opacity: 1;
+
+            visibility: visible;
+
+            pointer-events: auto;
+        }
+
+
+        /* MOBILE EDITOR */
+
+        .notes-editor {
+            position: absolute;
+
+            inset:
+                57px 0 0 0;
+
+            width: 100%;
+
+            height: auto;
+        }
+
+        .notes-editor-header {
+            flex: 0 0 56px;
+
+            min-height: 56px;
+
+            padding:
+                0 15px;
+        }
+
+        .editor-mobile-sidebar {
+            width: 30px;
+            height: 30px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+            gap: 4px;
+
+            padding: 0;
+
+            border: 0;
+
+            background: transparent;
+
+            cursor: pointer;
+        }
+
+        .editor-mobile-sidebar span {
+            width: 16px;
+            height: 1px;
+
+            background:
+                rgba(255, 255, 255, .60);
+        }
+
+        .editor-left {
+            gap: 7px;
+        }
+
+        .editor-location {
+            font-size: 7px;
+        }
+
+        .editor-actions {
+            gap: 9px;
+        }
+
+        .save-status {
+            display: none;
+        }
+
+        .editor-delete-button {
+            width: 33px;
+            height: 33px;
+
+            justify-content: center;
+
+            padding: 0;
+        }
+
+        .editor-delete-button span {
+            display: none;
+        }
+
+
+        /* MOBILE FORM */
+
+        .note-editor-scroll {
+            padding:
+                31px 20px 30px;
+        }
+
+        .note-title-input {
+            font-size: 34px;
+
+            max-width: 100%;
+        }
+
+        .note-meta-row {
+            margin-top: 12px;
+
+            margin-bottom: 23px;
+        }
+
+        .note-content-input {
+            min-height: 300px;
+
+            font-size: 14px;
+
+            line-height: 1.75;
+        }
+
+        .note-editor-footer {
+            flex: 0 0 58px;
+
+            min-height: 58px;
+
+            padding:
+                0 15px;
+
+            justify-content: stretch;
+        }
+
+        .keyboard-hint {
+            display: none;
+        }
+
+        .editor-footer-left {
+            display: none;
+        }
+
+        .save-note-button {
+            width: 100%;
+
+            height: 38px;
+        }
+
+
+        /* MOBILE WELCOME */
+
+        .notes-welcome {
+            padding:
+                30px 22px;
+        }
+
+        .notes-welcome h2 {
+            font-size: 42px;
+        }
+
+        .notes-welcome p {
+            font-size: 11px;
+
+            max-width: 330px;
+        }
+
+
+        /* MOBILE MODAL */
+
+        .delete-modal {
+            padding: 18px;
+        }
+
+        .delete-modal-box {
+            padding: 25px;
+        }
+
+        .delete-modal-copy h2 {
+            font-size: 25px;
+        }
+
+        .delete-modal-actions {
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr;
+
+            align-items: stretch;
+        }
+
+        .delete-cancel-button,
+        .delete-confirm-form,
+        .delete-confirm-button {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+    }
+
+
+    /* =========================================================
+                      SMALL MOBILE
+       ========================================================= */
+
+    @media (max-width: 430px) {
+
+        .notes-sidebar {
+            width: 91vw;
+        }
+
+        .note-title-input {
+            font-size: 31px;
+        }
+
+        .note-content-input {
+            font-size: 13.5px;
+        }
+
+        .delete-modal-actions {
+            grid-template-columns: 1fr;
+        }
+
+    }
+
+
+    /* =========================================================
+                    REDUCED MOTION
+       ========================================================= */
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .notes-sidebar,
+        .notes-sidebar-overlay,
+        .delete-modal,
+        .delete-modal-box,
+        .note-list-item,
+        .notes-new-button,
+        .welcome-new-note,
+        .save-note-button,
+        .editor-delete-button {
+            transition: none !important;
+        }
+
+    }
+</style>
+
+<script>
+
+    (function () {
+
+        "use strict";
+
+
+        /* =========================================================
+                             CREATE NOTE
+           ========================================================= */
+
+        const newNoteButton =
+            document.getElementById("newNoteButton");
+
+        const mobileNewNoteButton =
+            document.getElementById("mobileNewNoteButton");
+
+        const welcomeNewNoteButton =
+            document.getElementById("welcomeNewNoteButton");
+
+        const newNoteForm =
+            document.getElementById("newNoteForm");
+
+
+        function createNote() {
+
+            if (!newNoteForm) {
+                return;
+            }
+
+            newNoteForm.submit();
+
+        }
+
+
+        if (newNoteButton) {
+            newNoteButton.addEventListener(
+                "click",
+                createNote
+            );
+        }
+
+        if (mobileNewNoteButton) {
+            mobileNewNoteButton.addEventListener(
+                "click",
+                createNote
+            );
+        }
+
+        if (welcomeNewNoteButton) {
+            welcomeNewNoteButton.addEventListener(
+                "click",
+                createNote
+            );
+        }
+
+
+        /* =========================================================
+                           MOBILE SIDEBAR
+           ========================================================= */
+
+        const notesSidebar =
+            document.getElementById("notesSidebar");
+
+        const notesSidebarOverlay =
+            document.getElementById("notesSidebarOverlay");
+
+        const mobileNotesMenu =
+            document.getElementById("mobileNotesMenu");
+
+        const editorMobileSidebar =
+            document.getElementById("editorMobileSidebar");
+
+        const notesList =
+            document.getElementById("notesList");
+
+
+        function openSidebar() {
+
+            if (!notesSidebar) {
+                return;
+            }
+
+            notesSidebar.classList.add("open");
+
+            if (notesSidebarOverlay) {
+                notesSidebarOverlay.classList.add("open");
+            }
+
+        }
+
+
+        function closeSidebar() {
+
+            if (!notesSidebar) {
+                return;
+            }
+
+            notesSidebar.classList.remove("open");
+
+            if (notesSidebarOverlay) {
+                notesSidebarOverlay.classList.remove("open");
+            }
+
+        }
+
+
+        function toggleSidebar() {
+
+            if (!notesSidebar) {
+                return;
+            }
+
+            if (
+                notesSidebar.classList.contains("open")
+            ) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+
+        }
+
+
+        if (mobileNotesMenu) {
+            mobileNotesMenu.addEventListener(
+                "click",
+                toggleSidebar
+            );
+        }
+
+        if (editorMobileSidebar) {
+            editorMobileSidebar.addEventListener(
+                "click",
+                toggleSidebar
+            );
+        }
+
+        if (notesSidebarOverlay) {
+            notesSidebarOverlay.addEventListener(
+                "click",
+                closeSidebar
+            );
+        }
+
+
+        if (notesList) {
+
+            notesList
+                .querySelectorAll(".note-list-item")
+                .forEach(function (item) {
+
+                    item.addEventListener(
+                        "click",
+                        function () {
+
+                            if (
+                                window.innerWidth <= 700
+                            ) {
+                                closeSidebar();
+                            }
+
+                        }
+                    );
+
+                });
+
+        }
+
+
+        /* =========================================================
+                               SEARCH
+           ========================================================= */
+
+        const notesSearch =
+            document.getElementById("notesSearch");
+
+        const clearNotesSearch =
+            document.getElementById("clearNotesSearch");
+
+        const notesSearchEmpty =
+            document.getElementById("notesSearchEmpty");
+
+        const notesCountLabel =
+            document.getElementById("notesCountLabel");
+
+
+        function updateNoteSearch() {
+
+            if (!notesList || !notesSearch) {
+                return;
+            }
+
+            const query =
+                notesSearch.value
+                    .trim()
+                    .toLowerCase();
+
+            const items =
+                Array.from(
+                    notesList.querySelectorAll(
+                        ".note-list-item"
+                    )
+                );
+
+            let visibleCount = 0;
+
+
+            items.forEach(function (item) {
+
+                const title =
+                    item.dataset.noteTitle || "";
+
+                const content =
+                    item.dataset.noteContent || "";
+
+                const matches =
+                    !query ||
+                    title.includes(query) ||
+                    content.includes(query);
+
+
+                item.style.display =
+                    matches
+                        ? ""
+                        : "none";
+
+
+                if (matches) {
+                    visibleCount++;
+                }
+
+            });
+
+
+            if (clearNotesSearch) {
+
+                clearNotesSearch.classList.toggle(
+                    "visible",
+                    query.length > 0
+                );
+
+            }
+
+
+            if (notesSearchEmpty) {
+
+                notesSearchEmpty.hidden =
+                    query.length > 0 &&
+                    visibleCount === 0;
+
+            }
+
+
+            if (notesCountLabel) {
+
+                if (query) {
+
+                    notesCountLabel.textContent =
+                        visibleCount +
+                        (
+                            visibleCount === 1
+                                ? " result"
+                                : " results"
+                        );
+
+                } else {
+
+                    notesCountLabel.textContent =
+                        items.length +
+                        (
+                            items.length === 1
+                                ? " note"
+                                : " notes"
+                        );
+
+                }
+
+            }
+
+        }
+
+
+        if (notesSearch) {
+
+            notesSearch.addEventListener(
+                "input",
+                updateNoteSearch
+            );
+
+        }
+
+
+        if (clearNotesSearch) {
+
+            clearNotesSearch.addEventListener(
+                "click",
+                function () {
+
+                    if (!notesSearch) {
+                        return;
+                    }
+
+                    notesSearch.value = "";
+
+                    updateNoteSearch();
+
+                    notesSearch.focus();
+
+                }
+            );
+
+        }
+
+
+        /* =========================================================
+                          TEXTAREA RESIZE
+           ========================================================= */
+
+        const noteContent =
+            document.getElementById("noteContent");
+
+
+        function resizeContent() {
+
+            if (!noteContent) {
+                return;
+            }
+
+            noteContent.style.height = "auto";
+
+            noteContent.style.height =
+                Math.max(
+                    noteContent.scrollHeight,
+                    window.innerWidth <= 700
+                        ? 300
+                        : 390
+                ) + "px";
+
+        }
+
+
+        if (noteContent) {
+
+            noteContent.addEventListener(
+                "input",
+                resizeContent
+            );
+
+            window.addEventListener(
+                "resize",
+                resizeContent
+            );
+
+            resizeContent();
+
+        }
+
+
+        /* =========================================================
+                            WORD COUNTER
+           ========================================================= */
+
+        const wordCount =
+            document.getElementById("wordCount");
+
+        const characterCount =
+            document.getElementById("characterCount");
+
+
+        function updateCounts() {
+
+            if (!noteContent) {
+                return;
+            }
+
+            const text =
+                noteContent.value || "";
+
+            const trimmed =
+                text.trim();
+
+            const words =
+                trimmed
+                    ? trimmed.split(/\s+/).length
+                    : 0;
+
+            const characters =
+                text.length;
+
+
+            if (wordCount) {
+
+                wordCount.textContent =
+                    words +
+                    (
+                        words === 1
+                            ? " word"
+                            : " words"
+                    );
+
+            }
+
+
+            if (characterCount) {
+
+                characterCount.textContent =
+                    characters +
+                    (
+                        characters === 1
+                            ? " character"
+                            : " characters"
+                    );
+
+            }
+
+        }
+
+
+        if (noteContent) {
+
+            noteContent.addEventListener(
+                "input",
+                updateCounts
+            );
+
+            updateCounts();
+
+        }
+
+
+        /* =========================================================
+                           DIRTY STATE
+           ========================================================= */
+
+        const noteEditorForm =
+            document.getElementById("noteEditorForm");
+
+        const noteTitle =
+            document.getElementById("noteTitle");
+
+        const saveNoteButton =
+            document.getElementById("saveNoteButton");
+
+        const saveStatus =
+            document.getElementById("saveStatus");
+
+
+        let isDirty = false;
+
+
+        function markDirty() {
+
+            isDirty = true;
+
+            if (saveStatus) {
+
+                saveStatus.textContent =
+                    "EDITING";
+
+                saveStatus.classList.add(
+                    "editing"
+                );
+
+            }
+
+        }
+
+
+        if (noteTitle) {
+
+            noteTitle.addEventListener(
+                "input",
+                markDirty
+            );
+
+        }
+
+
+        if (noteContent) {
+
+            noteContent.addEventListener(
+                "input",
+                markDirty
+            );
+
+        }
+
+
+        if (noteEditorForm) {
+
+            noteEditorForm.addEventListener(
+                "submit",
+                function () {
+
+                    isDirty = false;
+
+                    if (saveStatus) {
+
+                        saveStatus.textContent =
+                            "SAVING…";
+
+                        saveStatus.classList.add(
+                            "editing"
+                        );
+
+                    }
+
+                    if (saveNoteButton) {
+
+                        saveNoteButton.disabled =
+                            true;
+
+                        saveNoteButton.textContent =
+                            "Saving…";
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =========================================================
+                               CTRL + S
+           ========================================================= */
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    (event.ctrlKey || event.metaKey) &&
+                    event.key.toLowerCase() === "s"
+                ) {
+
+                    if (!noteEditorForm) {
+                        return;
+                    }
+
+                    event.preventDefault();
+
+                    if (
+                        typeof noteEditorForm.requestSubmit ===
+                        "function"
+                    ) {
+
+                        noteEditorForm.requestSubmit();
+
+                    } else {
+
+                        noteEditorForm.submit();
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        /* =========================================================
+                           DELETE MODAL
+           ========================================================= */
+
+        const deleteModal =
+            document.getElementById("deleteModal");
+
+        const openDeleteModal =
+            document.getElementById("openDeleteModal");
+
+        const cancelDeleteButton =
+            document.getElementById("cancelDeleteButton");
+
+        const deleteModalBackdrop =
+            document.getElementById("deleteModalBackdrop");
+
+
+        function showDeleteModal() {
+
+            if (!deleteModal) {
+                return;
+            }
+
+            deleteModal.classList.add("open");
+
+            deleteModal.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+            document.body.classList.add(
+                "delete-modal-open"
+            );
+
+            if (cancelDeleteButton) {
+
+                window.setTimeout(
+                    function () {
+
+                        cancelDeleteButton.focus();
+
+                    },
+                    50
+                );
+
+            }
+
+        }
+
+
+        function hideDeleteModal() {
+
+            if (!deleteModal) {
+                return;
+            }
+
+            deleteModal.classList.remove("open");
+
+            deleteModal.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            document.body.classList.remove(
+                "delete-modal-open"
+            );
+
+        }
+
+
+        if (openDeleteModal) {
+
+            openDeleteModal.addEventListener(
+                "click",
+                showDeleteModal
+            );
+
+        }
+
+
+        if (cancelDeleteButton) {
+
+            cancelDeleteButton.addEventListener(
+                "click",
+                hideDeleteModal
+            );
+
+        }
+
+
+        if (deleteModalBackdrop) {
+
+            deleteModalBackdrop.addEventListener(
+                "click",
+                hideDeleteModal
+            );
+
+        }
+
+
+        /* =========================================================
+                             ESCAPE
+           ========================================================= */
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+
+                if (
+                    event.key === "Escape" &&
+                    deleteModal &&
+                    deleteModal.classList.contains("open")
+                ) {
+
+                    hideDeleteModal();
+
+                }
+
+            }
+        );
+
+
+        /* =========================================================
+                           BEFORE UNLOAD
+           ========================================================= */
+
+        window.addEventListener(
+            "beforeunload",
+            function (event) {
+
+                if (!isDirty) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                event.returnValue = "";
+
+            }
+        );
+
+
+        /* =========================================================
+                           INITIALIZE
+           ========================================================= */
+
+        updateNoteSearch();
+        updateCounts();
+        resizeContent();
+
+    })();
+
+</script>
+
+<style>
+    body.delete-modal-open {
+        overflow: hidden;
+    }
+</style>
+
+{% endblock %}

@@ -1,1456 +1,1558 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
+{% block title %}{{ article.title }} — ACC Press{% endblock %}
 
-    <meta charset="UTF-8">
+{% block extra_css %}
+<style>
+    /* =========================================================
+   ARTICLE READER
+   ========================================================= */
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    .article-reader-page {
+        position: relative;
+        min-height: 100vh;
+        background:
+            radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.035), transparent 28%),
+            radial-gradient(circle at 85% 65%, rgba(255, 255, 255, 0.02), transparent 30%);
+        overflow: hidden;
+    }
 
-    <title>
-        {{ article.title }} — ACC
-    </title>
+    /* ---------------------------------------------------------
+   READING PROGRESS
+   --------------------------------------------------------- */
 
+    .article-progress-track {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        z-index: 9999;
+        background: rgba(255, 255, 255, 0.04);
+        pointer-events: none;
+    }
 
-    <style>
-        /* =====================================================
-           RESET
-        ===================================================== */
+    .article-progress-bar {
+        width: 0%;
+        height: 100%;
+        background: #ffffff;
+        box-shadow: 0 0 16px rgba(255, 255, 255, 0.3);
+        transition: width 0.08s linear;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    /* ---------------------------------------------------------
+   TOP BAR
+   --------------------------------------------------------- */
 
+    .article-topbar {
+        width: min(1380px, calc(100% - 48px));
+        margin: 0 auto;
+        padding: 48px 0 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
 
-        html {
-            scroll-behavior: smooth;
-        }
+    .article-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        color: rgba(255, 255, 255, 0.58);
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        transition:
+            color 0.25s ease,
+            transform 0.25s ease;
+    }
 
+    .article-back:hover {
+        color: #ffffff;
+        transform: translateX(-4px);
+    }
 
-        body {
+    .article-back-arrow {
+        width: 34px;
+        height: 34px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        transition:
+            background 0.25s ease,
+            border-color 0.25s ease;
+    }
 
-            background: #090909;
+    .article-back:hover .article-back-arrow {
+        background: #ffffff;
+        color: #000000;
+        border-color: #ffffff;
+    }
 
-            color: #f5f5f5;
+    /* ---------------------------------------------------------
+   ARTICLE HEADER
+   --------------------------------------------------------- */
 
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
+    .article-shell {
+        width: min(1180px, calc(100% - 48px));
+        margin: 0 auto;
+    }
 
-            min-height: 100vh;
+    .article-header {
+        max-width: 1040px;
+        margin: 115px auto 0;
+        text-align: center;
+    }
 
-            overflow-x: hidden;
+    .article-kicker {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 30px;
+        color: rgba(255, 255, 255, 0.48);
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+    }
 
-        }
+    .article-kicker-line {
+        width: 34px;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.3);
+    }
 
+    .article-title {
+        margin: 0;
+        color: #ffffff;
+        font-size: clamp(48px, 7vw, 104px);
+        line-height: 0.94;
+        letter-spacing: -0.065em;
+        font-weight: 900;
+        text-wrap: balance;
+    }
 
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
+    .article-subtitle-space {
+        width: 80px;
+        height: 1px;
+        margin: 46px auto 38px;
+        background: linear-gradient(90deg,
+                transparent,
+                rgba(255, 255, 255, 0.55),
+                transparent);
+    }
 
+    /* ---------------------------------------------------------
+   METADATA
+   --------------------------------------------------------- */
 
-        button {
-            font-family: inherit;
-        }
+    .article-meta {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px 24px;
+        color: rgba(255, 255, 255, 0.48);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+    }
 
+    .article-meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+    }
 
-        /* =====================================================
-           CURSOR LIGHT
-        ===================================================== */
+    .article-meta-label {
+        color: rgba(255, 255, 255, 0.28);
+    }
 
-        #cursor-light {
+    .article-meta-value {
+        color: rgba(255, 255, 255, 0.72);
+    }
 
-            position: fixed;
+    .article-meta-divider {
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.22);
+    }
 
-            width: 320px;
-            height: 320px;
+    /* ---------------------------------------------------------
+   ARTICLE ACTIONS
+   --------------------------------------------------------- */
 
-            left: 0;
-            top: 0;
+    .article-actions {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 36px;
+    }
 
-            pointer-events: none;
+    .article-action {
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        background: rgba(255, 255, 255, 0.025);
+        color: rgba(255, 255, 255, 0.62);
+        min-height: 40px;
+        padding: 0 17px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        transition:
+            color 0.25s ease,
+            background 0.25s ease,
+            border-color 0.25s ease,
+            transform 0.25s ease;
+    }
 
-            z-index: 999999;
+    .article-action:hover {
+        color: #000000;
+        background: #ffffff;
+        border-color: #ffffff;
+        transform: translateY(-3px);
+    }
 
-            border-radius: 50%;
+    .article-action-danger:hover {
+        background: #ffffff;
+        color: #000000;
+    }
 
-            transform:
-                translate(-50%, -50%);
+    /* ---------------------------------------------------------
+   HERO DIVIDER
+   --------------------------------------------------------- */
 
+    .article-divider {
+        width: 100%;
+        height: 1px;
+        margin: 76px 0 0;
+        background:
+            linear-gradient(90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.12) 15%,
+                rgba(255, 255, 255, 0.22) 50%,
+                rgba(255, 255, 255, 0.12) 85%,
+                transparent 100%);
+    }
+
+    /* ---------------------------------------------------------
+   READING LAYOUT
+   --------------------------------------------------------- */
+
+    .article-reading-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 180px;
+        gap: 70px;
+        width: min(1030px, 100%);
+        margin: 75px auto 130px;
+    }
+
+    /* ---------------------------------------------------------
+   SIDE INFORMATION
+   --------------------------------------------------------- */
+
+    .article-side {
+        position: relative;
+    }
+
+    .article-side-inner {
+        position: sticky;
+        top: 110px;
+    }
+
+    .article-side-label {
+        margin-bottom: 15px;
+        color: rgba(255, 255, 255, 0.25);
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+    }
+
+    .article-side-rule {
+        width: 100%;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1);
+        margin-bottom: 18px;
+    }
+
+    .article-side-text {
+        margin: 0 0 28px;
+        color: rgba(255, 255, 255, 0.38);
+        font-size: 11px;
+        line-height: 1.7;
+    }
+
+    .article-side-mark {
+        width: 38px;
+        height: 38px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+    }
+
+    /* ---------------------------------------------------------
+   ARTICLE CONTENT
+   --------------------------------------------------------- */
+
+    .article-content {
+        min-width: 0;
+    }
+
+    .article-lead {
+        margin: 0 0 42px;
+        color: rgba(255, 255, 255, 0.75);
+        font-size: clamp(18px, 2vw, 22px);
+        line-height: 1.75;
+        font-weight: 500;
+        letter-spacing: -0.01em;
+    }
+
+    .article-body {
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 18px;
+        line-height: 1.95;
+        font-weight: 400;
+        letter-spacing: -0.005em;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .article-body::first-letter {
+        color: #ffffff;
+        font-size: 4.7em;
+        font-weight: 900;
+        line-height: 0.8;
+        float: left;
+        padding: 7px 15px 0 0;
+    }
+
+    .article-body strong {
+        color: #ffffff;
+        font-weight: 800;
+    }
+
+    .article-body em {
+        color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* ---------------------------------------------------------
+   ARTICLE END
+   --------------------------------------------------------- */
+
+    .article-end {
+        margin-top: 80px;
+        padding-top: 40px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .article-end-symbol {
+        width: 52px;
+        height: 52px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 24px;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 12px;
+        font-weight: 900;
+    }
+
+    .article-end-title {
+        margin: 0 0 10px;
+        color: #ffffff;
+        font-size: 22px;
+        letter-spacing: -0.03em;
+    }
+
+    .article-end-copy {
+        margin: 0;
+        max-width: 540px;
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    /* ---------------------------------------------------------
+   BOTTOM NAVIGATION
+   --------------------------------------------------------- */
+
+    .article-bottom-navigation {
+        width: min(1030px, 100%);
+        margin: 0 auto 120px;
+        padding-top: 34px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .article-bottom-link {
+        color: rgba(255, 255, 255, 0.48);
+        text-decoration: none;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        transition:
+            color 0.25s ease,
+            transform 0.25s ease;
+    }
+
+    .article-bottom-link:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    /* ---------------------------------------------------------
+   COPY FEEDBACK
+   --------------------------------------------------------- */
+
+    .copy-feedback {
+        position: fixed;
+        left: 50%;
+        bottom: 32px;
+        z-index: 9998;
+        transform: translate(-50%, 30px);
+        opacity: 0;
+        pointer-events: none;
+
+        padding: 12px 20px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 999px;
+        background: rgba(10, 10, 10, 0.92);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+
+        color: #ffffff;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+
+        transition:
+            opacity 0.25s ease,
+            transform 0.25s ease;
+    }
+
+    .copy-feedback.visible {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+    /* ---------------------------------------------------------
+   DELETE CONFIRMATION
+   --------------------------------------------------------- */
+
+    .delete-warning {
+        display: none;
+        width: min(500px, calc(100vw - 40px));
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        z-index: 10000;
+        transform: translate(-50%, -50%);
+        padding: 34px;
+
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 22px;
+        background: rgba(10, 10, 10, 0.97);
+        box-shadow: 0 30px 100px rgba(0, 0, 0, 0.65);
+    }
+
+    .delete-warning.visible {
+        display: block;
+    }
+
+    .delete-warning-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.72);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    }
+
+    .delete-warning-overlay.visible {
+        display: block;
+    }
+
+    .delete-warning-eyebrow {
+        margin-bottom: 12px;
+        color: rgba(255, 255, 255, 0.35);
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+    }
+
+    .delete-warning h2 {
+        margin: 0 0 12px;
+        color: #ffffff;
+        font-size: 26px;
+        letter-spacing: -0.04em;
+    }
+
+    .delete-warning p {
+        margin: 0 0 28px;
+        color: rgba(255, 255, 255, 0.45);
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .delete-warning-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .delete-warning-actions button {
+        flex: 1;
+    }
+
+    /* ---------------------------------------------------------
+   REVEAL ANIMATION
+   --------------------------------------------------------- */
+
+    .article-header,
+    .article-divider,
+    .article-reading-layout,
+    .article-bottom-navigation {
+        animation: articleReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    .article-header {
+        animation-delay: 0.05s;
+    }
+
+    .article-divider {
+        animation-delay: 0.12s;
+    }
+
+    .article-reading-layout {
+        animation-delay: 0.18s;
+    }
+
+    .article-bottom-navigation {
+        animation-delay: 0.24s;
+    }
+
+    @keyframes articleReveal {
+        from {
             opacity: 0;
-
-            background:
-                radial-gradient(circle,
-                    rgba(255, 255, 255, 0.20) 0%,
-                    rgba(255, 255, 255, 0.11) 18%,
-                    rgba(255, 255, 255, 0.055) 35%,
-                    rgba(255, 255, 255, 0.018) 52%,
-                    rgba(255, 255, 255, 0) 72%);
-
-            filter:
-                blur(2px);
-
-            mix-blend-mode:
-                screen;
-
-            will-change:
-                left,
-                top;
-
-            transition:
-                opacity 0.15s ease;
-
+            transform: translateY(24px);
         }
 
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 
-        /* =====================================================
-           NAVBAR
-        ===================================================== */
+    /* ---------------------------------------------------------
+   RESPONSIVE — TABLET
+   --------------------------------------------------------- */
 
-        .navbar {
-
-            position: sticky;
-
-            top: 0;
-
-            z-index: 1000;
-
-            width: 100%;
-
-            height: 78px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            padding: 0 5vw;
-
-            background:
-                rgba(9, 9, 9, 0.94);
-
-            border-bottom:
-                1px solid #292929;
-
-            backdrop-filter:
-                blur(16px);
-
-            -webkit-backdrop-filter:
-                blur(16px);
-
+    @media (max-width: 900px) {
+        .article-topbar {
+            width: min(100% - 34px, 1180px);
+            padding-top: 32px;
         }
 
-
-        .logo {
-
-            font-size: 25px;
-
-            font-weight: 900;
-
-            letter-spacing: -1px;
-
-            transition:
-                transform 0.25s ease,
-                opacity 0.25s ease;
-
+        .article-shell {
+            width: min(100% - 34px, 1180px);
         }
 
-
-        .logo:hover {
-
-            transform:
-                translateY(-2px);
-
-            opacity:
-                0.7;
-
+        .article-header {
+            margin-top: 80px;
         }
-
-
-        .nav-right {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 34px;
-
-        }
-
-
-        .nav-links {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 28px;
-
-        }
-
-
-        .nav-link {
-
-            position: relative;
-
-            font-size: 11px;
-
-            font-weight: 800;
-
-            letter-spacing: 1.5px;
-
-            color: #bdbdbd;
-
-            transition:
-                color 0.2s ease;
-
-        }
-
-
-        .nav-link::after {
-
-            content: "";
-
-            position: absolute;
-
-            left: 0;
-
-            bottom: -7px;
-
-            width: 0;
-
-            height: 1px;
-
-            background: #fff;
-
-            transition:
-                width 0.25s ease;
-
-        }
-
-
-        .nav-link:hover {
-
-            color:
-                #fff;
-
-        }
-
-
-        .nav-link:hover::after {
-
-            width:
-                100%;
-
-        }
-
-
-        /* =====================================================
-           PROFILE
-        ===================================================== */
-
-        .profile-wrapper {
-
-            position:
-                relative;
-
-        }
-
-
-        .profile-button {
-
-            width:
-                42px;
-
-            height:
-                42px;
-
-            border:
-                1px solid #444;
-
-            border-radius:
-                50%;
-
-            background:
-                #111;
-
-            cursor:
-                pointer;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            transition:
-                transform 0.25s ease,
-                border-color 0.25s ease,
-                background 0.25s ease;
-
-        }
-
-
-        .profile-button:hover {
-
-            transform:
-                translateY(-2px);
-
-            border-color:
-                #fff;
-
-            background:
-                #181818;
-
-        }
-
-
-        .person-icon {
-
-            position:
-                relative;
-
-            width:
-                20px;
-
-            height:
-                20px;
-
-            display:
-                block;
-
-        }
-
-
-        .person-icon::before {
-
-            content:
-                "";
-
-            position:
-                absolute;
-
-            width:
-                7px;
-
-            height:
-                7px;
-
-            left:
-                50%;
-
-            top:
-                1px;
-
-            transform:
-                translateX(-50%);
-
-            background:
-                #f5f5f5;
-
-            border-radius:
-                50%;
-
-        }
-
-
-        .person-icon::after {
-
-            content:
-                "";
-
-            position:
-                absolute;
-
-            width:
-                14px;
-
-            height:
-                8px;
-
-            left:
-                50%;
-
-            bottom:
-                1px;
-
-            transform:
-                translateX(-50%);
-
-            background:
-                #f5f5f5;
-
-            border-radius:
-                9px 9px 4px 4px;
-
-        }
-
-
-        .profile-menu {
-
-            position:
-                absolute;
-
-            right:
-                0;
-
-            top:
-                54px;
-
-            width:
-                250px;
-
-            padding:
-                20px;
-
-            background:
-                #101010;
-
-            border:
-                1px solid #333;
-
-            box-shadow:
-                0 25px 70px rgba(0, 0, 0, 0.65);
-
-            opacity:
-                0;
-
-            visibility:
-                hidden;
-
-            transform:
-                translateY(-8px);
-
-            transition:
-                opacity 0.2s ease,
-                transform 0.2s ease,
-                visibility 0.2s ease;
-
-        }
-
-
-        .profile-wrapper.open .profile-menu {
-
-            opacity:
-                1;
-
-            visibility:
-                visible;
-
-            transform:
-                translateY(0);
-
-        }
-
-
-        .profile-heading {
-
-            font-size:
-                9px;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                2px;
-
-            color:
-                #777;
-
-            margin-bottom:
-                7px;
-
-        }
-
-
-        .profile-name {
-
-            font-size:
-                18px;
-
-            font-weight:
-                800;
-
-            margin-bottom:
-                3px;
-
-        }
-
-
-        .profile-publication {
-
-            font-size:
-                11px;
-
-            color:
-                #888;
-
-            margin-bottom:
-                18px;
-
-        }
-
-
-        .profile-menu a {
-
-            display:
-                block;
-
-            padding:
-                11px 0;
-
-            border-top:
-                1px solid #282828;
-
-            font-size:
-                10px;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                1px;
-
-            color:
-                #ccc;
-
-            transition:
-                padding-left 0.2s ease,
-                color 0.2s ease;
-
-        }
-
-
-        .profile-menu a:hover {
-
-            padding-left:
-                6px;
-
-            color:
-                #fff;
-
-        }
-
-
-        /* =====================================================
-           ARTICLE READER
-        ===================================================== */
-
-        .reader {
-
-            width:
-                min(900px, 88%);
-
-            margin:
-                0 auto;
-
-            padding:
-                90px 0 120px;
-
-        }
-
-
-        /* =====================================================
-           BACK BUTTON
-        ===================================================== */
-
-        .back-button {
-
-            display:
-                inline-block;
-
-            margin-bottom:
-                65px;
-
-            color:
-                #777;
-
-            font-size:
-                10px;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                1.5px;
-
-            transition:
-                color 0.2s ease,
-                transform 0.2s ease;
-
-        }
-
-
-        .back-button:hover {
-
-            color:
-                #fff;
-
-            transform:
-                translateX(-5px);
-
-        }
-
-
-        /* =====================================================
-           PUBLICATION
-        ===================================================== */
-
-        .article-publication {
-
-            margin-bottom:
-                22px;
-
-            color:
-                #777;
-
-            font-size:
-                10px;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                3px;
-
-        }
-
-
-        /* =====================================================
-           TITLE
-        ===================================================== */
 
         .article-title {
-
-            max-width:
-                100%;
-
-            margin-bottom:
-                35px;
-
-            color:
-                #f5f5f5;
-
-            font-size:
-                clamp(45px, 7vw, 82px);
-
-            line-height:
-                0.98;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                -4px;
-
-            overflow-wrap:
-                break-word;
-
+            font-size: clamp(44px, 8vw, 76px);
         }
 
-
-        /* =====================================================
-           META
-        ===================================================== */
-
-        .article-meta {
-
-            display:
-                flex;
-
-            flex-wrap:
-                wrap;
-
-            gap:
-                12px 28px;
-
-            padding:
-                18px 0;
-
-            border-top:
-                1px solid #292929;
-
-            border-bottom:
-                1px solid #292929;
-
-            color:
-                #666;
-
-            font-size:
-                9px;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                1.2px;
-
+        .article-reading-layout {
+            grid-template-columns: 1fr;
+            gap: 38px;
+            margin-top: 60px;
         }
 
+        .article-side {
+            order: 2;
+        }
 
-        /* =====================================================
-           ARTICLE BODY
-        ===================================================== */
+        .article-side-inner {
+            position: static;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding-top: 28px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .article-side-rule {
+            display: none;
+        }
+
+        .article-side-text {
+            margin: 0;
+        }
+
+        .article-side-label {
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .article-side-mark {
+            flex: 0 0 auto;
+        }
 
         .article-content {
+            order: 1;
+        }
+    }
 
-            margin-top:
-                60px;
+    /* ---------------------------------------------------------
+   RESPONSIVE — MOBILE
+   --------------------------------------------------------- */
 
-            color:
-                #cfcfcf;
-
-            font-size:
-                18px;
-
-            line-height:
-                2;
-
-            white-space:
-                pre-line;
-
-            overflow-wrap:
-                break-word;
-
-            word-wrap:
-                break-word;
-
+    @media (max-width: 600px) {
+        .article-topbar {
+            width: calc(100% - 28px);
+            padding-top: 24px;
         }
 
-
-        /*
-           Every paragraph / line of the article
-           gets proper spacing.
-        */
-
-        .article-content p {
-
-            margin-bottom:
-                30px;
-
+        .article-shell {
+            width: calc(100% - 28px);
         }
 
-
-        /* =====================================================
-           CHAIR CONTROLS
-        ===================================================== */
-
-        .chair-controls {
-
-            margin-top:
-                75px;
-
-            padding-top:
-                25px;
-
-            border-top:
-                1px solid #292929;
-
+        .article-header {
+            margin-top: 60px;
         }
 
-
-        .delete-button {
-
-            padding:
-                13px 18px;
-
-            border:
-                1px solid #444;
-
-            background:
-                transparent;
-
-            color:
-                #888;
-
-            cursor:
-                pointer;
-
-            font-size:
-                9px;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                1.5px;
-
-            transition:
-                background 0.2s ease,
-                color 0.2s ease,
-                border-color 0.2s ease;
-
+        .article-kicker {
+            margin-bottom: 22px;
+            font-size: 8px;
+            letter-spacing: 0.2em;
         }
 
-
-        .delete-button:hover {
-
-            background:
-                #fff;
-
-            color:
-                #000;
-
-            border-color:
-                #fff;
-
+        .article-title {
+            font-size: clamp(38px, 12vw, 60px);
+            line-height: 0.96;
+            letter-spacing: -0.055em;
         }
 
+        .article-subtitle-space {
+            margin: 30px auto 26px;
+        }
 
-        /* =====================================================
-           END
-        ===================================================== */
+        .article-meta {
+            gap: 10px 15px;
+            font-size: 8px;
+            line-height: 1.5;
+        }
+
+        .article-meta-divider {
+            display: none;
+        }
+
+        .article-actions {
+            margin-top: 28px;
+        }
+
+        .article-action {
+            min-height: 38px;
+            padding: 0 13px;
+            font-size: 8px;
+        }
+
+        .article-divider {
+            margin-top: 52px;
+        }
+
+        .article-reading-layout {
+            margin-top: 48px;
+            margin-bottom: 80px;
+        }
+
+        .article-lead {
+            font-size: 17px;
+            line-height: 1.7;
+            margin-bottom: 30px;
+        }
+
+        .article-body {
+            font-size: 16px;
+            line-height: 1.85;
+        }
+
+        .article-body::first-letter {
+            font-size: 4em;
+            padding-right: 12px;
+        }
 
         .article-end {
-
-            margin-top:
-                100px;
-
-            padding-top:
-                25px;
-
-            border-top:
-                1px solid #292929;
-
-            color:
-                #555;
-
-            font-size:
-                9px;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                1.5px;
-
+            margin-top: 58px;
+            padding-top: 30px;
         }
 
-
-        /* =====================================================
-           FOOTER
-        ===================================================== */
-
-        footer {
-
-            border-top:
-                1px solid #292929;
-
-            padding:
-                28px 5vw;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                space-between;
-
-            color:
-                #555;
-
-            font-size:
-                9px;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                1.5px;
-
+        .article-end-title {
+            font-size: 19px;
         }
 
-
-        /* =====================================================
-           TABLET
-        ===================================================== */
-
-        @media (max-width: 800px) {
-
-            .navbar {
-
-                height:
-                    70px;
-
-                padding:
-                    0 6%;
-
-            }
-
-
-            .nav-right {
-
-                gap:
-                    15px;
-
-            }
-
-
-            .nav-links {
-
-                gap:
-                    17px;
-
-            }
-
-
-            .nav-link {
-
-                font-size:
-                    9px;
-
-                letter-spacing:
-                    1px;
-
-            }
-
-
-            .profile-menu {
-
-                right:
-                    -5px;
-
-                width:
-                    min(250px,
-                        calc(100vw - 30px));
-
-            }
-
-
-            .reader {
-
-                width:
-                    88%;
-
-                padding:
-                    65px 0 90px;
-
-            }
-
-
-            .article-title {
-
-                letter-spacing:
-                    -3px;
-
-            }
-
-
-            .article-content {
-
-                font-size:
-                    17px;
-
-                line-height:
-                    1.9;
-
-            }
-
-
-            footer {
-
-                flex-direction:
-                    column;
-
-                gap:
-                    10px;
-
-                text-align:
-                    center;
-
-            }
-
+        .article-end-copy {
+            font-size: 12px;
         }
 
-
-        /* =====================================================
-           PHONE
-        ===================================================== */
-
-        @media (max-width: 500px) {
-
-            .logo {
-
-                font-size:
-                    21px;
-
-            }
-
-
-            .nav-link {
-
-                display:
-                    none;
-
-            }
-
-
-            .profile-button {
-
-                width:
-                    40px;
-
-                height:
-                    40px;
-
-            }
-
-
-            .reader {
-
-                width:
-                    88%;
-
-            }
-
-
-            .article-title {
-
-                font-size:
-                    44px;
-
-                letter-spacing:
-                    -2.5px;
-
-                line-height:
-                    0.98;
-
-            }
-
-
-            .article-content {
-
-                font-size:
-                    16px;
-
-                line-height:
-                    1.9;
-
-            }
-
-
-            .article-meta {
-
-                gap:
-                    10px 18px;
-
-            }
-
+        .article-side-inner {
+            gap: 14px;
         }
-    </style>
 
-</head>
+        .article-side-label {
+            font-size: 8px;
+        }
+
+        .article-side-text {
+            font-size: 10px;
+        }
+
+        .article-side-mark {
+            width: 34px;
+            height: 34px;
+        }
+
+        .article-bottom-navigation {
+            margin-bottom: 70px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .delete-warning {
+            padding: 26px;
+        }
+
+        .delete-warning-actions {
+            flex-direction: column;
+        }
+    }
+
+    /* ---------------------------------------------------------
+   REDUCED MOTION
+   --------------------------------------------------------- */
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .article-header,
+        .article-divider,
+        .article-reading-layout,
+        .article-bottom-navigation {
+            animation: none;
+        }
+
+        .article-action,
+        .article-back,
+        .article-bottom-link,
+        .copy-feedback {
+            transition: none;
+        }
+    }
+</style>
+{% endblock %}
 
 
-<body>
+{% block content %}
+
+<div class="article-reader-page" id="articlePage">
+
+    <!-- =====================================================
+         READING PROGRESS
+         ====================================================== -->
+
+    <div class="article-progress-track" aria-hidden="true">
+        <div class="article-progress-bar" id="articleProgress"></div>
+    </div>
 
 
     <!-- =====================================================
-         CURSOR LIGHT
-    ===================================================== -->
+         TOP NAVIGATION
+         ====================================================== -->
 
-    <div id="cursor-light"></div>
+    <div class="article-topbar">
 
-
-    <!-- =====================================================
-         NAVBAR
-    ===================================================== -->
-
-    <nav class="navbar">
-
-        <a href="{{ url_for('home') }}" class="logo">
-            ACC
+        <a href="{{ url_for('articles') }}" class="article-back" aria-label="Return to press articles">
+            <span class="article-back-arrow">←</span>
+            <span>Press Archive</span>
         </a>
 
+        <div class="article-kicker">
+            <span class="article-kicker-line"></span>
+            ACC PRESS
+            <span class="article-kicker-line"></span>
+        </div>
 
-        <div class="nav-right">
+    </div>
 
-            <div class="nav-links">
 
-                <a href="{{ url_for('home') }}" class="nav-link">
-                    HOME
-                </a>
+    <!-- =====================================================
+         ARTICLE HEADER
+         ====================================================== -->
 
-                <a href="{{ url_for('articles') }}" class="nav-link">
-                    ARTICLES
-                </a>
+    <div class="article-shell">
+
+        <header class="article-header">
+
+            <div class="article-kicker">
+                <span class="article-kicker-line"></span>
+                OFFICIAL PRESS REPORT
+                <span class="article-kicker-line"></span>
+            </div>
+
+            <h1 class="article-title">
+                {{ article.title }}
+            </h1>
+
+            <div class="article-subtitle-space"></div>
+
+
+            <!-- ARTICLE METADATA -->
+
+            <div class="article-meta">
+
+                <span class="article-meta-item">
+                    <span class="article-meta-label">
+                        By
+                    </span>
+
+                    <span class="article-meta-value">
+                        {{ article.author }}
+                    </span>
+                </span>
+
+                <span class="article-meta-divider"></span>
+
+                <span class="article-meta-item">
+                    <span class="article-meta-label">
+                        Delegation
+                    </span>
+
+                    <span class="article-meta-value">
+                        {{ article.delegation }}
+                    </span>
+                </span>
+
+                <span class="article-meta-divider"></span>
+
+                <span class="article-meta-item">
+                    <span class="article-meta-label">
+                        Published
+                    </span>
+
+                    <span class="article-meta-value">
+                        {{ article.created_at }}
+                    </span>
+                </span>
 
             </div>
 
 
-            <div class="profile-wrapper" id="profileWrapper">
+            <!-- ARTICLE ACTIONS -->
 
-                <button type="button" class="profile-button" id="profileButton" aria-label="Account">
+            <div class="article-actions">
 
-                    <span class="person-icon"></span>
-
+                <button type="button" class="article-action" id="copyLinkButton">
+                    <span>↗</span>
+                    <span>Copy Link</span>
                 </button>
 
+                <button type="button" class="article-action" id="copyArticleButton">
+                    <span>□</span>
+                    <span>Copy Article</span>
+                </button>
 
-                <div class="profile-menu" id="profileMenu">
+                {% if user and user.role == "chair" %}
 
-                    {% if session.get("chair_authenticated") %}
+                <button type="button" class="article-action article-action-danger" id="openDeleteButton">
+                    <span>×</span>
+                    <span>Delete</span>
+                </button>
 
-                    <div class="profile-heading">
-                        CHAIR ACCOUNT
+                {% endif %}
+
+            </div>
+
+        </header>
+
+
+        <!-- =================================================
+             DIVIDER
+             ================================================== -->
+
+        <div class="article-divider"></div>
+
+
+        <!-- =================================================
+             READING AREA
+             ================================================== -->
+
+        <div class="article-reading-layout">
+
+            <!-- SIDE INFORMATION -->
+
+            <aside class="article-side">
+
+                <div class="article-side-inner">
+
+                    <div>
+                        <div class="article-side-label">
+                            ACC PRESS
+                        </div>
+
+                        <div class="article-side-rule"></div>
                     </div>
 
-                    <div class="profile-name">
-                        CHAIR
+                    <p class="article-side-text">
+                        Reporting from within the
+                        Arkanian Crisis Committee.
+                        Facts, developments and
+                        statements recorded by
+                        the Press Corps.
+                    </p>
+
+                    <div class="article-side-mark" aria-hidden="true">
+                        ACC
                     </div>
-
-                    <a href="{{ url_for('articles') }}">
-                        ARTICLES →
-                    </a>
-
-                    <a href="{{ url_for('chair_logout') }}">
-                        LOG OUT →
-                    </a>
-
-
-                    {% elif session.get("press_authenticated") %}
-
-                    <div class="profile-heading">
-                        PRESS ACCOUNT
-                    </div>
-
-                    <div class="profile-name">
-                        {{ session.get("press_name") }}
-                    </div>
-
-                    <div class="profile-publication">
-                        {{ session.get("press_publication") }}
-                    </div>
-
-                    <a href="{{ url_for('articles') }}">
-                        ARTICLES →
-                    </a>
-
-                    <a href="{{ url_for('press_upload') }}">
-                        UPLOAD ARTICLE →
-                    </a>
-
-                    <a href="{{ url_for('press_logout') }}">
-                        LOG OUT →
-                    </a>
-
-
-                    {% else %}
-
-                    <div class="profile-heading">
-                        ACCOUNT
-                    </div>
-
-                    <div class="profile-name">
-                        NOT SIGNED IN
-                    </div>
-
-                    <a href="{{ url_for('press_login') }}">
-                        PRESS LOGIN →
-                    </a>
-
-                    <a href="{{ url_for('chair_login') }}">
-                        CHAIR LOGIN →
-                    </a>
-
-                    {% endif %}
 
                 </div>
 
-            </div>
-
-        </div>
-
-    </nav>
+            </aside>
 
 
-    <!-- =====================================================
-         ARTICLE
-    ===================================================== -->
+            <!-- ARTICLE BODY -->
 
-    <main class="reader">
+            <article class="article-content">
 
+                <p class="article-lead">
+                    {{ article.body|striptags|truncate(280, true, "…") }}
+                </p>
 
-        <a href="{{ url_for('articles') }}" class="back-button">
-            ← BACK TO ARTICLES
-        </a>
-
-
-        <div class="article-publication">
-            {{ article.publication }}
-        </div>
+                <div class="article-body" id="articleBody">{{ article.body }}</div>
 
 
-        <h1 class="article-title">
-            {{ article.title }}
-        </h1>
+                <!-- ARTICLE END -->
 
+                <div class="article-end">
 
-        <div class="article-meta">
+                    <div class="article-end-symbol" aria-hidden="true">
+                        ◆
+                    </div>
 
-            <span>
-                BY {{ article.author }}
-            </span>
+                    <h2 class="article-end-title">
+                        End of report
+                    </h2>
 
-            <span>
-                {{ article.date }}
-            </span>
+                    <p class="article-end-copy">
+                        This report was published through the
+                        Arkanian Crisis Committee Press Corps.
+                        Return to the archive to explore other
+                        reports and developments.
+                    </p>
 
-            {% if article.time %}
+                </div>
 
-            <span>
-                {{ article.time }}
-            </span>
-
-            {% endif %}
+            </article>
 
         </div>
 
 
-        <article class="article-content">
+        <!-- =================================================
+             BOTTOM NAVIGATION
+             ================================================== -->
 
-            {{ article.content }}
+        <nav class="article-bottom-navigation" aria-label="Article navigation">
 
-        </article>
+            <a href="{{ url_for('articles') }}" class="article-bottom-link">
+                ← Back to archive
+            </a>
 
+            <a href="{{ url_for('home') }}" class="article-bottom-link">
+                ACC Home →
+            </a>
 
-        {% if session.get("chair_authenticated") %}
+        </nav>
 
-        <div class="chair-controls">
+    </div>
 
-            <form method="POST" action="{{ url_for('delete_article', article_id=article.id) }}"
-                onsubmit="return confirm('Delete this article?');">
-
-                <button type="submit" class="delete-button">
-                    DELETE ARTICLE
-                </button>
-
-            </form>
-
-        </div>
-
-        {% endif %}
+</div>
 
 
-        <div class="article-end">
-            END OF ARTICLE
-        </div>
+<!-- =========================================================
+     COPY FEEDBACK
+     ========================================================== -->
+
+<div class="copy-feedback" id="copyFeedback" role="status" aria-live="polite">
+    Copied to clipboard
+</div>
 
 
-    </main>
+{% if user and user.role == "chair" %}
+
+<!-- =========================================================
+     DELETE CONFIRMATION
+     ========================================================== -->
+
+<div class="delete-warning-overlay" id="deleteOverlay"></div>
+
+<div class="delete-warning" id="deleteWarning" role="dialog" aria-modal="true" aria-labelledby="deleteTitle">
+
+    <div class="delete-warning-eyebrow">
+        Chair action
+    </div>
+
+    <h2 id="deleteTitle">
+        Delete this article?
+    </h2>
+
+    <p>
+        This will permanently remove the article from the
+        ACC Press archive. This action cannot be undone.
+    </p>
+
+    <div class="delete-warning-actions">
+
+        <button type="button" class="article-action" id="cancelDeleteButton">
+            Cancel
+        </button>
+
+        <form method="POST" action="{{ url_for('delete_article', article_id=article.id) }}" id="deleteArticleForm"
+            style="display:flex; flex:1;">
+            <button type="submit" class="article-action" style="width:100%;">
+                Delete Article
+            </button>
+        </form>
+
+    </div>
+
+</div>
+
+{% endif %}
 
 
-    <!-- =====================================================
-         FOOTER
-    ===================================================== -->
-
-    <footer>
-
-        <span>
-            ARKANIAN JOINT CRISIS COMMITTEE
-        </span>
-
-        <span>
-            PRESS ARCHIVE
-        </span>
-
-    </footer>
+{% endblock %}
 
 
-    <!-- =====================================================
-         JAVASCRIPT
-    ===================================================== -->
+{% block extra_js %}
+<script>
+    /* =========================================================
+       ARTICLE READER JAVASCRIPT
+       ========================================================= */
 
-    <script>
+    document.addEventListener("DOMContentLoaded", () => {
 
+        const progressBar =
+            document.getElementById("articleProgress");
 
-        /* =================================================
-           PROFILE MENU
-        ================================================= */
+        const articleBody =
+            document.getElementById("articleBody");
 
-        const profileButton =
-            document.getElementById(
-                "profileButton"
-            );
+        const copyLinkButton =
+            document.getElementById("copyLinkButton");
 
+        const copyArticleButton =
+            document.getElementById("copyArticleButton");
 
-        const profileWrapper =
-            document.getElementById(
-                "profileWrapper"
-            );
-
-
-        if (
-            profileButton &&
-            profileWrapper
-        ) {
-
-            profileButton.addEventListener(
-                "click",
-                function (event) {
-
-                    event.stopPropagation();
-
-                    profileWrapper.classList.toggle(
-                        "open"
-                    );
-
-                }
-            );
+        const copyFeedback =
+            document.getElementById("copyFeedback");
 
 
-            document.addEventListener(
-                "click",
-                function (event) {
+        /* -----------------------------------------------------
+           READING PROGRESS
+           ----------------------------------------------------- */
 
-                    if (
-                        !profileWrapper.contains(
-                            event.target
-                        )
-                    ) {
+        function updateReadingProgress() {
 
-                        profileWrapper.classList.remove(
-                            "open"
-                        );
+            if (!progressBar || !articleBody) {
+                return;
+            }
 
-                    }
+            const articleTop =
+                articleBody.getBoundingClientRect().top +
+                window.scrollY;
 
-                }
-            );
+            const articleHeight =
+                articleBody.offsetHeight;
+
+            const viewportHeight =
+                window.innerHeight;
+
+            const currentPosition =
+                window.scrollY - articleTop + viewportHeight * 0.25;
+
+            const readableDistance =
+                Math.max(
+                    articleHeight - viewportHeight * 0.25,
+                    1
+                );
+
+            let percentage =
+                (currentPosition / readableDistance) * 100;
+
+            percentage =
+                Math.max(
+                    0,
+                    Math.min(100, percentage)
+                );
+
+            progressBar.style.width =
+                percentage + "%";
+        }
+
+        window.addEventListener(
+            "scroll",
+            updateReadingProgress,
+            { passive: true }
+        );
+
+        window.addEventListener(
+            "resize",
+            updateReadingProgress
+        );
+
+        updateReadingProgress();
 
 
-            document.addEventListener(
-                "keydown",
-                function (event) {
+        /* -----------------------------------------------------
+           COPY FEEDBACK
+           ----------------------------------------------------- */
 
-                    if (
-                        event.key === "Escape"
-                    ) {
+        let feedbackTimer = null;
 
-                        profileWrapper.classList.remove(
-                            "open"
-                        );
+        function showFeedback(message) {
 
-                    }
+            if (!copyFeedback) {
+                return;
+            }
 
-                }
-            );
+            copyFeedback.textContent = message;
+            copyFeedback.classList.add("visible");
 
+            clearTimeout(feedbackTimer);
+
+            feedbackTimer = setTimeout(() => {
+                copyFeedback.classList.remove("visible");
+            }, 1800);
         }
 
 
-        /* =================================================
-           CURSOR LIGHT
-        ================================================= */
+        /* -----------------------------------------------------
+           COPY LINK
+           ----------------------------------------------------- */
 
-        const cursorLight =
-            document.getElementById(
-                "cursor-light"
+        if (copyLinkButton) {
+
+            copyLinkButton.addEventListener(
+                "click",
+                async () => {
+
+                    const currentUrl =
+                        window.location.href;
+
+                    try {
+
+                        await navigator.clipboard.writeText(
+                            currentUrl
+                        );
+
+                        showFeedback(
+                            "Article link copied"
+                        );
+
+                    } catch (error) {
+
+                        const temporaryInput =
+                            document.createElement("input");
+
+                        temporaryInput.value =
+                            currentUrl;
+
+                        document.body.appendChild(
+                            temporaryInput
+                        );
+
+                        temporaryInput.select();
+
+                        try {
+                            document.execCommand("copy");
+
+                            showFeedback(
+                                "Article link copied"
+                            );
+
+                        } catch (fallbackError) {
+
+                            showFeedback(
+                                "Unable to copy link"
+                            );
+                        }
+
+                        temporaryInput.remove();
+                    }
+                }
             );
+        }
 
 
-        let mouseX = 0;
-        let mouseY = 0;
+        /* -----------------------------------------------------
+           COPY ARTICLE
+           ----------------------------------------------------- */
 
-        let lightX = 0;
-        let lightY = 0;
+        if (copyArticleButton) {
 
-        let mouseStarted = false;
+            copyArticleButton.addEventListener(
+                "click",
+                async () => {
 
-
-        if (cursorLight) {
-
-            document.addEventListener(
-                "mousemove",
-                function (event) {
-
-                    mouseX =
-                        event.clientX;
-
-                    mouseY =
-                        event.clientY;
-
-
-                    if (!mouseStarted) {
-
-                        lightX =
-                            mouseX;
-
-                        lightY =
-                            mouseY;
-
-                        mouseStarted =
-                            true;
-
+                    if (!articleBody) {
+                        return;
                     }
 
+                    const title =
+                        {{ article.title| tojson
+                }};
 
-                    cursorLight.style.opacity =
-                        "1";
+        const author =
+            {{ article.author| tojson
+    }};
 
-                }
+    const delegation =
+        {{ article.delegation| tojson }};
+
+    const body =
+        {{ article.body| tojson }};
+
+    const articleText =
+        `${title}
+
+By ${author}
+${delegation}
+
+${body}`;
+
+    try {
+
+        await navigator.clipboard.writeText(
+            articleText
+        );
+
+        showFeedback(
+            "Article copied"
+        );
+
+    } catch (error) {
+
+        const temporaryArea =
+            document.createElement("textarea");
+
+        temporaryArea.value =
+            articleText;
+
+        document.body.appendChild(
+            temporaryArea
+        );
+
+        temporaryArea.select();
+
+        try {
+
+            document.execCommand(
+                "copy"
             );
 
-
-            document.addEventListener(
-                "mouseleave",
-                function () {
-
-                    cursorLight.style.opacity =
-                        "0";
-
-                }
+            showFeedback(
+                "Article copied"
             );
 
+        } catch (fallbackError) {
 
-            function moveLight() {
+            showFeedback(
+                "Unable to copy article"
+            );
+        }
 
-                lightX +=
-                    (
-                        mouseX -
-                        lightX
-                    ) * 0.75;
-
-
-                lightY +=
-                    (
-                        mouseY -
-                        lightY
-                    ) * 0.75;
+        temporaryArea.remove();
+    }
+            }
+        );
+    }
 
 
-                cursorLight.style.left =
-                    lightX + "px";
+    /* -----------------------------------------------------
+       CHAIR DELETE MODAL
+       ----------------------------------------------------- */
+
+    const openDeleteButton =
+        document.getElementById(
+            "openDeleteButton"
+        );
+
+    const cancelDeleteButton =
+        document.getElementById(
+            "cancelDeleteButton"
+        );
+
+    const deleteWarning =
+        document.getElementById(
+            "deleteWarning"
+        );
+
+    const deleteOverlay =
+        document.getElementById(
+            "deleteOverlay"
+        );
 
 
-                cursorLight.style.top =
-                    lightY + "px";
+    function openDeleteModal() {
+
+        if (!deleteWarning || !deleteOverlay) {
+            return;
+        }
+
+        deleteWarning.classList.add(
+            "visible"
+        );
+
+        deleteOverlay.classList.add(
+            "visible"
+        );
+
+        document.body.style.overflow =
+            "hidden";
+
+        if (cancelDeleteButton) {
+            setTimeout(() => {
+                cancelDeleteButton.focus();
+            }, 50);
+        }
+    }
 
 
-                requestAnimationFrame(
-                    moveLight
-                );
+    function closeDeleteModal() {
 
+        if (!deleteWarning || !deleteOverlay) {
+            return;
+        }
+
+        deleteWarning.classList.remove(
+            "visible"
+        );
+
+        deleteOverlay.classList.remove(
+            "visible"
+        );
+
+        document.body.style.overflow =
+            "";
+    }
+
+
+    if (openDeleteButton) {
+
+        openDeleteButton.addEventListener(
+            "click",
+            openDeleteModal
+        );
+    }
+
+
+    if (cancelDeleteButton) {
+
+        cancelDeleteButton.addEventListener(
+            "click",
+            closeDeleteModal
+        );
+    }
+
+
+    if (deleteOverlay) {
+
+        deleteOverlay.addEventListener(
+            "click",
+            closeDeleteModal
+        );
+    }
+
+
+    /* -----------------------------------------------------
+       ESCAPE KEY
+       ----------------------------------------------------- */
+
+    document.addEventListener(
+        "keydown",
+        (event) => {
+
+            if (
+                event.key === "Escape" &&
+                deleteWarning &&
+                deleteWarning.classList.contains(
+                    "visible"
+                )
+            ) {
+
+                closeDeleteModal();
+            }
+        }
+    );
+
+
+    /* -----------------------------------------------------
+       KEYBOARD SHORTCUTS
+       ----------------------------------------------------- */
+
+    document.addEventListener(
+        "keydown",
+        (event) => {
+
+            if (
+                event.target.tagName === "INPUT" ||
+                event.target.tagName === "TEXTAREA" ||
+                event.target.isContentEditable
+            ) {
+                return;
             }
 
 
-            moveLight();
+            /* B = back to archive */
+
+            if (
+                event.key.toLowerCase() === "b"
+            ) {
+
+                window.location.href =
+                    "{{ url_for('articles') }}";
+            }
+
+
+            /* C = copy link */
+
+            if (
+                event.key.toLowerCase() === "c" &&
+                copyLinkButton
+            ) {
+
+                copyLinkButton.click();
+            }
 
         }
+    );
 
-    </script>
+
+    /* -----------------------------------------------------
+       IMAGE / CONTENT FADE-IN
+       ----------------------------------------------------- */
+
+    if (
+        articleBody &&
+        "IntersectionObserver" in window
+    ) {
+
+        const observer =
+            new IntersectionObserver(
+                (entries) => {
+
+                    entries.forEach(
+                        (entry) => {
+
+                            if (
+                                entry.isIntersecting
+                            ) {
+
+                                entry.target.style.opacity =
+                                    "1";
+
+                                entry.target.style.transform =
+                                    "translateY(0)";
+
+                                observer.unobserve(
+                                    entry.target
+                                );
+                            }
+                        }
+                    );
+                },
+                {
+                    threshold: 0.05
+                }
+            );
+
+        articleBody.style.opacity = "0";
+        articleBody.style.transform =
+            "translateY(14px)";
+        articleBody.style.transition =
+            "opacity 0.8s ease, transform 0.8s ease";
+
+        observer.observe(articleBody);
+    }
 
 
-</body>
+    /* -----------------------------------------------------
+       PREVENT DOUBLE DELETE SUBMISSION
+       ----------------------------------------------------- */
 
-</html>
+    const deleteForm =
+        document.getElementById(
+            "deleteArticleForm"
+        );
+
+    if (deleteForm) {
+
+        deleteForm.addEventListener(
+            "submit",
+            () => {
+
+                const button =
+                    deleteForm.querySelector(
+                        "button"
+                    );
+
+                if (!button) {
+                    return;
+                }
+
+                button.disabled = true;
+                button.textContent =
+                    "Deleting…";
+            }
+        );
+    }
+
+});
+</script>
+{% endblock %}

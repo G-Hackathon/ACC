@@ -1,395 +1,2632 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
+{% block title %}
+Chair Access — ACC
+{% endblock %}
 
-    <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block content %}
 
-    <title>Chair Login</title>
+<section class="chair-login-page">
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+    <div class="chair-login-bg" aria-hidden="true">
+
+        <div class="chair-grid"></div>
+
+        <div class="chair-bg-word">
+            CHAIR
+        </div>
+
+        <div class="chair-bg-number">
+            00
+        </div>
+
+        <div class="chair-cross chair-cross-one"></div>
+        <div class="chair-cross chair-cross-two"></div>
+
+    </div>
+
+
+    <div class="chair-login-top">
+
+        <div class="chair-system-id">
+
+            <span class="chair-system-dot"></span>
+
+            <span>
+                ACC / ADMINISTRATIVE SYSTEM
+            </span>
+
+        </div>
+
+
+        <div class="chair-system-status">
+            AUTHORIZED PERSONNEL ONLY
+        </div>
+
+    </div>
+
+
+    <div class="chair-login-container">
+
+        <div class="chair-login-introduction">
+
+            <div class="chair-index">
+
+                <span>
+                    ACCESS POINT
+                </span>
+
+                <strong>
+                    03
+                </strong>
+
+            </div>
+
+
+            <div class="chair-introduction-main">
+
+                <div class="chair-eyebrow">
+
+                    <span class="chair-eyebrow-line"></span>
+
+                    ARKANIAN CRISIS COMMITTEE
+
+                </div>
+
+
+                <h1>
+                    CHAIR<br>
+                    <span>ACCESS.</span>
+                </h1>
+
+
+                <p class="chair-introduction-text">
+
+                    The administrative command interface
+                    for the Arkanian Crisis Committee.
+
+                </p>
+
+            </div>
+
+
+            <div class="chair-login-warning">
+
+                <div class="chair-warning-icon">
+                    !
+                </div>
+
+
+                <div>
+
+                    <span class="chair-warning-label">
+                        RESTRICTED AREA
+                    </span>
+
+                    <p>
+
+                        This access point is reserved for the
+                        Committee Chair. Do not share administrative
+                        credentials with delegates or members of
+                        the Press Corps.
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="chair-login-panel">
+
+            <div class="chair-panel-header">
+
+                <div>
+
+                    <span class="chair-panel-label">
+                        ADMINISTRATIVE LOGIN
+                    </span>
+
+                    <h2>
+                        Enter credentials
+                    </h2>
+
+                </div>
+
+
+                <div class="chair-lock">
+
+                    <span></span>
+                    <span></span>
+                    <span></span>
+
+                </div>
+
+            </div>
+
+
+            {% if error %}
+
+            <div class="chair-login-error">
+
+                <div class="chair-error-symbol">
+                    ×
+                </div>
+
+
+                <div>
+
+                    <span>
+                        ACCESS DENIED
+                    </span>
+
+                    <p>
+                        {{ error }}
+                    </p>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+
+            <form method="POST" action="{{ url_for('chair_login') }}" class="chair-login-form" id="chairLoginForm"
+                autocomplete="off">
+
+                <div class="chair-field">
+
+                    <label for="username">
+                        CHAIR IDENTIFIER
+                    </label>
+
+
+                    <div class="chair-input-wrapper">
+
+                        <span class="chair-input-index">
+                            01
+                        </span>
+
+
+                        <input type="text" id="username" name="username" placeholder="Enter identifier"
+                            autocomplete="username" required autofocus>
+
+                    </div>
+
+                </div>
+
+
+                <div class="chair-field">
+
+                    <label for="password">
+                        ACCESS PASSWORD
+                    </label>
+
+
+                    <div class="chair-input-wrapper">
+
+                        <span class="chair-input-index">
+                            02
+                        </span>
+
+
+                        <input type="password" id="password" name="password" placeholder="Enter password"
+                            autocomplete="current-password" required>
+
+
+                        <button type="button" class="chair-password-toggle" id="passwordToggle"
+                            aria-label="Show password">
+                            SHOW
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="chair-form-options">
+
+                    <label class="chair-remember">
+
+                        <input type="checkbox" id="rememberDevice">
+
+                        <span class="chair-checkbox"></span>
+
+                        <span>
+                            REMEMBER THIS DEVICE
+                        </span>
+
+                    </label>
+
+
+                    <span class="chair-encryption">
+                        SESSION ENCRYPTED
+                    </span>
+
+                </div>
+
+
+                <button type="submit" class="chair-submit" id="chairSubmit">
+
+                    <span class="chair-submit-text">
+                        ENTER COMMAND CENTRE
+                    </span>
+
+                    <span class="chair-submit-arrow">
+                        →
+                    </span>
+
+                    <span class="chair-submit-loading">
+                        AUTHENTICATING...
+                    </span>
+
+                </button>
+
+            </form>
+
+
+            <div class="chair-panel-footer">
+
+                <div class="chair-security-status">
+
+                    <span class="chair-security-dot"></span>
+
+                    <span>
+                        SECURE AUTHENTICATION
+                    </span>
+
+                </div>
+
+
+                <span class="chair-footer-code">
+                    ACC-ADMIN
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <section class="chair-access-information">
+
+        <div class="chair-access-heading">
+
+            <span class="chair-section-number">
+                01 /
+            </span>
+
+            <span class="chair-section-title">
+                ADMINISTRATIVE ACCESS
+            </span>
+
+            <span class="chair-section-line"></span>
+
+        </div>
+
+
+        <div class="chair-access-grid">
+
+            <div class="chair-access-item">
+
+                <div class="chair-access-item-number">
+                    01
+                </div>
+
+                <div class="chair-access-item-content">
+
+                    <span>
+                        CRISIS MANAGEMENT
+                    </span>
+
+                    <h3>
+                        Publish developments.
+                    </h3>
+
+                    <p>
+                        Create and publish crisis announcements
+                        for delegates through the Committee's
+                        central crisis interface.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="chair-access-item">
+
+                <div class="chair-access-item-number">
+                    02
+                </div>
+
+                <div class="chair-access-item-content">
+
+                    <span>
+                        COMMITTEE CONTROL
+                    </span>
+
+                    <h3>
+                        Manage the room.
+                    </h3>
+
+                    <p>
+                        Maintain the flow of committee developments
+                        and provide delegates with official
+                        information during the crisis.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="chair-access-item">
+
+                <div class="chair-access-item-number">
+                    03
+                </div>
+
+                <div class="chair-access-item-content">
+
+                    <span>
+                        ARCHIVE
+                    </span>
+
+                    <h3>
+                        Monitor the record.
+                    </h3>
+
+                    <p>
+                        Review published articles and committee
+                        material through the public archive.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="chair-security-strip">
+
+        <div class="chair-security-strip-inner">
+
+            <div class="chair-security-block">
+
+                <span class="chair-security-big">
+                    01
+                </span>
+
+                <div>
+
+                    <span class="chair-security-title">
+                        PRIVATE
+                    </span>
+
+                    <p>
+                        Administrative controls are
+                        restricted to authorized Chair access.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="chair-security-block">
+
+                <span class="chair-security-big">
+                    02
+                </span>
+
+                <div>
+
+                    <span class="chair-security-title">
+                        CONTROLLED
+                    </span>
+
+                    <p>
+                        Published crisis material becomes
+                        visible to the committee.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="chair-security-block">
+
+                <span class="chair-security-big">
+                    03
+                </span>
+
+                <div>
+
+                    <span class="chair-security-title">
+                        OFFICIAL
+                    </span>
+
+                    <p>
+                        Chair announcements represent the
+                        official committee record.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <div class="chair-return">
+
+        <a href="{{ url_for('home') }}">
+
+            <span class="chair-return-arrow">
+                ←
+            </span>
+
+            <span>
+                RETURN TO ACC
+            </span>
+
+        </a>
+
+
+        <div class="chair-return-label">
+            ARKANIAN CRISIS COMMITTEE
+        </div>
+
+    </div>
+
+</section>
+
+
+<style>
+    /* =========================================================
+   CHAIR LOGIN PAGE
+========================================================= */
+
+    .chair-login-page {
+
+        position: relative;
+
+        min-height: calc(100vh - 80px);
+
+        overflow: hidden;
+
+        background: #050505;
+    }
+
+
+    .chair-login-bg {
+
+        position: absolute;
+
+        inset: 0;
+
+        pointer-events: none;
+
+        overflow: hidden;
+    }
+
+
+    .chair-grid {
+
+        position: absolute;
+
+        inset: 0;
+
+        opacity: 0.32;
+
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.035) 1px,
+                transparent 1px),
+            linear-gradient(90deg,
+                rgba(255, 255, 255, 0.035) 1px,
+                transparent 1px);
+
+        background-size: 80px 80px;
+
+        mask-image:
+            linear-gradient(to bottom,
+                black,
+                transparent 85%);
+    }
+
+
+    .chair-bg-word {
+
+        position: absolute;
+
+        right: -30px;
+
+        top: 70px;
+
+        font-size: clamp(12rem, 30vw, 35rem);
+
+        line-height: .75;
+
+        font-weight: 900;
+
+        letter-spacing: -.10em;
+
+        color: transparent;
+
+        -webkit-text-stroke:
+            1px rgba(255, 255, 255, .035);
+
+        white-space: nowrap;
+
+        user-select: none;
+    }
+
+
+    .chair-bg-number {
+
+        position: absolute;
+
+        left: 4%;
+
+        bottom: -100px;
+
+        font-size: clamp(15rem, 35vw, 40rem);
+
+        line-height: .8;
+
+        font-weight: 900;
+
+        letter-spacing: -.10em;
+
+        color: rgba(255, 255, 255, .018);
+
+        user-select: none;
+    }
+
+
+    .chair-cross {
+
+        position: absolute;
+
+        width: 35px;
+        height: 35px;
+    }
+
+
+    .chair-cross::before,
+    .chair-cross::after {
+
+        content: "";
+
+        position: absolute;
+
+        background: rgba(255, 255, 255, .18);
+    }
+
+
+    .chair-cross::before {
+
+        width: 100%;
+        height: 1px;
+
+        top: 50%;
+        left: 0;
+    }
+
+
+    .chair-cross::after {
+
+        height: 100%;
+        width: 1px;
+
+        left: 50%;
+        top: 0;
+    }
+
+
+    .chair-cross-one {
+
+        top: 18%;
+        left: 7%;
+    }
+
+
+    .chair-cross-two {
+
+        right: 7%;
+        bottom: 21%;
+    }
+
+
+    /* =========================================================
+   TOP
+========================================================= */
+
+    .chair-login-top {
+
+        position: relative;
+
+        z-index: 5;
+
+        width: min(1500px,
+                calc(100% - 80px));
+
+        margin: 0 auto;
+
+        padding: 28px 0;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        border-bottom:
+            1px solid rgba(255, 255, 255, .09);
+    }
+
+
+    .chair-system-id,
+    .chair-system-status {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        font-size: .58rem;
+
+        font-weight: 800;
+
+        letter-spacing: .16em;
+
+        color: rgba(255, 255, 255, .40);
+    }
+
+
+    .chair-system-status {
+
+        color: rgba(255, 255, 255, .25);
+    }
+
+
+    .chair-system-dot {
+
+        width: 6px;
+        height: 6px;
+
+        display: block;
+
+        border-radius: 50%;
+
+        background: #fff;
+
+        box-shadow:
+            0 0 0 4px rgba(255, 255, 255, .06);
+
+        animation:
+            chairStatusPulse 2s ease-in-out infinite;
+    }
+
+
+    @keyframes chairStatusPulse {
+
+        0%,
+        100% {
+            opacity: 1;
         }
 
-        body {
-            min-height: 100vh;
-
-            background: #090909;
-            color: #f5f5f5;
-
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            padding: 30px;
+        50% {
+            opacity: .35;
         }
 
-
-        /* ================================================
-           BACK
-        ================================================ */
-
-        .back {
-            position: fixed;
-
-            top: 28px;
-            left: 30px;
-
-            color: #777;
-
-            text-decoration: none;
-
-            font-size: 10px;
-            font-weight: 900;
-
-            letter-spacing: 1.5px;
-
-            transition:
-                color 0.2s ease,
-                transform 0.2s ease;
-        }
-
-        .back:hover {
-            color: white;
-
-            transform:
-                translateX(-4px);
-        }
+    }
 
 
-        /* ================================================
-           LOGIN BOX
-        ================================================ */
+    /* =========================================================
+   CONTAINER
+========================================================= */
 
-        .login-wrapper {
+    .chair-login-container {
+
+        position: relative;
+
+        z-index: 3;
+
+        width: min(1500px,
+                calc(100% - 80px));
+
+        min-height: 650px;
+
+        margin: 0 auto;
+
+        padding: 100px 0 120px;
+
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, 1fr) minmax(440px, .75fr);
+
+        gap: 100px;
+
+        align-items: center;
+    }
+
+
+    /* =========================================================
+   INTRO
+========================================================= */
+
+    .chair-login-introduction {
+
+        position: relative;
+
+        min-height: 540px;
+
+        display: flex;
+
+        flex-direction: column;
+
+        justify-content: space-between;
+    }
+
+
+    .chair-index {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 18px;
+    }
+
+
+    .chair-index span {
+
+        font-size: .58rem;
+
+        font-weight: 800;
+
+        letter-spacing: .18em;
+
+        color: rgba(255, 255, 255, .30);
+    }
+
+
+    .chair-index strong {
+
+        font-size: .78rem;
+
+        font-weight: 800;
+
+        color: rgba(255, 255, 255, .70);
+    }
+
+
+    .chair-introduction-main {
+
+        margin-top: auto;
+
+        margin-bottom: auto;
+
+        padding: 70px 0;
+    }
+
+
+    .chair-eyebrow {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 13px;
+
+        margin-bottom: 25px;
+
+        font-size: .61rem;
+
+        font-weight: 800;
+
+        letter-spacing: .19em;
+
+        color: rgba(255, 255, 255, .42);
+    }
+
+
+    .chair-eyebrow-line {
+
+        width: 42px;
+        height: 1px;
+
+        background: rgba(255, 255, 255, .40);
+    }
+
+
+    .chair-introduction-main h1 {
+
+        margin: 0;
+
+        font-size:
+            clamp(5.5rem, 11vw, 12rem);
+
+        line-height: .78;
+
+        font-weight: 900;
+
+        letter-spacing: -.09em;
+
+        color: #fff;
+    }
+
+
+    .chair-introduction-main h1 span {
+
+        color: transparent;
+
+        -webkit-text-stroke:
+            1px rgba(255, 255, 255, .48);
+    }
+
+
+    .chair-introduction-text {
+
+        max-width: 420px;
+
+        margin: 38px 0 0;
+
+        font-size: .90rem;
+
+        line-height: 1.75;
+
+        color: rgba(255, 255, 255, .42);
+    }
+
+
+    /* =========================================================
+   WARNING
+========================================================= */
+
+    .chair-login-warning {
+
+        display: grid;
+
+        grid-template-columns:
+            40px minmax(0, 1fr);
+
+        gap: 17px;
+
+        max-width: 570px;
+
+        padding-top: 22px;
+
+        border-top:
+            1px solid rgba(255, 255, 255, .11);
+    }
+
+
+    .chair-warning-icon {
+
+        width: 30px;
+        height: 30px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        border:
+            1px solid rgba(255, 255, 255, .32);
+
+        font-size: .72rem;
+
+        font-weight: 800;
+    }
+
+
+    .chair-warning-label {
+
+        display: block;
+
+        margin-bottom: 7px;
+
+        font-size: .58rem;
+
+        font-weight: 800;
+
+        letter-spacing: .16em;
+
+        color: rgba(255, 255, 255, .54);
+    }
+
+
+    .chair-login-warning p {
+
+        max-width: 470px;
+
+        margin: 0;
+
+        font-size: .67rem;
+
+        line-height: 1.7;
+
+        color: rgba(255, 255, 255, .30);
+    }
+
+
+    /* =========================================================
+   PANEL
+========================================================= */
+
+    .chair-login-panel {
+
+        position: relative;
+
+        padding: 45px;
+
+        border:
+            1px solid rgba(255, 255, 255, .14);
+
+        background:
+            linear-gradient(145deg,
+                rgba(255, 255, 255, .055),
+                rgba(255, 255, 255, .012));
+
+        box-shadow:
+            0 35px 100px rgba(0, 0, 0, .45);
+
+        backdrop-filter: blur(20px);
+
+        transition:
+            transform .2s ease;
+    }
+
+
+    .chair-login-panel::before,
+    .chair-login-panel::after {
+
+        content: "";
+
+        position: absolute;
+
+        width: 18px;
+        height: 18px;
+
+        pointer-events: none;
+    }
+
+
+    .chair-login-panel::before {
+
+        left: -1px;
+        top: -1px;
+
+        border-left:
+            1px solid rgba(255, 255, 255, .75);
+
+        border-top:
+            1px solid rgba(255, 255, 255, .75);
+    }
+
+
+    .chair-login-panel::after {
+
+        right: -1px;
+        bottom: -1px;
+
+        border-right:
+            1px solid rgba(255, 255, 255, .75);
+
+        border-bottom:
+            1px solid rgba(255, 255, 255, .75);
+    }
+
+
+    /* =========================================================
+   HEADER
+========================================================= */
+
+    .chair-panel-header {
+
+        display: flex;
+
+        align-items: flex-start;
+
+        justify-content: space-between;
+
+        gap: 20px;
+
+        margin-bottom: 40px;
+    }
+
+
+    .chair-panel-label {
+
+        display: block;
+
+        margin-bottom: 10px;
+
+        font-size: .59rem;
+
+        font-weight: 800;
+
+        letter-spacing: .18em;
+
+        color: rgba(255, 255, 255, .35);
+    }
+
+
+    .chair-panel-header h2 {
+
+        margin: 0;
+
+        font-size:
+            clamp(1.7rem, 3vw, 2.5rem);
+
+        line-height: .95;
+
+        font-weight: 800;
+
+        letter-spacing: -.055em;
+
+        color: #fff;
+    }
+
+
+    .chair-lock {
+
+        width: 35px;
+        height: 35px;
+
+        display: flex;
+
+        align-items: flex-end;
+
+        justify-content: center;
+
+        gap: 3px;
+
+        padding: 7px;
+
+        border:
+            1px solid rgba(255, 255, 255, .18);
+    }
+
+
+    .chair-lock span {
+
+        width: 4px;
+
+        display: block;
+
+        background: rgba(255, 255, 255, .65);
+    }
+
+
+    .chair-lock span:nth-child(1) {
+        height: 35%;
+    }
+
+
+    .chair-lock span:nth-child(2) {
+        height: 65%;
+    }
+
+
+    .chair-lock span:nth-child(3) {
+        height: 100%;
+    }
+
+
+    /* =========================================================
+   ERROR
+========================================================= */
+
+    .chair-login-error {
+
+        display: grid;
+
+        grid-template-columns:
+            34px minmax(0, 1fr);
+
+        gap: 13px;
+
+        margin-bottom: 25px;
+
+        padding: 15px;
+
+        border:
+            1px solid rgba(255, 255, 255, .18);
+
+        background:
+            rgba(255, 255, 255, .035);
+    }
+
+
+    .chair-error-symbol {
+
+        width: 28px;
+        height: 28px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        border:
+            1px solid rgba(255, 255, 255, .35);
+
+        font-size: 1rem;
+
+        font-weight: 700;
+    }
+
+
+    .chair-login-error span {
+
+        display: block;
+
+        margin-bottom: 4px;
+
+        font-size: .58rem;
+
+        font-weight: 800;
+
+        letter-spacing: .14em;
+
+        color: rgba(255, 255, 255, .72);
+    }
+
+
+    .chair-login-error p {
+
+        margin: 0;
+
+        font-size: .67rem;
+
+        line-height: 1.5;
+
+        color: rgba(255, 255, 255, .38);
+    }
+
+
+    /* =========================================================
+   FORM
+========================================================= */
+
+    .chair-login-form {
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 26px;
+    }
+
+
+    .chair-field label {
+
+        display: block;
+
+        margin-bottom: 10px;
+
+        font-size: .59rem;
+
+        font-weight: 800;
+
+        letter-spacing: .17em;
+
+        color: rgba(255, 255, 255, .40);
+    }
+
+
+    .chair-input-wrapper {
+
+        position: relative;
+
+        display: flex;
+
+        align-items: center;
+
+        min-height: 63px;
+
+        border:
+            1px solid rgba(255, 255, 255, .13);
+
+        background:
+            rgba(0, 0, 0, .30);
+
+        transition:
+            border-color .25s ease,
+            background .25s ease,
+            transform .2s ease;
+    }
+
+
+    .chair-input-wrapper:focus-within {
+
+        border-color:
+            rgba(255, 255, 255, .52);
+
+        background:
+            rgba(255, 255, 255, .025);
+    }
+
+
+    .chair-input-index {
+
+        width: 52px;
+
+        flex: 0 0 52px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        align-self: stretch;
+
+        border-right:
+            1px solid rgba(255, 255, 255, .09);
+
+        font-size: .57rem;
+
+        font-weight: 800;
+
+        color: rgba(255, 255, 255, .22);
+    }
+
+
+    .chair-input-wrapper input {
+
+        width: 100%;
+
+        height: 61px;
+
+        min-width: 0;
+
+        padding: 0 17px;
+
+        border: 0;
+
+        outline: 0;
+
+        background: transparent;
+
+        color: #fff;
+
+        font-family: inherit;
+
+        font-size: .82rem;
+    }
+
+
+    .chair-input-wrapper input::placeholder {
+
+        color: rgba(255, 255, 255, .22);
+    }
+
+
+    .chair-password-toggle {
+
+        flex: 0 0 auto;
+
+        height: 61px;
+
+        padding: 0 17px;
+
+        border: 0;
+
+        background: transparent;
+
+        color: rgba(255, 255, 255, .30);
+
+        font-family: inherit;
+
+        font-size: .56rem;
+
+        font-weight: 800;
+
+        letter-spacing: .12em;
+
+        cursor: pointer;
+
+        transition:
+            color .2s ease;
+    }
+
+
+    .chair-password-toggle:hover {
+
+        color: #fff;
+    }
+
+
+    /* =========================================================
+   OPTIONS
+========================================================= */
+
+    .chair-form-options {
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 20px;
+    }
+
+
+    .chair-remember {
+
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 9px;
+
+        cursor: pointer;
+
+        user-select: none;
+
+        font-size: .56rem;
+
+        font-weight: 800;
+
+        letter-spacing: .10em;
+
+        color: rgba(255, 255, 255, .30);
+    }
+
+
+    .chair-remember input {
+
+        position: absolute;
+
+        opacity: 0;
+
+        pointer-events: none;
+    }
+
+
+    .chair-checkbox {
+
+        position: relative;
+
+        width: 14px;
+        height: 14px;
+
+        display: block;
+
+        border:
+            1px solid rgba(255, 255, 255, .27);
+
+        transition:
+            background .2s ease,
+            border-color .2s ease;
+    }
+
+
+    .chair-remember input:checked+.chair-checkbox {
+
+        background: #fff;
+
+        border-color: #fff;
+    }
+
+
+    .chair-remember input:checked+.chair-checkbox::after {
+
+        content: "";
+
+        position: absolute;
+
+        width: 6px;
+        height: 3px;
+
+        left: 3px;
+        top: 3px;
+
+        border-left:
+            1px solid #050505;
+
+        border-bottom:
+            1px solid #050505;
+
+        transform: rotate(-45deg);
+    }
+
+
+    .chair-encryption {
+
+        font-size: .54rem;
+
+        font-weight: 800;
+
+        letter-spacing: .11em;
+
+        color: rgba(255, 255, 255, .20);
+    }
+
+
+    /* =========================================================
+   SUBMIT
+========================================================= */
+
+    .chair-submit {
+
+        position: relative;
+
+        width: 100%;
+
+        min-height: 65px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 20px;
+
+        padding:
+            0 20px 0 22px;
+
+        border: 1px solid #fff;
+
+        background: #fff;
+
+        color: #050505;
+
+        font-family: inherit;
+
+        font-size: .61rem;
+
+        font-weight: 900;
+
+        letter-spacing: .14em;
+
+        cursor: pointer;
+
+        overflow: hidden;
+
+        transition:
+            background .25s ease,
+            color .25s ease,
+            transform .25s ease;
+    }
+
+
+    .chair-submit::before {
+
+        content: "";
+
+        position: absolute;
+
+        inset: 0;
+
+        background: #050505;
+
+        transform:
+            translateX(-101%);
+
+        transition:
+            transform .35s cubic-bezier(.2, .8, .2, 1);
+    }
+
+
+    .chair-submit:hover::before {
+
+        transform:
+            translateX(0);
+    }
+
+
+    .chair-submit:hover {
+
+        color: #fff;
+
+        transform:
+            translateY(-2px);
+    }
+
+
+    .chair-submit-text,
+    .chair-submit-arrow,
+    .chair-submit-loading {
+
+        position: relative;
+
+        z-index: 2;
+    }
+
+
+    .chair-submit-arrow {
+
+        font-size: 1.2rem;
+
+        transition:
+            transform .25s ease;
+    }
+
+
+    .chair-submit:hover .chair-submit-arrow {
+
+        transform:
+            translateX(5px);
+    }
+
+
+    .chair-submit-loading {
+
+        display: none;
+    }
+
+
+    .chair-submit.is-loading {
+
+        pointer-events: none;
+    }
+
+
+    .chair-submit.is-loading .chair-submit-text,
+    .chair-submit.is-loading .chair-submit-arrow {
+
+        display: none;
+    }
+
+
+    .chair-submit.is-loading .chair-submit-loading {
+
+        display: block;
+    }
+
+
+    /* =========================================================
+   FOOTER
+========================================================= */
+
+    .chair-panel-footer {
+
+        margin-top: 27px;
+
+        padding-top: 20px;
+
+        border-top:
+            1px solid rgba(255, 255, 255, .08);
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 15px;
+    }
+
+
+    .chair-security-status {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 8px;
+
+        font-size: .53rem;
+
+        font-weight: 800;
+
+        letter-spacing: .13em;
+
+        color: rgba(255, 255, 255, .24);
+    }
+
+
+    .chair-security-dot {
+
+        width: 5px;
+        height: 5px;
+
+        display: block;
+
+        border-radius: 50%;
+
+        background:
+            rgba(255, 255, 255, .65);
+    }
+
+
+    .chair-footer-code {
+
+        font-size: .51rem;
+
+        font-weight: 800;
+
+        letter-spacing: .13em;
+
+        color: rgba(255, 255, 255, .16);
+    }
+
+
+    /* =========================================================
+   ACCESS INFORMATION
+========================================================= */
+
+    .chair-access-information {
+
+        position: relative;
+
+        z-index: 3;
+
+        border-top:
+            1px solid rgba(255, 255, 255, .09);
+
+        border-bottom:
+            1px solid rgba(255, 255, 255, .09);
+
+        padding:
+            75px max(40px,
+                calc((100vw - 1500px) / 2));
+    }
+
+
+    .chair-access-heading {
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 16px;
+
+        margin-bottom: 45px;
+    }
+
+
+    .chair-section-number {
+
+        font-size: .57rem;
+
+        font-weight: 800;
+
+        letter-spacing: .13em;
+
+        color: rgba(255, 255, 255, .23);
+    }
+
+
+    .chair-section-title {
+
+        font-size: .63rem;
+
+        font-weight: 800;
+
+        letter-spacing: .17em;
+
+        color: rgba(255, 255, 255, .57);
+    }
+
+
+    .chair-section-line {
+
+        height: 1px;
+
+        flex: 1;
+
+        background:
+            rgba(255, 255, 255, .08);
+    }
+
+
+    .chair-access-grid {
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, 1fr);
+
+        border-top:
+            1px solid rgba(255, 255, 255, .09);
+    }
+
+
+    .chair-access-item {
+
+        display: grid;
+
+        grid-template-columns:
+            50px minmax(0, 1fr);
+
+        gap: 20px;
+
+        padding:
+            34px 30px 20px 0;
+
+        border-right:
+            1px solid rgba(255, 255, 255, .09);
+    }
+
+
+    .chair-access-item+.chair-access-item {
+
+        padding-left: 30px;
+    }
+
+
+    .chair-access-item:last-child {
+
+        border-right: 0;
+
+        padding-right: 0;
+    }
+
+
+    .chair-access-item-number {
+
+        font-size: .59rem;
+
+        font-weight: 800;
+
+        letter-spacing: .12em;
+
+        color: rgba(255, 255, 255, .22);
+    }
+
+
+    .chair-access-item-content>span {
+
+        display: block;
+
+        margin-bottom: 9px;
+
+        font-size: .57rem;
+
+        font-weight: 800;
+
+        letter-spacing: .15em;
+
+        color: rgba(255, 255, 255, .34);
+    }
+
+
+    .chair-access-item-content h3 {
+
+        margin: 0 0 12px;
+
+        font-size: 1.45rem;
+
+        line-height: 1;
+
+        font-weight: 750;
+
+        letter-spacing: -.04em;
+
+        color: #fff;
+    }
+
+
+    .chair-access-item-content p {
+
+        max-width: 310px;
+
+        margin: 0;
+
+        font-size: .68rem;
+
+        line-height: 1.75;
+
+        color: rgba(255, 255, 255, .31);
+    }
+
+
+    /* =========================================================
+   SECURITY STRIP
+========================================================= */
+
+    .chair-security-strip {
+
+        position: relative;
+
+        z-index: 3;
+
+        padding:
+            55px max(40px,
+                calc((100vw - 1500px) / 2));
+
+        background:
+            rgba(255, 255, 255, .015);
+    }
+
+
+    .chair-security-strip-inner {
+
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, 1fr);
+
+        gap: 0;
+    }
+
+
+    .chair-security-block {
+
+        display: grid;
+
+        grid-template-columns:
+            60px minmax(0, 1fr);
+
+        gap: 15px;
+
+        padding-right: 35px;
+    }
+
+
+    .chair-security-block+.chair-security-block {
+
+        padding-left: 35px;
+
+        border-left:
+            1px solid rgba(255, 255, 255, .08);
+    }
+
+
+    .chair-security-big {
+
+        font-size: 1.8rem;
+
+        line-height: 1;
+
+        font-weight: 900;
+
+        letter-spacing: -.06em;
+
+        color: rgba(255, 255, 255, .13);
+    }
+
+
+    .chair-security-title {
+
+        display: block;
+
+        margin-bottom: 7px;
+
+        font-size: .58rem;
+
+        font-weight: 800;
+
+        letter-spacing: .15em;
+
+        color: rgba(255, 255, 255, .52);
+    }
+
+
+    .chair-security-block p {
+
+        max-width: 330px;
+
+        margin: 0;
+
+        font-size: .64rem;
+
+        line-height: 1.65;
+
+        color: rgba(255, 255, 255, .27);
+    }
+
+
+    /* =========================================================
+   RETURN
+========================================================= */
+
+    .chair-return {
+
+        position: relative;
+
+        z-index: 3;
+
+        width: min(1500px,
+                calc(100% - 80px));
+
+        margin: 0 auto;
+
+        min-height: 100px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 25px;
+    }
+
+
+    .chair-return a {
+
+        display: inline-flex;
+
+        align-items: center;
+
+        gap: 12px;
+
+        color: rgba(255, 255, 255, .45);
+
+        text-decoration: none;
+
+        font-size: .58rem;
+
+        font-weight: 800;
+
+        letter-spacing: .15em;
+
+        transition:
+            color .25s ease;
+    }
+
+
+    .chair-return a:hover {
+
+        color: #fff;
+    }
+
+
+    .chair-return-arrow {
+
+        font-size: 1rem;
+
+        transition:
+            transform .25s ease;
+    }
+
+
+    .chair-return a:hover .chair-return-arrow {
+
+        transform:
+            translateX(-4px);
+    }
+
+
+    .chair-return-label {
+
+        font-size: .53rem;
+
+        font-weight: 800;
+
+        letter-spacing: .14em;
+
+        color: rgba(255, 255, 255, .18);
+    }
+
+
+    /* =========================================================
+   RESPONSIVE
+========================================================= */
+
+    @media (max-width: 1100px) {
+
+        .chair-login-top,
+        .chair-login-container,
+        .chair-return {
 
             width:
-                min(100%,
-                    470px);
+                calc(100% - 48px);
         }
 
 
-        .eyebrow {
+        .chair-login-container {
 
-            font-size: 10px;
+            grid-template-columns: 1fr;
 
-            font-weight: 900;
-
-            letter-spacing: 3px;
-
-            color: #666;
-
-            margin-bottom: 18px;
-        }
-
-
-        h1 {
-
-            font-size:
-                clamp(55px,
-                    11vw,
-                    90px);
-
-            line-height:
-                0.88;
-
-            font-weight: 900;
-
-            letter-spacing:
-                -5px;
-
-            margin-bottom: 28px;
-        }
-
-
-        .description {
-
-            color: #777;
-
-            font-size: 13px;
-
-            line-height: 1.7;
-
-            margin-bottom: 42px;
-        }
-
-
-        /* ================================================
-           ERROR
-        ================================================ */
-
-        .error {
-
-            padding: 13px 15px;
-
-            margin-bottom: 18px;
-
-            border:
-                1px solid #444;
-
-            background:
-                #111;
-
-            color:
-                #aaa;
-
-            font-size: 10px;
-
-            font-weight: 800;
-
-            letter-spacing:
-                0.8px;
-        }
-
-
-        /* ================================================
-           FORM
-        ================================================ */
-
-        form {
-            width: 100%;
-        }
-
-
-        label {
-
-            display: block;
-
-            margin-bottom: 9px;
-
-            color: #777;
-
-            font-size: 9px;
-
-            font-weight: 900;
-
-            letter-spacing: 2px;
-        }
-
-
-        input {
-
-            width: 100%;
+            gap: 60px;
 
             padding:
-                17px 16px;
-
-            margin-bottom: 18px;
-
-            border:
-                1px solid #333;
-
-            outline: none;
-
-            background:
-                #111;
-
-            color:
-                white;
-
-            font-size:
-                15px;
-
-            transition:
-                border-color 0.2s ease,
-                background 0.2s ease;
+                80px 0 100px;
         }
 
 
-        input:focus {
+        .chair-login-introduction {
 
-            border-color:
-                #777;
-
-            background:
-                #151515;
+            min-height: auto;
         }
 
 
-        input::placeholder {
-
-            color:
-                #444;
-        }
-
-
-        button {
-
-            width: 100%;
+        .chair-introduction-main {
 
             padding:
-                17px 20px;
+                70px 0;
+        }
 
-            border:
-                1px solid white;
 
-            background:
-                white;
-
-            color:
-                #000;
-
-            cursor:
-                pointer;
+        .chair-introduction-main h1 {
 
             font-size:
-                10px;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                1.5px;
-
-            transition:
-                transform 0.2s ease,
-                background 0.2s ease;
+                clamp(5rem, 14vw, 9rem);
         }
 
 
-        button:hover {
+        .chair-login-panel {
 
-            transform:
-                translateY(-3px);
-
-            background:
-                #ddd;
+            width:
+                min(100%, 650px);
         }
 
 
-        /* ================================================
-           FOOTER
-        ================================================ */
+        .chair-access-information,
+        .chair-security-strip {
 
-        .footer {
+            padding-left: 24px;
+            padding-right: 24px;
+        }
 
-            margin-top:
-                35px;
 
-            padding-top:
-                18px;
+        .chair-access-grid {
 
-            border-top:
-                1px solid #222;
+            grid-template-columns: 1fr;
+        }
 
-            color:
-                #444;
+
+        .chair-access-item,
+        .chair-access-item+.chair-access-item {
+
+            padding:
+                30px 0;
+
+            border-right: 0;
+
+            border-bottom:
+                1px solid rgba(255, 255, 255, .08);
+        }
+
+
+        .chair-access-item:last-child {
+
+            border-bottom: 0;
+        }
+
+    }
+
+
+    @media (max-width: 700px) {
+
+        .chair-login-top,
+        .chair-login-container,
+        .chair-return {
+
+            width:
+                calc(100% - 32px);
+        }
+
+
+        .chair-login-top {
+
+            padding: 21px 0;
+        }
+
+
+        .chair-system-status {
+
+            display: none;
+        }
+
+
+        .chair-grid {
+
+            background-size:
+                50px 50px;
+        }
+
+
+        .chair-bg-word {
+
+            top: 80px;
+
+            right: -45px;
+
+            font-size: 10rem;
+        }
+
+
+        .chair-bg-number {
+
+            bottom: -30px;
+
+            left: -20px;
+
+            font-size: 13rem;
+        }
+
+
+        .chair-login-container {
+
+            padding:
+                55px 0 70px;
+
+            gap: 45px;
+        }
+
+
+        .chair-introduction-main {
+
+            padding:
+                55px 0;
+        }
+
+
+        .chair-introduction-main h1 {
 
             font-size:
-                8px;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                1.5px;
+                clamp(4.5rem, 22vw, 7rem);
         }
 
 
-        @media (max-width: 500px) {
+        .chair-introduction-text {
 
-            body {
-                padding:
-                    25px;
+            margin-top: 27px;
+
+            font-size: .78rem;
+        }
+
+
+        .chair-login-warning {
+
+            grid-template-columns:
+                30px minmax(0, 1fr);
+        }
+
+
+        .chair-login-panel {
+
+            padding:
+                28px 20px;
+        }
+
+
+        .chair-panel-header {
+
+            margin-bottom: 30px;
+        }
+
+
+        .chair-panel-header h2 {
+
+            font-size: 1.7rem;
+        }
+
+
+        .chair-form-options {
+
+            align-items: flex-start;
+
+            flex-direction: column;
+
+            gap: 13px;
+        }
+
+
+        .chair-submit {
+
+            min-height: 59px;
+        }
+
+
+        .chair-access-information {
+
+            padding:
+                55px 16px;
+        }
+
+
+        .chair-access-heading {
+
+            margin-bottom: 25px;
+        }
+
+
+        .chair-access-item {
+
+            grid-template-columns:
+                38px minmax(0, 1fr);
+
+            gap: 12px;
+        }
+
+
+        .chair-access-item+.chair-access-item {
+
+            padding-left: 0;
+        }
+
+
+        .chair-security-strip {
+
+            padding:
+                45px 16px;
+        }
+
+
+        .chair-security-strip-inner {
+
+            grid-template-columns: 1fr;
+
+            gap: 30px;
+        }
+
+
+        .chair-security-block,
+        .chair-security-block+.chair-security-block {
+
+            padding:
+                0 0 30px;
+
+            border-left: 0;
+
+            border-bottom:
+                1px solid rgba(255, 255, 255, .08);
+        }
+
+
+        .chair-security-block:last-child {
+
+            padding-bottom: 0;
+
+            border-bottom: 0;
+        }
+
+
+        .chair-return {
+
+            min-height: 85px;
+        }
+
+
+        .chair-return-label {
+
+            display: none;
+        }
+
+    }
+
+
+    @media (max-width: 430px) {
+
+        .chair-input-index {
+
+            width: 42px;
+
+            flex-basis: 42px;
+        }
+
+
+        .chair-input-wrapper input {
+
+            padding-left: 12px;
+
+            padding-right: 8px;
+        }
+
+
+        .chair-password-toggle {
+
+            padding: 0 10px;
+
+            font-size: .51rem;
+        }
+
+
+        .chair-introduction-main h1 {
+
+            font-size: 4.25rem;
+        }
+
+
+        .chair-login-panel {
+
+            padding:
+                25px 16px;
+        }
+
+    }
+
+
+    @media (prefers-reduced-motion: reduce) {
+
+        .chair-system-dot {
+
+            animation: none;
+        }
+
+
+        .chair-submit,
+        .chair-submit::before,
+        .chair-password-toggle,
+        .chair-return a,
+        .chair-return-arrow,
+        .chair-login-panel {
+
+            transition: none !important;
+        }
+
+    }
+</style>
+
+
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            const form =
+                document.getElementById(
+                    "chairLoginForm"
+                );
+
+            const password =
+                document.getElementById(
+                    "password"
+                );
+
+            const toggle =
+                document.getElementById(
+                    "passwordToggle"
+                );
+
+            const submit =
+                document.getElementById(
+                    "chairSubmit"
+                );
+
+
+            /* =====================================================
+               PASSWORD TOGGLE
+            ====================================================== */
+
+            if (
+                toggle &&
+                password
+            ) {
+
+                toggle.addEventListener(
+                    "click",
+                    function () {
+
+                        const isPassword =
+                            password.type === "password";
+
+
+                        password.type =
+                            isPassword
+                                ? "text"
+                                : "password";
+
+
+                        toggle.textContent =
+                            isPassword
+                                ? "HIDE"
+                                : "SHOW";
+
+
+                        toggle.setAttribute(
+                            "aria-label",
+                            isPassword
+                                ? "Hide password"
+                                : "Show password"
+                        );
+
+                    }
+                );
+
             }
 
-            .back {
 
-                top: 22px;
-                left: 22px;
+            /* =====================================================
+               SUBMIT ANIMATION
+            ====================================================== */
+
+            if (
+                form &&
+                submit
+            ) {
+
+                form.addEventListener(
+                    "submit",
+                    function () {
+
+                        if (
+                            submit.classList.contains(
+                                "is-loading"
+                            )
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        submit.classList.add(
+                            "is-loading"
+                        );
+
+                    }
+                );
+
             }
 
-            .login-wrapper {
 
-                margin-top:
-                    35px;
+            /* =====================================================
+               INPUT MICRO-INTERACTION
+            ====================================================== */
+
+            const inputs =
+                document.querySelectorAll(
+                    ".chair-input-wrapper input"
+                );
+
+
+            inputs.forEach(
+                function (input) {
+
+                    input.addEventListener(
+                        "focus",
+                        function () {
+
+                            const wrapper =
+                                input.closest(
+                                    ".chair-input-wrapper"
+                                );
+
+
+                            if (wrapper) {
+
+                                wrapper.style.transform =
+                                    "translateX(3px)";
+
+                            }
+
+                        }
+                    );
+
+
+                    input.addEventListener(
+                        "blur",
+                        function () {
+
+                            const wrapper =
+                                input.closest(
+                                    ".chair-input-wrapper"
+                                );
+
+
+                            if (wrapper) {
+
+                                wrapper.style.transform =
+                                    "";
+
+                            }
+
+                        }
+                    );
+
+                }
+            );
+
+
+            /* =====================================================
+               PANEL POINTER EFFECT
+            ====================================================== */
+
+            const panel =
+                document.querySelector(
+                    ".chair-login-panel"
+                );
+
+
+            if (
+                panel &&
+                window.innerWidth > 900
+            ) {
+
+                panel.addEventListener(
+                    "mousemove",
+                    function (event) {
+
+                        const rect =
+                            panel.getBoundingClientRect();
+
+
+                        const x =
+                            (
+                                event.clientX -
+                                rect.left
+                            ) / rect.width;
+
+
+                        const y =
+                            (
+                                event.clientY -
+                                rect.top
+                            ) / rect.height;
+
+
+                        const rotateX =
+                            (0.5 - y) * 1.2;
+
+
+                        const rotateY =
+                            (x - 0.5) * 1.2;
+
+
+                        panel.style.transform =
+                            `perspective(1200px)
+                         rotateX(${rotateX}deg)
+                         rotateY(${rotateY}deg)`;
+
+                    }
+                );
+
+
+                panel.addEventListener(
+                    "mouseleave",
+                    function () {
+
+                        panel.style.transform = "";
+
+                    }
+                );
+
             }
 
-            h1 {
 
-                letter-spacing:
-                    -3px;
+            /* =====================================================
+               ENTER ON USERNAME
+            ====================================================== */
+
+            const username =
+                document.getElementById(
+                    "username"
+                );
+
+
+            if (
+                username &&
+                password
+            ) {
+
+                username.addEventListener(
+                    "keydown",
+                    function (event) {
+
+                        if (
+                            event.key === "Enter"
+                        ) {
+
+                            event.preventDefault();
+
+                            password.focus();
+
+                        }
+
+                    }
+                );
+
             }
 
         }
-    </style>
+    );
 
-</head>
+</script>
 
-
-<body>
-
-
-    <a href="{{ url_for('articles') }}" class="back">
-        ← BACK TO ARTICLES
-    </a>
-
-
-    <main class="login-wrapper">
-
-
-        <div class="eyebrow">
-            RESTRICTED ACCESS
-        </div>
-
-
-        <h1>
-            CHAIR<br>
-            LOGIN.
-        </h1>
-
-
-        <p class="description">
-            Authorized chair access provides moderation
-            controls for the press archive.
-        </p>
-
-
-        {% if error %}
-
-        <div class="error">
-            {{ error }}
-        </div>
-
-        {% endif %}
-
-
-        <form method="POST" action="{{ url_for('chair_login') }}">
-
-            <label for="password">
-                CHAIR PASSWORD
-            </label>
-
-
-            <input type="password" id="password" name="password" placeholder="Enter chair password"
-                autocomplete="current-password" required>
-
-
-            <button type="submit">
-                ENTER CHAIR MODE →
-            </button>
-
-        </form>
-
-
-        <div class="footer">
-            RESTRICTED ACCESS
-        </div>
-
-
-    </main>
-
-
-</body>
-
-</html>
+{% endblock %}

@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+
+{% block title %}
+ACC — Committee Access
+{% endblock %}
+
+
+{% block content %}
+
+<section class="login-page">
+
+    <!-- ======================================================
+         LEFT — INTRODUCTION
+         ====================================================== -->
+
+    <div class="login-side">
+
+        <div class="login-index">
+            ACC / SECURE ACCESS
+        </div>
+
+
+        <h1>
+            ENTER<br>
+            THE<br>
+            <span>COMMITTEE.</span>
+        </h1>
+
+
+        <p>
+            Access your assigned Arkanian Crisis Committee
+            workspace. Delegates can manage private notes,
+            press delegates can publish reports, and the
+            chair can manage the live crisis environment.
+        </p>
+
+    </div>
+
+
+    <!-- ======================================================
+         RIGHT — LOGIN FORM
+         ====================================================== -->
+
+    <div class="login-card">
+
+        <div class="login-label">
+            COMMITTEE CREDENTIALS
+        </div>
+
+
+        <h2>
+            Sign in.
+        </h2>
+
+
+        <!-- ================================================
+             ERROR
+             ================================================ -->
+
+        {% if error %}
+
+        <div class="form-error" role="alert">
+            {{ error }}
+        </div>
+
+        {% endif %}
+
+
+        <!-- ================================================
+             LOGIN FORM
+             ================================================ -->
+
+        <form method="POST" action="{{ url_for('login') }}" autocomplete="on">
+
+            <!-- USERNAME -->
+
+            <label for="username">
+                NAME / USERNAME
+            </label>
+
+            <input type="text" id="username" name="username" placeholder="Enter your assigned name"
+                autocomplete="username" autocapitalize="none" spellcheck="false" required>
+
+
+            <!-- PASSWORD -->
+
+            <label for="password">
+                PASSWORD
+            </label>
+
+            <input type="password" id="password" name="password" placeholder="Enter your password"
+                autocomplete="current-password" required>
+
+
+            <!-- SUBMIT -->
+
+            <button type="submit" class="button button-primary full" style="margin-top: 30px;">
+                ENTER COMMITTEE
+            </button>
+
+        </form>
+
+
+        <!-- ================================================
+             ACCESS INFORMATION
+             ================================================ -->
+
+        <div class="login-note">
+
+            <strong style="color: #aaa;">
+                ACCESS LEVELS
+            </strong>
+
+            <br><br>
+
+            <strong style="color: #aaa;">
+                DELEGATE
+            </strong>
+            <br>
+            Private notes and delegate workspace.
+
+            <br><br>
+
+            <strong style="color: #aaa;">
+                PRESS
+            </strong>
+            <br>
+            Press archive and article publishing.
+
+            <br><br>
+
+            <strong style="color: #aaa;">
+                CHAIR
+            </strong>
+            <br>
+            Crisis management and committee administration.
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     ACCESS INFORMATION STRIP
+     ============================================================ -->
+
+<section class="home-grid">
+
+    <div class="section-heading">
+
+        <span>
+            ACCESS / 01
+        </span>
+
+        <h2>
+            ONE<br>
+            PLATFORM.
+        </h2>
+
+    </div>
+
+
+    <div>
+
+        <div class="preview-list">
+
+            <!-- DELEGATE -->
+
+            <div class="preview-item">
+
+                <div>
+
+                    <span class="preview-author">
+                        DELEGATE WORKSPACE
+                    </span>
+
+                    <h3>
+                        Your notes stay yours.
+                    </h3>
+
+                </div>
+
+                <div class="preview-arrow">
+                    01
+                </div>
+
+            </div>
+
+
+            <!-- PRESS -->
+
+            <div class="preview-item">
+
+                <div>
+
+                    <span class="preview-author">
+                        PRESS CORPS
+                    </span>
+
+                    <h3>
+                        Report the committee.
+                    </h3>
+
+                </div>
+
+                <div class="preview-arrow">
+                    02
+                </div>
+
+            </div>
+
+
+            <!-- CHAIR -->
+
+            <div class="preview-item">
+
+                <div>
+
+                    <span class="preview-author">
+                        COMMITTEE CHAIR
+                    </span>
+
+                    <h3>
+                        Shape the crisis.
+                    </h3>
+
+                </div>
+
+                <div class="preview-arrow">
+                    03
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============================================================
+     SECURITY NOTICE
+     ============================================================ -->
+
+<section class="manifesto">
+
+    <div>
+
+        <div class="manifesto-number">
+            02
+        </div>
+
+    </div>
+
+
+    <div>
+
+        <div class="manifesto-label">
+            PRIVATE ACCESS
+        </div>
+
+        <h2>
+            YOUR<br>
+            <em>WORKSPACE</em><br>
+            IS YOURS.
+        </h2>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+    /*
+     * =========================================================
+     * LOGIN PAGE MICRO-INTERACTION
+     * =========================================================
+     */
+
+    const loginCard =
+        document.querySelector(".login-card");
+
+    if (
+        loginCard &&
+        window.matchMedia(
+            "(pointer: fine)"
+        ).matches
+    ) {
+
+        loginCard.addEventListener(
+            "mousemove",
+            function (event) {
+
+                const rect =
+                    loginCard.getBoundingClientRect();
+
+                const x =
+                    (event.clientX - rect.left)
+                    / rect.width
+                    - 0.5;
+
+                const y =
+                    (event.clientY - rect.top)
+                    / rect.height
+                    - 0.5;
+
+
+                /*
+                 * Extremely subtle movement.
+                 * We don't want the login box flying
+                 * around while someone types.
+                 */
+
+                loginCard.style.transform =
+                    `
+                    translate(
+                        ${x * 3}px,
+                        ${y * 3}px
+                    )
+                    `;
+
+            }
+        );
+
+
+        loginCard.addEventListener(
+            "mouseleave",
+            function () {
+
+                loginCard.style.transform =
+                    "translate(0, 0)";
+
+            }
+        );
+
+    }
+
+
+    /*
+     * =========================================================
+     * PASSWORD VISIBILITY
+     * =========================================================
+     *
+     * Double-clicking the password field toggles visibility.
+     * This keeps the interface minimal without adding another
+     * visible button.
+     */
+
+    const passwordInput =
+        document.getElementById("password");
+
+    if (passwordInput) {
+
+        passwordInput.addEventListener(
+            "dblclick",
+            function () {
+
+                if (
+                    passwordInput.type ===
+                    "password"
+                ) {
+
+                    passwordInput.type =
+                        "text";
+
+                } else {
+
+                    passwordInput.type =
+                        "password";
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /*
+     * =========================================================
+     * AUTO FOCUS
+     * =========================================================
+     */
+
+    const usernameInput =
+        document.getElementById("username");
+
+    if (
+        usernameInput &&
+        window.innerWidth > 700
+    ) {
+
+        window.setTimeout(
+            function () {
+
+                usernameInput.focus();
+
+            },
+            500
+        );
+
+    }
+
+</script>
+
+{% endblock %}

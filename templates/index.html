@@ -1,997 +1,1191 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block title %}
+Arkanian Crisis Committee — Crisis. Diplomacy. Decision.
+{% endblock %}
 
-    <title>ACC — Arkanian Crisis Committee</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+{% block content %}
+
+<style>
+    /* =========================================================
+       ACC HOMEPAGE
+       ========================================================= */
+
+    .home-page {
+        overflow: hidden;
+        background: #050505;
+        color: #fff;
+    }
+
+
+    /* =========================================================
+       HERO
+       ========================================================= */
+
+    .home-hero {
+        position: relative;
+        min-height: calc(100vh - 82px);
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        border-bottom: 1px solid rgba(255, 255, 255, .1);
+    }
+
+
+    .home-hero-grid {
+        position: absolute;
+        inset: 0;
+        opacity: .13;
+        background-image:
+            linear-gradient(rgba(255, 255, 255, .1) 1px,
+                transparent 1px),
+            linear-gradient(90deg,
+                rgba(255, 255, 255, .1) 1px,
+                transparent 1px);
+        background-size: 80px 80px;
+        mask-image:
+            linear-gradient(to bottom,
+                transparent,
+                black 25%,
+                black 70%,
+                transparent);
+    }
+
+
+    .home-hero-glow {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        right: -180px;
+        top: 50%;
+        transform: translateY(-50%);
+        border-radius: 50%;
+        background: radial-gradient(circle,
+                rgba(255, 255, 255, .075),
+                transparent 68%);
+        pointer-events: none;
+    }
+
+
+    .home-hero-number {
+        position: absolute;
+        right: 5vw;
+        top: 14%;
+        font-family: monospace;
+        font-size: .6rem;
+        letter-spacing: .2em;
+        color: rgba(255, 255, 255, .23);
+    }
+
+
+    .home-hero-number::before {
+        content: "";
+        display: inline-block;
+        width: 35px;
+        height: 1px;
+        margin-right: 12px;
+        vertical-align: middle;
+        background: rgba(255, 255, 255, .3);
+    }
+
+
+    .home-hero-content {
+        position: relative;
+        z-index: 2;
+        width: min(1300px, 90%);
+        margin: 0 auto;
+        padding: 100px 0;
+    }
+
+
+    .home-kicker {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        margin-bottom: 30px;
+        font-family: monospace;
+        font-size: .62rem;
+        letter-spacing: .22em;
+        color: rgba(255, 255, 255, .4);
+        text-transform: uppercase;
+    }
+
+
+    .home-kicker-line {
+        width: 50px;
+        height: 1px;
+        background: rgba(255, 255, 255, .4);
+    }
+
+
+    .home-title {
+        margin: 0;
+        max-width: 1200px;
+        font-size: clamp(4.5rem, 11vw, 12rem);
+        line-height: .77;
+        letter-spacing: -.085em;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+
+    .home-title span {
+        display: block;
+    }
+
+
+    .home-title .muted {
+        color: rgba(255, 255, 255, .28);
+    }
+
+
+    .home-description {
+        max-width: 560px;
+        margin-top: 45px;
+        color: rgba(255, 255, 255, .5);
+        font-size: .95rem;
+        line-height: 1.8;
+    }
+
+
+    .home-description strong {
+        color: #fff;
+    }
+
+
+    /* =========================================================
+       HERO ACTIONS
+       ========================================================= */
+
+    .home-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 38px;
+    }
+
+
+    .home-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 16px;
+        min-height: 52px;
+        padding: 0 20px;
+        border: 1px solid rgba(255, 255, 255, .2);
+        color: #fff;
+        text-decoration: none;
+        font-size: .63rem;
+        font-weight: 700;
+        letter-spacing: .13em;
+        text-transform: uppercase;
+        transition:
+            background .25s ease,
+            color .25s ease,
+            transform .25s ease,
+            border-color .25s ease;
+    }
+
+
+    .home-action:hover {
+        background: #fff;
+        border-color: #fff;
+        color: #050505;
+        transform: translateY(-4px);
+    }
+
+
+    .home-action.primary {
+        background: #fff;
+        color: #050505;
+        border-color: #fff;
+    }
+
+
+    .home-action.primary:hover {
+        background: transparent;
+        color: #fff;
+    }
+
+
+    .home-action-arrow {
+        transition: transform .25s ease;
+    }
+
+
+    .home-action:hover .home-action-arrow {
+        transform: translateX(5px);
+    }
+
+
+    /* =========================================================
+       HERO STATUS
+       ========================================================= */
+
+    .home-status {
+        position: absolute;
+        z-index: 2;
+        bottom: 38px;
+        left: 5%;
+        right: 5%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 30px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(255, 255, 255, .12);
+        font-family: monospace;
+        font-size: .53rem;
+        letter-spacing: .14em;
+        color: rgba(255, 255, 255, .23);
+        text-transform: uppercase;
+    }
+
+
+    .home-status-live {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+
+    .home-status-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 12px rgba(255, 255, 255, .8);
+    }
+
+
+    /* =========================================================
+       ROLE SECTION
+       ========================================================= */
+
+    .home-section {
+        width: min(1300px, 90%);
+        margin: 0 auto;
+        padding: 130px 0;
+    }
+
+
+    .home-section-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 30px;
+        margin-bottom: 50px;
+    }
+
+
+    .home-section-label {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        margin-bottom: 17px;
+        font-family: monospace;
+        font-size: .58rem;
+        letter-spacing: .2em;
+        color: rgba(255, 255, 255, .3);
+        text-transform: uppercase;
+    }
+
+
+    .home-section-label::before {
+        content: "";
+        width: 38px;
+        height: 1px;
+        background: rgba(255, 255, 255, .35);
+    }
+
+
+    .home-section-heading h2 {
+        margin: 0;
+        font-size: clamp(2.5rem, 5vw, 5.5rem);
+        line-height: .88;
+        letter-spacing: -.065em;
+    }
+
+
+    .home-section-heading p {
+        max-width: 380px;
+        margin: 0;
+        color: rgba(255, 255, 255, .35);
+        font-size: .78rem;
+        line-height: 1.7;
+    }
+
+
+    /* =========================================================
+       ROLE CARDS
+       ========================================================= */
+
+    .role-grid {
+        display: grid;
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+        border-top: 1px solid rgba(255, 255, 255, .13);
+        border-bottom: 1px solid rgba(255, 255, 255, .13);
+    }
+
+
+    .role-card {
+        position: relative;
+        min-height: 480px;
+        padding: 30px;
+        border-right: 1px solid rgba(255, 255, 255, .13);
+        overflow: hidden;
+        text-decoration: none;
+        color: #fff;
+        transition:
+            background .3s ease,
+            transform .35s cubic-bezier(.22, 1, .36, 1);
+    }
+
+
+    .role-card:last-child {
+        border-right: none;
+    }
+
+
+    .role-card:hover {
+        background: rgba(255, 255, 255, .035);
+        transform: translateY(-7px);
+    }
+
+
+    .role-card-number {
+        display: flex;
+        justify-content: space-between;
+        font-family: monospace;
+        font-size: .6rem;
+        color: rgba(255, 255, 255, .25);
+    }
+
+
+    .role-card-arrow {
+        font-size: 1.1rem;
+        transition: transform .3s ease;
+    }
+
+
+    .role-card:hover .role-card-arrow {
+        transform: translate(5px, -5px);
+    }
+
+
+    .role-card-content {
+        position: absolute;
+        left: 30px;
+        right: 30px;
+        bottom: 30px;
+    }
+
+
+    .role-card-title {
+        font-size: clamp(2rem, 3vw, 3.4rem);
+        line-height: .9;
+        letter-spacing: -.06em;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
+
+    .role-card-description {
+        max-width: 330px;
+        margin-top: 18px;
+        color: rgba(255, 255, 255, .4);
+        font-size: .76rem;
+        line-height: 1.7;
+    }
+
+
+    .role-card-link {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 25px;
+        padding-top: 17px;
+        border-top: 1px solid rgba(255, 255, 255, .12);
+        font-family: monospace;
+        font-size: .56rem;
+        letter-spacing: .14em;
+        color: rgba(255, 255, 255, .45);
+    }
+
+
+    /* =========================================================
+       CRISIS / ARTICLES SPLIT
+       ========================================================= */
+
+    .home-feature-grid {
+        display: grid;
+        grid-template-columns: 1.15fr .85fr;
+        border-top: 1px solid rgba(255, 255, 255, .13);
+        border-bottom: 1px solid rgba(255, 255, 255, .13);
+    }
+
+
+    .home-feature {
+        position: relative;
+        min-height: 440px;
+        padding: 35px;
+        border-right: 1px solid rgba(255, 255, 255, .13);
+        overflow: hidden;
+    }
+
+
+    .home-feature:last-child {
+        border-right: none;
+    }
+
+
+    .home-feature-label {
+        display: flex;
+        justify-content: space-between;
+        font-family: monospace;
+        font-size: .57rem;
+        letter-spacing: .15em;
+        color: rgba(255, 255, 255, .27);
+        text-transform: uppercase;
+    }
+
+
+    .home-feature-content {
+        position: absolute;
+        left: 35px;
+        right: 35px;
+        bottom: 35px;
+    }
+
+
+    .home-feature-content h3 {
+        margin: 0;
+        font-size: clamp(2rem, 4vw, 4.2rem);
+        line-height: .88;
+        letter-spacing: -.06em;
+    }
+
+
+    .home-feature-content p {
+        max-width: 520px;
+        margin: 20px 0 0;
+        color: rgba(255, 255, 255, .4);
+        font-size: .77rem;
+        line-height: 1.7;
+    }
+
+
+    .home-feature-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 25px;
+        color: #fff;
+        text-decoration: none;
+        font-family: monospace;
+        font-size: .58rem;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+    }
+
+
+    .home-feature-link span {
+        transition: transform .25s ease;
+    }
+
+
+    .home-feature-link:hover span {
+        transform: translateX(5px);
+    }
+
+
+    /* =========================================================
+       LATEST CRISIS
+       ========================================================= */
+
+    .home-crisis-card {
+        margin-top: 20px;
+        padding: 25px;
+        border: 1px solid rgba(255, 255, 255, .12);
+        background: rgba(255, 255, 255, .02);
+    }
+
+
+    .home-crisis-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        letter-spacing: -.035em;
+    }
+
+
+    .home-crisis-description {
+        margin-top: 10px;
+        color: rgba(255, 255, 255, .4);
+        font-size: .74rem;
+        line-height: 1.7;
+    }
+
+
+    .home-empty {
+        color: rgba(255, 255, 255, .28);
+        font-family: monospace;
+        font-size: .63rem;
+        letter-spacing: .08em;
+    }
+
+
+    /* =========================================================
+       MANIFESTO
+       ========================================================= */
+
+    .home-manifesto {
+        padding: 150px 0;
+        border-top: 1px solid rgba(255, 255, 255, .1);
+        border-bottom: 1px solid rgba(255, 255, 255, .1);
+    }
+
+
+    .home-manifesto-inner {
+        width: min(1300px, 90%);
+        margin: 0 auto;
+    }
+
+
+    .home-manifesto-text {
+        max-width: 1100px;
+        font-size: clamp(2.7rem, 6vw, 7rem);
+        line-height: .92;
+        letter-spacing: -.07em;
+        font-weight: 800;
+    }
+
+
+    .home-manifesto-text span {
+        color: rgba(255, 255, 255, .23);
+    }
+
+
+    /* =========================================================
+       FINAL CTA
+       ========================================================= */
+
+    .home-final {
+        position: relative;
+        padding: 150px 0;
+        text-align: center;
+        overflow: hidden;
+    }
+
+
+    .home-final::before {
+        content: "ACC";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        font-size: clamp(12rem, 35vw, 35rem);
+        line-height: .7;
+        font-weight: 900;
+        letter-spacing: -.1em;
+        color: rgba(255, 255, 255, .025);
+        pointer-events: none;
+    }
+
+
+    .home-final-inner {
+        position: relative;
+        z-index: 2;
+        width: min(900px, 90%);
+        margin: 0 auto;
+    }
+
+
+    .home-final-label {
+        margin-bottom: 25px;
+        font-family: monospace;
+        font-size: .58rem;
+        letter-spacing: .2em;
+        color: rgba(255, 255, 255, .3);
+    }
+
+
+    .home-final h2 {
+        margin: 0;
+        font-size: clamp(3.5rem, 8vw, 8rem);
+        line-height: .82;
+        letter-spacing: -.08em;
+    }
+
+
+    .home-final p {
+        max-width: 500px;
+        margin: 30px auto 0;
+        color: rgba(255, 255, 255, .38);
+        font-size: .82rem;
+        line-height: 1.7;
+    }
+
+
+    .home-final-actions {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 35px;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+       ========================================================= */
+
+    @media (max-width: 900px) {
+
+        .home-hero {
+            min-height: calc(100vh - 72px);
         }
 
-        html {
-            scroll-behavior: smooth;
+        .role-grid {
+            grid-template-columns: 1fr;
         }
 
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #050505;
-            color: #f5f5f5;
-            overflow-x: hidden;
+        .role-card {
+            min-height: 360px;
+            border-right: none;
+            border-bottom: 1px solid rgba(255, 255, 255, .13);
         }
 
-        a {
-            color: inherit;
-            text-decoration: none;
+        .role-card:last-child {
+            border-bottom: none;
         }
 
-        /* =========================
-           BACKGROUND
-        ========================= */
-
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            z-index: -5;
-            pointer-events: none;
-
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.018) 1px,
-                    transparent 1px),
-                linear-gradient(90deg,
-                    rgba(255, 255, 255, 0.018) 1px,
-                    transparent 1px);
-
-            background-size: 60px 60px;
+        .home-feature-grid {
+            grid-template-columns: 1fr;
         }
 
-        body::after {
-            content: "";
-            position: fixed;
-            inset: 0;
-            z-index: -4;
-            pointer-events: none;
-
-            background:
-                radial-gradient(circle at 50% 30%,
-                    rgba(255, 255, 255, 0.045),
-                    transparent 38%);
+        .home-feature {
+            min-height: 350px;
+            border-right: none;
+            border-bottom: 1px solid rgba(255, 255, 255, .13);
         }
 
-        /* =========================
-           CURSOR LIGHT
-        ========================= */
-
-        #cursor-light {
-            position: fixed;
-
-            width: 330px;
-            height: 330px;
-
-            left: 0;
-            top: 0;
-
-            transform: translate(-50%, -50%);
-
-            pointer-events: none;
-            z-index: 999999;
-
-            border-radius: 50%;
-
-            opacity: 0;
-
-            background: radial-gradient(circle,
-                    rgba(255, 255, 255, 0.18) 0%,
-                    rgba(255, 255, 255, 0.10) 18%,
-                    rgba(255, 255, 255, 0.045) 38%,
-                    rgba(255, 255, 255, 0.015) 55%,
-                    transparent 72%);
-
-            filter: blur(2px);
-            mix-blend-mode: screen;
-
-            will-change: left, top;
+        .home-feature:last-child {
+            border-bottom: none;
         }
 
-        /* =========================
-           NAVBAR
-        ========================= */
+    }
 
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
 
-            width: 100%;
-            height: 74px;
+    @media (max-width: 600px) {
 
-            padding: 0 5vw;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            background: rgba(5, 5, 5, 0.78);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-
-            z-index: 1000;
+        .home-hero-content {
+            width: calc(100% - 40px);
+            padding: 90px 0 130px;
         }
 
-        .logo {
-            font-size: 21px;
-            font-weight: 900;
-            letter-spacing: -1px;
+        .home-title {
+            font-size: clamp(3.6rem, 17vw, 6rem);
         }
 
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 30px;
+        .home-description {
+            margin-top: 30px;
+            font-size: .83rem;
         }
 
-        .nav-link {
-            position: relative;
-
-            color: #888;
-
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: 1.7px;
-
-            transition:
-                color 0.25s ease,
-                transform 0.25s ease;
+        .home-status {
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 9px;
         }
 
-        .nav-link:hover {
-            color: white;
-            transform: translateY(-2px);
+        .home-section {
+            width: calc(100% - 40px);
+            padding: 90px 0;
         }
 
-        .nav-link::after {
-            content: "";
-
-            position: absolute;
-            left: 0;
-            bottom: -7px;
-
-            width: 0;
-            height: 1px;
-
-            background: white;
-
-            transition: width 0.25s ease;
-        }
-
-        .nav-link:hover::after {
-            width: 100%;
-        }
-
-        /* =========================
-           PROFILE
-        ========================= */
-
-        .profile-wrapper {
-            position: relative;
-        }
-
-        .profile-button {
-            width: 39px;
-            height: 39px;
-
-            border-radius: 50%;
-
-            border: 1px solid #393939;
-
-            background: #0b0b0b;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            cursor: pointer;
-
-            transition:
-                border-color 0.25s ease,
-                background 0.25s ease,
-                transform 0.25s ease;
-        }
-
-        .profile-button:hover {
-            border-color: #aaa;
-            background: #151515;
-            transform: translateY(-2px);
-        }
-
-        .person-icon {
-            position: relative;
-            width: 17px;
-            height: 18px;
-        }
-
-        .person-icon::before {
-            content: "";
-
-            position: absolute;
-
-            width: 7px;
-            height: 7px;
-
-            top: 0;
-            left: 50%;
-
-            transform: translateX(-50%);
-
-            border-radius: 50%;
-
-            background: white;
-        }
-
-        .person-icon::after {
-            content: "";
-
-            position: absolute;
-
-            width: 14px;
-            height: 8px;
-
-            bottom: 0;
-            left: 50%;
-
-            transform: translateX(-50%);
-
-            border-radius: 9px 9px 3px 3px;
-
-            background: white;
-        }
-
-        .profile-menu {
-            position: absolute;
-
-            top: 51px;
-            right: 0;
-
-            width: 225px;
-
-            padding: 18px;
-
-            background: rgba(10, 10, 10, 0.98);
-
-            border: 1px solid #292929;
-            border-radius: 12px;
-
-            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.6);
-
-            opacity: 0;
-            visibility: hidden;
-
-            transform: translateY(-8px);
-
-            transition:
-                opacity 0.2s ease,
-                transform 0.2s ease,
-                visibility 0.2s ease;
-        }
-
-        .profile-wrapper.open .profile-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .profile-title {
-            color: #666;
-
-            font-size: 9px;
-            font-weight: 800;
-            letter-spacing: 1.7px;
-
-            margin-bottom: 6px;
-        }
-
-        .profile-name {
-            font-size: 16px;
-            font-weight: 800;
-        }
-
-        .profile-divider {
-            height: 1px;
-            background: #252525;
-            margin: 16px 0 9px;
-        }
-
-        .profile-item {
+        .home-section-heading {
             display: block;
-
-            padding: 9px 0;
-
-            color: #999;
-
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.8px;
-
-            transition:
-                color 0.2s ease,
-                padding-left 0.2s ease;
         }
 
-        .profile-item:hover {
-            color: white;
-            padding-left: 5px;
+        .home-section-heading p {
+            margin-top: 20px;
         }
 
-        /* =========================
-           HERO
-        ========================= */
-
-        .hero {
-            min-height: 100vh;
-
-            padding:
-                145px 6vw 90px;
-
-            display: flex;
-            align-items: center;
+        .role-card {
+            min-height: 330px;
+            padding: 23px;
         }
 
-        .hero-container {
-            width: min(1240px, 100%);
-            margin: 0 auto;
-
-            display: grid;
-
-            grid-template-columns:
-                minmax(0, 1.15fr) minmax(320px, 0.85fr);
-
-            gap: 80px;
-
-            align-items: center;
+        .role-card-content {
+            left: 23px;
+            right: 23px;
+            bottom: 23px;
         }
 
-        /* =========================
-           HERO LEFT
-        ========================= */
-
-        .hero-label {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-
-            margin-bottom: 27px;
-
-            color: #777;
-
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 2px;
+        .home-feature {
+            min-height: 330px;
+            padding: 23px;
         }
 
-        .hero-label::before {
-            content: "";
-
-            width: 31px;
-            height: 1px;
-
-            background: #777;
+        .home-feature-content {
+            left: 23px;
+            right: 23px;
+            bottom: 23px;
         }
 
-        .hero-heading {
-            max-width: 760px;
-
-            font-size: clamp(54px, 7vw, 100px);
-            line-height: 0.92;
-
-            font-weight: 900;
-
-            letter-spacing: -0.065em;
+        .home-manifesto {
+            padding: 90px 0;
         }
 
-        .hero-heading .muted {
-            color: #686868;
+        .home-final {
+            padding: 100px 0;
         }
 
-        .hero-description {
-            max-width: 570px;
+    }
 
-            margin-top: 32px;
 
-            color: #8b8b8b;
+    @media (prefers-reduced-motion: reduce) {
 
-            font-size: 15px;
-            line-height: 1.8;
+        .home-action,
+        .role-card,
+        .role-card-arrow,
+        .home-feature-link span {
+            transition: none !important;
         }
 
-        .hero-actions {
-            display: flex;
-            flex-wrap: wrap;
+    }
+</style>
 
-            gap: 11px;
 
-            margin-top: 34px;
-        }
+<div class="home-page">
 
-        .action {
-            min-height: 46px;
 
-            padding: 0 20px;
+    <!-- =====================================================
+         HERO
+         ===================================================== -->
 
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+    <section class="home-hero">
 
-            border-radius: 3px;
-            border: 1px solid #353535;
+        <div class="home-hero-grid"></div>
 
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 1.1px;
+        <div class="home-hero-glow"></div>
 
-            transition:
-                transform 0.25s ease,
-                background 0.25s ease,
-                color 0.25s ease,
-                border-color 0.25s ease;
-        }
+        <div class="home-hero-number">
+            SYSTEM / 01
+        </div>
 
-        .action.primary {
-            color: #050505;
-            background: white;
-            border-color: white;
-        }
 
-        .action.secondary {
-            color: #999;
-            background: transparent;
-        }
+        <div class="home-hero-content">
 
-        .action:hover {
-            transform: translateY(-4px);
-        }
+            <div class="home-kicker">
+                <span class="home-kicker-line"></span>
+                <span>Arkanian Crisis Committee</span>
+            </div>
 
-        .action.primary:hover {
-            background: #dcdcdc;
-        }
 
-        .action.secondary:hover {
-            color: white;
-            border-color: #777;
-        }
+            <h1 class="home-title">
 
-        /* =========================
-           STATUS PANEL
-        ========================= */
+                <span>
+                    CRISIS.
+                </span>
 
-        .status-panel {
-            position: relative;
+                <span class="muted">
+                    DIPLOMACY.
+                </span>
 
-            min-height: 410px;
+                <span>
+                    DECISION.
+                </span>
 
-            padding: 27px;
+            </h1>
 
-            border: 1px solid #292929;
-            border-radius: 14px;
 
-            background:
-                linear-gradient(145deg,
-                    rgba(255, 255, 255, 0.045),
-                    rgba(255, 255, 255, 0.008));
+            <p class="home-description">
 
-            overflow: hidden;
+                A live political simulation where every
+                decision matters, every development changes
+                the situation, and every delegate has a role
+                in shaping the crisis.
 
-            transition:
-                transform 0.4s ease,
-                border-color 0.4s ease;
-        }
+                <strong>
+                    Welcome to the Arkanian Crisis Committee.
+                </strong>
 
-        .status-panel:hover {
-            transform: translateY(-7px);
-            border-color: #4c4c4c;
-        }
+            </p>
 
-        .status-panel::before {
-            content: "";
 
-            position: absolute;
+            <div class="home-actions">
 
-            top: 0;
-            left: 0;
-            right: 0;
+                {% if user %}
 
-            height: 1px;
+                <a href="{{ url_for('profile') }}" class="home-action primary">
+                    <span>
+                        OPEN PROFILE
+                    </span>
 
-            background: linear-gradient(90deg,
-                    transparent,
-                    rgba(255, 255, 255, 0.5),
-                    transparent);
-        }
+                    <span class="home-action-arrow">
+                        →
+                    </span>
+                </a>
 
-        .panel-grid {
-            position: absolute;
-            inset: 0;
 
-            opacity: 0.6;
+                {% if user.role == "delegate" %}
 
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.025) 1px,
-                    transparent 1px),
-                linear-gradient(90deg,
-                    rgba(255, 255, 255, 0.025) 1px,
-                    transparent 1px);
+                <a href="{{ url_for('notes') }}" class="home-action">
+                    <span>
+                        OPEN NOTES
+                    </span>
 
-            background-size: 35px 35px;
+                    <span class="home-action-arrow">
+                        →
+                    </span>
+                </a>
 
-            mask-image: linear-gradient(to bottom,
-                    black,
-                    transparent);
-        }
+                {% elif user.role == "press" %}
 
-        .panel-content {
-            position: relative;
-            z-index: 2;
+                <a href="{{ url_for('press_upload') }}" class="home-action">
+                    <span>
+                        PUBLISH
+                    </span>
 
-            height: 100%;
+                    <span class="home-action-arrow">
+                        →
+                    </span>
+                </a>
 
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+                {% elif user.role == "chair" %}
 
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+                <a href="{{ url_for('crises') }}" class="home-action">
+                    <span>
+                        CRISIS CONTROL
+                    </span>
 
-            color: #666;
+                    <span class="home-action-arrow">
+                        →
+                    </span>
+                </a>
 
-            font-size: 9px;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-        }
+                {% endif %}
 
-        .panel-code {
-            color: #777;
-        }
+                {% else %}
 
-        .panel-status {
-            display: flex;
-            align-items: center;
-            gap: 7px;
+                <a href="{{ url_for('login') }}" class="home-action primary">
+                    <span>
+                        DELEGATE LOGIN
+                    </span>
 
-            color: #aaa;
-        }
+                    <span class="home-action-arrow">
+                        →
+                    </span>
+                </a>
 
-        .status-dot {
-            width: 6px;
-            height: 6px;
 
-            border-radius: 50%;
+                <button type="button" class="home-action" id="heroAccessButton">
+                    <span>
+                        OTHER ACCESS
+                    </span>
 
-            background: white;
-
-            box-shadow:
-                0 0 7px rgba(255, 255, 255, 0.8);
-
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.35;
-            }
-
-        }
-
-        .panel-main {
-            margin-top: 55px;
-        }
-
-        .panel-label {
-            color: #666;
-
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 2px;
-
-            margin-bottom: 17px;
-        }
-
-        .panel-active {
-            font-size: clamp(48px, 6vw, 76px);
-
-            font-weight: 900;
-            letter-spacing: -0.06em;
-
-            line-height: 0.9;
-        }
-
-        .panel-info {
-            margin-top: 35px;
-
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-
-            border-top: 1px solid #282828;
-        }
-
-        .info-item {
-            padding: 19px 0;
-
-            border-bottom: 1px solid #282828;
-        }
-
-        .info-item:nth-child(odd) {
-            margin-right: 18px;
-        }
-
-        .info-label {
-            color: #555;
-
-            font-size: 8px;
-            font-weight: 800;
-            letter-spacing: 1.3px;
-
-            margin-bottom: 7px;
-        }
-
-        .info-value {
-            color: #ccc;
-
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        .panel-footer {
-            padding-top: 20px;
-
-            color: #555;
-
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        /* =========================
-           LOWER SECTION
-        ========================= */
-
-        .overview {
-            padding: 120px 6vw 140px;
-
-            border-top: 1px solid #181818;
-        }
-
-        .overview-container {
-            width: min(1240px, 100%);
-            margin: 0 auto;
-        }
-
-        .section-label {
-            color: #5f5f5f;
-
-            font-size: 9px;
-            font-weight: 800;
-            letter-spacing: 2px;
-
-            margin-bottom: 17px;
-        }
-
-        .section-heading {
-            max-width: 850px;
-
-            font-size: clamp(37px, 5vw, 65px);
-
-            line-height: 0.96;
-
-            font-weight: 900;
-
-            letter-spacing: -0.055em;
-        }
-
-        .overview-grid {
-            margin-top: 65px;
-
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-
-            gap: 12px;
-        }
-
-        .overview-card {
-            min-height: 225px;
-
-            padding: 26px;
-
-            border: 1px solid #242424;
-            border-radius: 10px;
-
-            background: #080808;
-
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-
-            transition:
-                transform 0.3s ease,
-                border-color 0.3s ease,
-                background 0.3s ease;
-        }
-
-        .overview-card:hover {
-            transform: translateY(-7px);
-
-            border-color: #4a4a4a;
-
-            background: #0c0c0c;
-        }
-
-        .card-number {
-            color: #4d4d4d;
-
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-
-        .card-title {
-            margin-bottom: 9px;
-
-            font-size: 20px;
-            font-weight: 800;
-
-            letter-spacing: -0.03em;
-        }
-
-        .card-text {
-            color: #707070;
-
-            font-size: 12px;
-            line-height: 1.7;
-        }
-
-        /* =========================
-           FOOTER
-        ========================= */
-
-        footer {
-            padding: 30px 6vw;
-
-            border-top: 1px solid #181818;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            color: #505050;
-
-            font-size: 9px;
-            font-weight: 800;
-            letter-spacing: 1.2px;
-        }
-
-        /* =========================
-           RESPONSIVE
-        ========================= */
-
-        @media (max-width: 950px) {
-
-            .hero-container {
-                grid-template-columns: 1fr;
-                gap: 55px;
-            }
-
-            .status-panel {
-                min-height: 350px;
-            }
-
-            .overview-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .overview-card {
-                min-height: 190px;
-            }
-        }
-
-        @media (max-width: 650px) {
-
-            .navbar {
-                height: 68px;
-                padding: 0 20px;
-            }
-
-            .nav-right {
-                gap: 16px;
-            }
-
-            .nav-link {
-                display: none;
-            }
-
-            .hero {
-                padding:
-                    120px 20px 75px;
-            }
-
-            .hero-label {
-                font-size: 8px;
-                letter-spacing: 1.4px;
-            }
-
-            .hero-heading {
-                font-size: clamp(48px, 15vw, 76px);
-            }
-
-            .hero-description {
-                font-size: 13px;
-                margin-top: 25px;
-            }
-
-            .hero-actions {
-                margin-top: 27px;
-            }
-
-            .action {
-                width: 100%;
-            }
-
-            .status-panel {
-                min-height: 350px;
-                padding: 22px;
-            }
-
-            .panel-active {
-                font-size: 57px;
-            }
-
-            .overview {
-                padding:
-                    85px 20px 100px;
-            }
-
-            .section-heading {
-                font-size: 42px;
-            }
-
-            footer {
-                padding: 27px 20px;
-
-                flex-direction: column;
-                align-items: flex-start;
-
-                gap: 10px;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-
-            *,
-            *::before,
-            *::after {
-                animation-duration: 0.01ms !important;
-                transition-duration: 0.01ms !important;
-            }
-
-            html {
-                scroll-behavior: auto;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-    <div id="cursor-light"></div>
-
-
-    <!-- =========================
-     NAVIGATION
-========================= -->
-
-    <nav class="navbar">
-
-        <a href="/" class="logo">ACC.</a>
-
-        <div class="nav-right">
-
-            <a href="/" class="nav-link">
-                HOME
-            </a>
-
-            <a href="/articles" class="nav-link">
-                ARTICLES
-            </a>
-
-            <div class="profile-wrapper" id="profileWrapper">
-
-                <button class="profile-button" id="profileButton" aria-label="Open account menu" aria-expanded="false">
-                    <span class="person-icon"></span>
+                    <span class="home-action-arrow">
+                        →
+                    </span>
                 </button>
 
-                <div class="profile-menu">
+                {% endif %}
 
-                    {% if session.get("press_authenticated") %}
+            </div>
 
-                    <div class="profile-title">
-                        PRESS ACCOUNT
+        </div>
+
+
+        <div class="home-status">
+
+            <div class="home-status-live">
+                <span class="home-status-dot"></span>
+                <span>
+                    Committee network operational
+                </span>
+            </div>
+
+            <span>
+                ACC / 2026
+            </span>
+
+            <span>
+                SECURE SYSTEM
+            </span>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         ROLE SECTION
+         ===================================================== -->
+
+    <section class="home-section">
+
+        <div class="home-section-heading">
+
+            <div>
+
+                <div class="home-section-label">
+                    Access architecture
+                </div>
+
+                <h2>
+                    THREE ROLES.<br>
+                    ONE COMMITTEE.
+                </h2>
+
+            </div>
+
+            <p>
+                Every part of the committee has a dedicated
+                workspace. Select the portal corresponding
+                to your assigned role.
+            </p>
+
+        </div>
+
+
+        <div class="role-grid">
+
+
+            <!-- DELEGATE -->
+
+            <a href="{{ url_for('login') }}" class="role-card">
+
+                <div class="role-card-number">
+
+                    <span>
+                        01 / DELEGATE
+                    </span>
+
+                    <span class="role-card-arrow">
+                        ↗
+                    </span>
+
+                </div>
+
+
+                <div class="role-card-content">
+
+                    <div class="role-card-title">
+                        Delegate
                     </div>
 
-                    <div class="profile-name">
-                        {{ session.get("press_name") }}
+                    <div class="role-card-description">
+                        Represent your assigned delegation,
+                        prepare speeches, keep private notes,
+                        and participate directly in the crisis.
                     </div>
 
-                    <div class="profile-title" style="margin-top: 5px;">
-                        {{ session.get("press_publication") }}
+                    <div class="role-card-link">
+
+                        <span>
+                            DELEGATE LOGIN
+                        </span>
+
+                        <span>
+                            →
+                        </span>
+
                     </div>
 
-                    <div class="profile-divider"></div>
+                </div>
 
-                    <a href="/articles" class="profile-item">
-                        ARTICLES →
-                    </a>
+            </a>
 
-                    <a href="/press-upload" class="profile-item">
-                        UPLOAD ARTICLE →
-                    </a>
 
-                    <a href="/press-logout" class="profile-item">
-                        LOG OUT →
-                    </a>
+            <!-- PRESS -->
 
-                    {% elif session.get("chair_authenticated") %}
+            <a href="{{ url_for('press_login') }}" class="role-card">
 
-                    <div class="profile-title">
-                        CHAIR ACCOUNT
+                <div class="role-card-number">
+
+                    <span>
+                        02 / PRESS CORPS
+                    </span>
+
+                    <span class="role-card-arrow">
+                        ↗
+                    </span>
+
+                </div>
+
+
+                <div class="role-card-content">
+
+                    <div class="role-card-title">
+                        Press
                     </div>
 
-                    <div class="profile-name">
-                        CHAIR
+                    <div class="role-card-description">
+                        Follow developments, document events,
+                        write reports, and publish articles to
+                        the public committee archive.
                     </div>
 
-                    <div class="profile-divider"></div>
+                    <div class="role-card-link">
 
-                    <a href="/articles" class="profile-item">
-                        ARTICLES →
-                    </a>
+                        <span>
+                            PRESS LOGIN
+                        </span>
 
-                    <a href="/chair-logout" class="profile-item">
-                        LOG OUT →
+                        <span>
+                            →
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+
+            <!-- CHAIR -->
+
+            <a href="{{ url_for('chair_login') }}" class="role-card">
+
+                <div class="role-card-number">
+
+                    <span>
+                        03 / ADMINISTRATION
+                    </span>
+
+                    <span class="role-card-arrow">
+                        ↗
+                    </span>
+
+                </div>
+
+
+                <div class="role-card-content">
+
+                    <div class="role-card-title">
+                        Chair
+                    </div>
+
+                    <div class="role-card-description">
+                        Manage crisis developments, publish
+                        official crisis files, and oversee
+                        committee administration.
+                    </div>
+
+                    <div class="role-card-link">
+
+                        <span>
+                            CHAIR LOGIN
+                        </span>
+
+                        <span>
+                            →
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CRISIS + ARTICLES
+         ===================================================== -->
+
+    <section class="home-section">
+
+        <div class="home-section-heading">
+
+            <div>
+
+                <div class="home-section-label">
+                    Committee intelligence
+                </div>
+
+                <h2>
+                    THE RECORD<br>
+                    NEVER STOPS.
+                </h2>
+
+            </div>
+
+            <p>
+                Follow official crisis developments and
+                read reporting from the Press Corps.
+            </p>
+
+        </div>
+
+
+        <div class="home-feature-grid">
+
+
+            <!-- LATEST CRISIS -->
+
+            <div class="home-feature">
+
+                <div class="home-feature-label">
+
+                    <span>
+                        Latest crisis
+                    </span>
+
+                    <span>
+                        LIVE
+                    </span>
+
+                </div>
+
+
+                <div class="home-feature-content">
+
+                    {% if latest_crisis %}
+
+                    <h3>
+                        {{ latest_crisis.title }}
+                    </h3>
+
+                    <div class="home-crisis-card">
+
+                        <div class="home-crisis-description">
+                            {{ latest_crisis.description }}
+                        </div>
+
+                    </div>
+
+                    <a href="{{ url_for('crises') }}" class="home-feature-link">
+                        <span>
+                            VIEW CRISIS CONTROL
+                        </span>
+
+                        <span>
+                            →
+                        </span>
+
                     </a>
 
                     {% else %}
 
-                    <div class="profile-title">
-                        ACCOUNT
-                    </div>
+                    <h3>
+                        NO CRISIS
+                        <br>
+                        PUBLISHED
+                    </h3>
 
-                    <div class="profile-name">
-                        NOT SIGNED IN
-                    </div>
-
-                    <div class="profile-divider"></div>
-
-                    <a href="/press-login" class="profile-item">
-                        PRESS LOGIN →
-                    </a>
-
-                    <a href="/chair-login" class="profile-item">
-                        CHAIR LOGIN →
-                    </a>
+                    <p class="home-empty">
+                        No crisis developments have been
+                        published yet.
+                    </p>
 
                     {% endif %}
 
@@ -999,376 +1193,388 @@
 
             </div>
 
-        </div>
 
-    </nav>
+            <!-- LATEST ARTICLES -->
+
+            <div class="home-feature">
+
+                <div class="home-feature-label">
+
+                    <span>
+                        Press Corps
+                    </span>
+
+                    <span>
+                        ARCHIVE
+                    </span>
+
+                </div>
 
 
-    <!-- =========================
-     HERO
-========================= -->
+                <div class="home-feature-content">
 
-    <main>
+                    {% if latest_articles %}
 
-        <section class="hero">
+                    {% set first_article = latest_articles[0] %}
 
-            <div class="hero-container">
+                    <h3>
+                        {{ first_article.title }}
+                    </h3>
 
-                <div class="hero-left">
-
-                    <div class="hero-label">
-                        LIVE CRISIS
-                    </div>
-
-                    <h1 class="hero-heading">
-                        ARKANIAN<br>
-                        <span class="muted">CRISIS</span><br>
-                        COMMITTEE
-                    </h1>
-
-                    <p class="hero-description">
-                        The situation is developing. Information changes,
-                        decisions have consequences, and every move can
-                        alter the course of the crisis.
+                    <p>
+                        The latest reporting from the
+                        Arkanian Crisis Committee Press Corps.
                     </p>
 
-                    <div class="hero-actions">
+                    <a href="{{ url_for(
+                                'full_article',
+                                article_id=first_article.id
+                            ) }}" class="home-feature-link">
+                        <span>
+                            READ ARTICLE
+                        </span>
 
-                        <a href="/articles" class="action primary">
-                            READ PRESS ARTICLES →
-                        </a>
+                        <span>
+                            →
+                        </span>
 
-                        <a href="#overview" class="action secondary">
-                            EXPLORE THE COMMITTEE
-                        </a>
+                    </a>
 
-                    </div>
+                    {% else %}
 
-                </div>
+                    <h3>
+                        THE PRESS
+                        <br>
+                        IS WAITING.
+                    </h3>
 
+                    <p>
+                        No articles have been published yet.
+                        Check back once the Press Corps begins
+                        reporting.
+                    </p>
 
-                <!-- STATUS PANEL -->
-
-                <div class="status-panel">
-
-                    <div class="panel-grid"></div>
-
-                    <div class="panel-content">
-
-                        <div class="panel-header">
-
-                            <span class="panel-code">
-                                ACC / 2026
-                            </span>
-
-                            <span class="panel-status">
-                                <span class="status-dot"></span>
-                                ACTIVE
-                            </span>
-
-                        </div>
+                    {% endif %}
 
 
-                        <div class="panel-main">
+                    <a href="{{ url_for('articles') }}" class="home-feature-link">
+                        <span>
+                            OPEN ARCHIVE
+                        </span>
 
-                            <div class="panel-label">
-                                CRISIS STATUS
-                            </div>
-
-                            <div class="panel-active">
-                                ACTIVE
-                            </div>
-
-
-                            <div class="panel-info">
-
-                                <div class="info-item">
-
-                                    <div class="info-label">
-                                        INFORMATION
-                                    </div>
-
-                                    <div class="info-value">
-                                        DEVELOPING
-                                    </div>
-
-                                </div>
-
-
-                                <div class="info-item">
-
-                                    <div class="info-label">
-                                        COMMITTEE
-                                    </div>
-
-                                    <div class="info-value">
-                                        ACC
-                                    </div>
-
-                                </div>
-
-
-                                <div class="info-item">
-
-                                    <div class="info-label">
-                                        COVERAGE
-                                    </div>
-
-                                    <div class="info-value">
-                                        LIVE
-                                    </div>
-
-                                </div>
-
-
-                                <div class="info-item">
-
-                                    <div class="info-label">
-                                        YEAR
-                                    </div>
-
-                                    <div class="info-value">
-                                        2026
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="panel-footer">
-                            MONITOR THE SITUATION / STAY INFORMED
-                        </div>
-
-                    </div>
+                        <span>
+                            →
+                        </span>
+                    </a>
 
                 </div>
 
             </div>
 
-        </section>
+        </div>
+
+    </section>
 
 
-        <!-- =========================
-     OVERVIEW
-========================= -->
+    <!-- =====================================================
+         MANIFESTO
+         ===================================================== -->
 
-        <section class="overview" id="overview">
+    <section class="home-manifesto">
 
-            <div class="overview-container">
+        <div class="home-manifesto-inner">
 
-                <div class="section-label">
-                    THE COMMITTEE
-                </div>
+            <div class="home-section-label">
+                Committee philosophy
+            </div>
 
-                <h2 class="section-heading">
-                    ONE ROOM.<br>
-                    CONSTANTLY CHANGING.
-                </h2>
+            <div class="home-manifesto-text">
 
+                Every crisis creates
+                <span>uncertainty.</span>
 
-                <div class="overview-grid">
+                Every delegation creates
+                <span>possibility.</span>
 
-                    <div class="overview-card">
-
-                        <div class="card-number">
-                            01 / DELEGATES
-                        </div>
-
-                        <div>
-
-                            <div class="card-title">
-                                DECISIONS
-                            </div>
-
-                            <div class="card-text">
-                                Represent your role, assess the situation,
-                                and decide how to respond when circumstances
-                                change.
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="overview-card">
-
-                        <div class="card-number">
-                            02 / CRISIS
-                        </div>
-
-                        <div>
-
-                            <div class="card-title">
-                                DEVELOPMENTS
-                            </div>
-
-                            <div class="card-text">
-                                New information can arrive at any moment.
-                                Adapt quickly as the situation develops.
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="overview-card">
-
-                        <div class="card-number">
-                            03 / CONSEQUENCES
-                        </div>
-
-                        <div>
-
-                            <div class="card-title">
-                                IMPACT
-                            </div>
-
-                            <div class="card-text">
-                                Every decision matters. What happens next
-                                depends on what happens now.
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
+                Every decision creates
+                <span>consequences.</span>
 
             </div>
 
-        </section>
+        </div>
 
-    </main>
-
-
-    <!-- =========================
-     FOOTER
-========================= -->
-
-    <footer>
-
-        <span>
-            ARKANIAN CRISIS COMMITTEE
-        </span>
-
-        <span>
-            ACC © 2026
-        </span>
-
-    </footer>
+    </section>
 
 
-    <script>
+    <!-- =====================================================
+         FINAL CTA
+         ===================================================== -->
 
-        /* =========================
-           PROFILE MENU
-        ========================= */
+    <section class="home-final">
 
-        const profileWrapper =
-            document.getElementById("profileWrapper");
+        <div class="home-final-inner">
 
-        const profileButton =
-            document.getElementById("profileButton");
-
-        profileButton.addEventListener("click", function (event) {
-
-            event.stopPropagation();
-
-            const open =
-                profileWrapper.classList.toggle("open");
-
-            profileButton.setAttribute(
-                "aria-expanded",
-                open ? "true" : "false"
-            );
-
-        });
+            <div class="home-final-label">
+                ARKANIAN CRISIS COMMITTEE / ACCESS
+            </div>
 
 
-        document.addEventListener("click", function (event) {
+            {% if user %}
 
-            if (!profileWrapper.contains(event.target)) {
+            <h2>
+                YOUR SESSION
+                <br>
+                IS ACTIVE.
+            </h2>
 
-                profileWrapper.classList.remove("open");
+            <p>
+                Continue to your role-specific workspace
+                or review the public committee record.
+            </p>
 
-                profileButton.setAttribute(
-                    "aria-expanded",
-                    "false"
+
+            <div class="home-final-actions">
+
+                <a href="{{ url_for('profile') }}" class="home-action primary">
+                    <span>
+                        PROFILE
+                    </span>
+
+                    <span>
+                        →
+                    </span>
+                </a>
+
+                <a href="{{ url_for('articles') }}" class="home-action">
+                    <span>
+                        ARTICLES
+                    </span>
+
+                    <span>
+                        →
+                    </span>
+                </a>
+
+            </div>
+
+            {% else %}
+
+            <h2>
+                ENTER
+                <br>
+                THE CRISIS.
+            </h2>
+
+            <p>
+                Select your assigned role and enter the
+                appropriate authenticated workspace.
+            </p>
+
+
+            <div class="home-final-actions">
+
+                <a href="{{ url_for('login') }}" class="home-action primary">
+                    <span>
+                        DELEGATE
+                    </span>
+
+                    <span>
+                        →
+                    </span>
+                </a>
+
+                <a href="{{ url_for('press_login') }}" class="home-action">
+                    <span>
+                        PRESS
+                    </span>
+
+                    <span>
+                        →
+                    </span>
+                </a>
+
+                <a href="{{ url_for('chair_login') }}" class="home-action">
+                    <span>
+                        CHAIR
+                    </span>
+
+                    <span>
+                        →
+                    </span>
+                </a>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script>
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            /* =================================================
+               HERO ACCESS BUTTON
+               ================================================= */
+
+            const heroAccessButton =
+                document.getElementById(
+                    "heroAccessButton"
+                );
+
+            const accessButton =
+                document.getElementById(
+                    "accessButton"
+                );
+
+
+            if (
+                heroAccessButton &&
+                accessButton
+            ) {
+
+                heroAccessButton.addEventListener(
+                    "click",
+                    function () {
+
+                        accessButton.click();
+
+                    }
                 );
 
             }
 
-        });
+
+            /* =================================================
+               ROLE CARD HOVER FOCUS
+               ================================================= */
+
+            const roleCards =
+                document.querySelectorAll(
+                    ".role-card"
+                );
 
 
-        /* =========================
-           CURSOR LIGHT
-        ========================= */
+            roleCards.forEach(function (card) {
 
-        const cursorLight =
-            document.getElementById("cursor-light");
+                card.addEventListener(
+                    "mouseenter",
+                    function () {
 
-        let mouseX = 0;
-        let mouseY = 0;
+                        roleCards.forEach(
+                            function (other) {
 
-        let currentX = 0;
-        let currentY = 0;
+                                if (other !== card) {
 
-        let hideTimer;
+                                    other.style.opacity =
+                                        ".4";
 
+                                }
 
-        document.addEventListener("mousemove", function (event) {
+                            }
+                        );
 
-            mouseX = event.clientX;
-            mouseY = event.clientY;
-
-            cursorLight.style.opacity = "1";
-
-            clearTimeout(hideTimer);
-
-            hideTimer = setTimeout(function () {
-
-                cursorLight.style.opacity = "0";
-
-            }, 900);
-
-        });
+                    }
+                );
 
 
-        function animateCursor() {
+                card.addEventListener(
+                    "mouseleave",
+                    function () {
 
-            currentX +=
-                (mouseX - currentX) * 0.78;
+                        roleCards.forEach(
+                            function (other) {
 
-            currentY +=
-                (mouseY - currentY) * 0.78;
+                                other.style.opacity =
+                                    "";
 
-            cursorLight.style.left =
-                currentX + "px";
+                            }
+                        );
 
-            cursorLight.style.top =
-                currentY + "px";
+                    }
+                );
 
-            requestAnimationFrame(animateCursor);
+            });
+
+
+            /* =================================================
+               SIMPLE REVEAL
+               ================================================= */
+
+            const revealElements =
+                document.querySelectorAll(
+                    ".role-card, .home-feature, .home-manifesto-text"
+                );
+
+
+            if (
+                "IntersectionObserver" in window &&
+                !window.matchMedia(
+                    "(prefers-reduced-motion: reduce)"
+                ).matches
+            ) {
+
+                const observer =
+                    new IntersectionObserver(
+                        function (entries) {
+
+                            entries.forEach(
+                                function (entry) {
+
+                                    if (
+                                        entry.isIntersecting
+                                    ) {
+
+                                        entry.target.style.opacity =
+                                            "1";
+
+                                        entry.target.style.transform =
+                                            "translateY(0)";
+
+                                        observer.unobserve(
+                                            entry.target
+                                        );
+
+                                    }
+
+                                }
+                            );
+
+                        },
+                        {
+                            threshold: .08
+                        }
+                    );
+
+
+                revealElements.forEach(
+                    function (element) {
+
+                        element.style.opacity = "0";
+
+                        element.style.transform =
+                            "translateY(22px)";
+
+                        element.style.transition =
+                            "opacity .7s ease, transform .7s ease";
+
+                        observer.observe(element);
+
+                    }
+                );
+
+            }
 
         }
+    );
 
-        animateCursor();
+</script>
 
-
-        document.addEventListener("mouseleave", function () {
-
-            cursorLight.style.opacity = "0";
-
-        });
-
-    </script>
-
-</body>
-
-</html>
+{% endblock %}

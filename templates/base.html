@@ -7,129 +7,299 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <meta name="theme-color" content="#050505">
+
+    <meta name="description" content="Arkanian Crisis Committee — Crisis. Diplomacy. Decision.">
+
     <title>
-        {% block title %}ACC{% endblock %}
+        {% block title %}
+        Arkanian Crisis Committee
+        {% endblock %}
     </title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    {% block extra_css %}{% endblock %}
 
 
     <style>
-        /* =====================================================
-           RESET
-        ===================================================== */
+        /* =========================================================
+           NAVIGATION PANELS — HIDDEN BY DEFAULT
+           ========================================================= */
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        .access-panel,
+        .mobile-nav-panel {
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+        }
+
+        .access-panel.open,
+        .mobile-nav-panel.open {
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
         }
 
 
-        html {
-            scroll-behavior: smooth;
-        }
-
-
-        body {
-            min-height: 100vh;
-
-            background: #090909;
-            color: #f5f5f5;
-
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
-
-            overflow-x: hidden;
-        }
-
-
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
-
-
-        button,
-        input,
-        textarea {
-            font-family: inherit;
-        }
-
-
-        /* =====================================================
+        /* =========================================================
            CURSOR LIGHT
-        ===================================================== */
+           ========================================================= */
 
-        #cursor-light {
+        .cursor-light {
+            position: fixed !important;
 
-            position: fixed;
+            left: 0 !important;
+            top: 0 !important;
 
-            left: 0;
-            top: 0;
-
-            width: 360px;
-            height: 360px;
-
-            transform:
-                translate(-50%, -50%);
-
-            pointer-events: none;
-
-            z-index: 999999;
+            width: 420px !important;
+            height: 420px !important;
 
             border-radius: 50%;
 
-            opacity: 0;
+            pointer-events: none !important;
 
             background:
                 radial-gradient(circle,
-                    rgba(255, 255, 255, 0.24) 0%,
-                    rgba(255, 255, 255, 0.14) 18%,
-                    rgba(255, 255, 255, 0.07) 35%,
-                    rgba(255, 255, 255, 0.025) 52%,
-                    rgba(255, 255, 255, 0) 72%);
+                    rgba(255, 255, 255, 0.028) 0%,
+                    rgba(255, 255, 255, 0.010) 32%,
+                    rgba(255, 255, 255, 0.004) 50%,
+                    transparent 72%);
 
-            transition:
-                opacity 0.1s ease;
+            /*
+             * IMPORTANT:
+             * The glow must stay BELOW the navigation.
+             * It cannot interfere with Profile / Logout / buttons.
+             */
+            z-index: 1 !important;
+
+            transform:
+                translate3d(var(--cursor-x, -1000px),
+                    var(--cursor-y, -1000px),
+                    0) translate(-50%, -50%);
+
+            opacity: 0 !important;
+
+            visibility: hidden !important;
+
+            mix-blend-mode: normal;
 
             will-change:
-                left,
-                top;
+                transform,
+                opacity;
 
+            transition:
+                opacity 350ms ease;
+        }
+
+        .cursor-light.visible {
+            opacity: 1 !important;
+            visibility: visible !important;
         }
 
 
-        /* =====================================================
-           NAVBAR
-        ===================================================== */
+        /* =========================================================
+           KEEP NAVIGATION ABOVE CURSOR LIGHT
+           ========================================================= */
+
+        .site-header {
+            position: relative;
+            z-index: 100 !important;
+        }
 
         .navbar {
+            position: relative;
+            z-index: 101 !important;
+        }
 
-            position: sticky;
+        .nav-links,
+        .nav-actions {
+            position: relative;
+            z-index: 102 !important;
+        }
 
-            top: 0;
+        .nav-links a,
+        .profile-button,
+        .access-button,
+        .mobile-menu-button {
+            position: relative;
+            z-index: 103 !important;
+        }
 
-            z-index: 10000;
 
-            width: 100%;
+        /* =========================================================
+           NAV ACTIONS
+           ========================================================= */
 
-            height: 78px;
+        .nav-actions {
+            display: flex;
+
+            align-items: center;
+
+            gap: 15px;
+        }
+
+
+        .nav-role-indicator {
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            font-family: monospace;
+
+            font-size: .55rem;
+
+            letter-spacing: .13em;
+
+            color:
+                rgba(255, 255, 255, .38);
+        }
+
+
+        .nav-role-dot {
+            width: 5px;
+
+            height: 5px;
+
+            border-radius: 50%;
+
+            background: #fff;
+
+            box-shadow:
+                0 0 9px rgba(255, 255, 255, .7);
+        }
+
+
+        /* =========================================================
+           PROFILE BUTTON
+           ========================================================= */
+
+        .profile-button {
+            width: 38px;
+
+            height: 38px;
 
             display: flex;
 
             align-items: center;
 
-            justify-content: space-between;
+            justify-content: center;
 
-            padding:
-                0 5vw;
+            border:
+                1px solid rgba(255, 255, 255, .22);
 
             background:
-                rgba(9, 9, 9, 0.94);
+                transparent;
 
-            border-bottom:
-                1px solid #292929;
+            color: #fff;
+
+            text-decoration: none;
+
+            font-family: monospace;
+
+            font-size: .68rem;
+
+            font-weight: 800;
+
+            cursor: pointer;
+
+            transition:
+                background .25s ease,
+                color .25s ease,
+                border-color .25s ease,
+                transform .25s ease;
+        }
+
+
+        .profile-button:hover {
+            background: #fff;
+
+            color: #050505;
+
+            border-color: #fff;
+
+            transform:
+                translateY(-2px);
+        }
+
+
+        /* =========================================================
+           ACCESS BUTTON
+           ========================================================= */
+
+        .access-button {
+            position: relative;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            padding: 11px 16px;
+
+            border:
+                1px solid rgba(255, 255, 255, .22);
+
+            background:
+                transparent;
+
+            color: #fff;
+
+            cursor: pointer;
+
+            font-family: inherit;
+
+            font-size: .62rem;
+
+            font-weight: 700;
+
+            letter-spacing: .13em;
+
+            transition:
+                background .25s ease,
+                border-color .25s ease,
+                color .25s ease;
+        }
+
+
+        .access-button:hover,
+        .access-button[aria-expanded="true"] {
+            background: #fff;
+
+            border-color: #fff;
+
+            color: #050505;
+        }
+
+
+        .access-arrow {
+            transition:
+                transform .25s ease;
+        }
+
+
+        .access-button[aria-expanded="true"] .access-arrow {
+            transform:
+                rotate(180deg);
+        }
+
+
+        /* =========================================================
+           ACCESS PANEL
+           ========================================================= */
+
+        .access-panel {
+            position: fixed !important;
+
+            z-index: 9000 !important;
+
+            inset: 0;
+
+            background:
+                rgba(0, 0, 0, .78);
 
             backdrop-filter:
                 blur(16px);
@@ -137,593 +307,1005 @@
             -webkit-backdrop-filter:
                 blur(16px);
 
-        }
-
-
-        .logo {
-
-            font-size: 25px;
-
-            font-weight: 900;
-
-            letter-spacing:
-                -1px;
-
             transition:
-                transform 0.2s ease,
-                opacity 0.2s ease;
-
+                opacity .35s ease,
+                visibility .35s ease;
         }
 
 
-        .logo:hover {
-
-            transform:
-                translateY(-2px);
-
-            opacity:
-                0.7;
-
-        }
-
-
-        .nav-right {
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                30px;
-
-        }
-
-
-        .nav-links {
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                28px;
-
-        }
-
-
-        .nav-link {
-
-            position:
-                relative;
-
-            font-size:
-                10px;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                1.5px;
-
-            color:
-                #aaa;
-
-            transition:
-                color 0.2s ease;
-
-        }
-
-
-        .nav-link:hover {
-
-            color:
-                #fff;
-
-        }
-
-
-        .nav-link::after {
-
-            content:
-                "";
-
-            position:
-                absolute;
-
-            left:
-                0;
-
-            bottom:
-                -7px;
-
+        .access-panel-inner {
             width:
-                0;
+                min(1200px, 90%);
 
-            height:
-                1px;
-
-            background:
-                #fff;
-
-            transition:
-                width 0.25s ease;
-
-        }
-
-
-        .nav-link:hover::after {
-
-            width:
-                100%;
-
-        }
-
-
-        /* =====================================================
-           PROFILE
-        ===================================================== */
-
-        .profile-wrapper {
-
-            position:
-                relative;
-
-            z-index:
-                10001;
-
-        }
-
-
-        .profile-button {
-
-            width:
-                42px;
-
-            height:
-                42px;
-
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            justify-content:
-                center;
-
-            border:
-                1px solid #444;
-
-            border-radius:
-                50%;
-
-            background:
-                #111;
-
-            color:
-                white;
-
-            cursor:
-                pointer;
-
-            transition:
-                transform 0.2s ease,
-                border-color 0.2s ease,
-                background 0.2s ease;
-
-        }
-
-
-        .profile-button:hover {
-
-            transform:
-                translateY(-2px);
-
-            border-color:
-                white;
-
-            background:
-                #181818;
-
-        }
-
-
-        /* PERSON */
-
-        .person-icon {
-
-            position:
-                relative;
-
-            width:
-                20px;
-
-            height:
-                20px;
-
-            display:
-                block;
-
-        }
-
-
-        .person-icon::before {
-
-            content:
-                "";
-
-            position:
-                absolute;
-
-            width:
-                7px;
-
-            height:
-                7px;
-
-            top:
-                1px;
-
-            left:
-                50%;
-
-            transform:
-                translateX(-50%);
-
-            background:
-                white;
-
-            border-radius:
-                50%;
-
-        }
-
-
-        .person-icon::after {
-
-            content:
-                "";
-
-            position:
-                absolute;
-
-            width:
-                14px;
-
-            height:
-                8px;
-
-            bottom:
-                1px;
-
-            left:
-                50%;
-
-            transform:
-                translateX(-50%);
-
-            background:
-                white;
-
-            border-radius:
-                9px 9px 4px 4px;
-
-        }
-
-
-        /* =====================================================
-           PROFILE MENU
-        ===================================================== */
-
-        .profile-menu {
-
-            position:
-                absolute;
-
-            top:
-                54px;
-
-            right:
-                0;
-
-            width:
-                250px;
+            margin:
+                0 auto;
 
             padding:
-                20px;
-
-            background:
-                #101010;
-
-            border:
-                1px solid #333;
-
-            box-shadow:
-                0 25px 70px rgba(0, 0, 0, 0.7);
-
-            opacity:
-                0;
-
-            visibility:
-                hidden;
+                130px 0 50px;
 
             transform:
-                translateY(-8px);
+                translateY(-25px);
 
             transition:
-                opacity 0.2s ease,
-                transform 0.2s ease,
-                visibility 0.2s ease;
-
+                transform .4s cubic-bezier(.22, 1, .36, 1);
         }
 
 
-        .profile-wrapper.open .profile-menu {
-
-            opacity:
-                1;
-
-            visibility:
-                visible;
-
+        .access-panel.open .access-panel-inner {
             transform:
                 translateY(0);
-
         }
 
 
-        .profile-heading {
-
-            font-size:
-                9px;
-
-            font-weight:
-                900;
-
-            letter-spacing:
-                2px;
-
-            color:
-                #777;
-
-            margin-bottom:
-                7px;
-
-        }
-
-
-        .profile-name {
-
-            font-size:
-                18px;
-
-            font-weight:
-                900;
-
-            margin-bottom:
-                3px;
-
-        }
-
-
-        .profile-publication {
-
-            font-size:
-                11px;
-
-            color:
-                #777;
-
-            margin-bottom:
-                18px;
-
-        }
-
-
-        .profile-menu a {
-
-            display:
-                block;
-
-            width:
-                100%;
-
-            padding:
-                11px 0;
-
-            border-top:
-                1px solid #282828;
-
-            font-size:
-                10px;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                1px;
-
-            color:
-                #ccc;
-
-            transition:
-                color 0.2s ease,
-                padding-left 0.2s ease;
-
-        }
-
-
-        .profile-menu a:hover {
-
-            color:
-                #fff;
-
-            padding-left:
-                6px;
-
-        }
-
-
-        /* =====================================================
-           MAIN
-        ===================================================== */
-
-        main {
-
-            position:
-                relative;
-
-            z-index:
-                1;
-
-        }
-
-
-        /* =====================================================
-           FOOTER
-        ===================================================== */
-
-        footer {
-
-            border-top:
-                1px solid #292929;
-
-            padding:
-                28px 5vw;
-
-            display:
-                flex;
-
-            align-items:
-                center;
+        .access-panel-header {
+            display: flex;
 
             justify-content:
                 space-between;
 
-            color:
-                #555;
+            align-items:
+                flex-end;
+
+            gap: 30px;
+
+            margin-bottom:
+                35px;
+        }
+
+
+        .access-panel-eyebrow {
+            display: block;
+
+            margin-bottom:
+                14px;
+
+            font-family:
+                monospace;
 
             font-size:
-                9px;
+                .58rem;
+
+            letter-spacing:
+                .2em;
+
+            color:
+                rgba(255, 255, 255, .35);
+        }
+
+
+        .access-panel-header h2 {
+            margin: 0;
+
+            font-size:
+                clamp(2.2rem, 5vw, 4.8rem);
+
+            line-height:
+                .9;
+
+            letter-spacing:
+                -.065em;
+        }
+
+
+        .access-close {
+            width: 46px;
+
+            height: 46px;
+
+            flex-shrink: 0;
+
+            border:
+                1px solid rgba(255, 255, 255, .2);
+
+            background:
+                transparent;
+
+            color: #fff;
+
+            cursor: pointer;
+
+            font-size: 1.5rem;
+
+            line-height: 1;
+
+            transition:
+                background .2s ease,
+                color .2s ease;
+        }
+
+
+        .access-close:hover {
+            background: #fff;
+
+            color: #050505;
+        }
+
+
+        /* =========================================================
+           ACCESS PORTAL GRID
+           ========================================================= */
+
+        .access-portal-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            border-top:
+                1px solid rgba(255, 255, 255, .14);
+
+            border-bottom:
+                1px solid rgba(255, 255, 255, .14);
+        }
+
+
+        .access-portal {
+            position: relative;
+
+            min-height: 390px;
+
+            padding: 28px;
+
+            color: #fff;
+
+            text-decoration: none;
+
+            border-right:
+                1px solid rgba(255, 255, 255, .14);
+
+            overflow: hidden;
+
+            transition:
+                background .3s ease,
+                transform .3s ease,
+                opacity .3s ease;
+        }
+
+
+        .access-portal:last-child {
+            border-right: none;
+        }
+
+
+        .access-portal::before {
+            content: "";
+
+            position: absolute;
+
+            inset: 0;
+
+            background:
+                linear-gradient(135deg,
+                    rgba(255, 255, 255, .08),
+                    transparent 50%);
+
+            opacity: 0;
+
+            transition:
+                opacity .3s ease;
+        }
+
+
+        .access-portal:hover {
+            background:
+                rgba(255, 255, 255, .035);
+
+            transform:
+                translateY(-6px);
+        }
+
+
+        .access-portal:hover::before {
+            opacity: 1;
+        }
+
+
+        .access-portal-top {
+            position: relative;
+
+            z-index: 2;
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items:
+                center;
+        }
+
+
+        .access-portal-number {
+            font-family:
+                monospace;
+
+            font-size:
+                .62rem;
+
+            letter-spacing:
+                .12em;
+
+            color:
+                rgba(255, 255, 255, .3);
+        }
+
+
+        .access-portal-arrow {
+            font-size:
+                1.2rem;
+
+            transition:
+                transform .25s ease;
+        }
+
+
+        .access-portal:hover .access-portal-arrow {
+            transform:
+                translate(4px, -4px);
+        }
+
+
+        .access-portal-role {
+            position: relative;
+
+            z-index: 2;
+
+            margin-top:
+                110px;
+
+            font-size:
+                clamp(1.8rem, 3vw, 3rem);
+
+            line-height:
+                .9;
+
+            letter-spacing:
+                -.055em;
+
+            font-weight:
+                900;
+        }
+
+
+        .access-portal p {
+            position: relative;
+
+            z-index: 2;
+
+            max-width:
+                330px;
+
+            margin:
+                18px 0 0;
+
+            color:
+                rgba(255, 255, 255, .43);
+
+            font-size:
+                .77rem;
+
+            line-height:
+                1.7;
+        }
+
+
+        .access-portal-footer {
+            position: absolute;
+
+            z-index: 2;
+
+            bottom:
+                28px;
+
+            left:
+                28px;
+
+            right:
+                28px;
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items:
+                center;
+
+            padding-top:
+                17px;
+
+            border-top:
+                1px solid rgba(255, 255, 255, .12);
+
+            font-family:
+                monospace;
+
+            font-size:
+                .57rem;
+
+            letter-spacing:
+                .13em;
+
+            color:
+                rgba(255, 255, 255, .45);
+        }
+
+
+        .access-panel-bottom {
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            padding-top:
+                18px;
+
+            font-family:
+                monospace;
+
+            font-size:
+                .52rem;
+
+            letter-spacing:
+                .13em;
+
+            color:
+                rgba(255, 255, 255, .2);
+        }
+
+
+        /* =========================================================
+           MOBILE MENU BUTTON
+           ========================================================= */
+
+        .mobile-menu-button {
+            display: none;
+
+            width: 42px;
+
+            height: 42px;
+
+            border:
+                1px solid rgba(255, 255, 255, .2);
+
+            background:
+                transparent;
+
+            cursor:
+                pointer;
+
+            padding:
+                0;
+        }
+
+
+        .mobile-menu-button span {
+            display: block;
+
+            width: 17px;
+
+            height: 1px;
+
+            margin: 5px auto;
+
+            background:
+                #fff;
+
+            transition:
+                transform .25s ease,
+                opacity .25s ease;
+        }
+
+
+        .mobile-menu-button.open span:first-child {
+            transform:
+                translateY(3px) rotate(45deg);
+        }
+
+
+        .mobile-menu-button.open span:last-child {
+            transform:
+                translateY(-3px) rotate(-45deg);
+        }
+
+
+        /* =========================================================
+           MOBILE NAVIGATION
+           ========================================================= */
+
+        .mobile-nav-panel {
+            position: fixed !important;
+
+            z-index: 8500 !important;
+
+            inset: 0;
+
+            background:
+                #050505;
+
+            transition:
+                opacity .3s ease,
+                visibility .3s ease;
+        }
+
+
+        .mobile-nav-inner {
+            width:
+                calc(100% - 40px);
+
+            margin:
+                0 auto;
+
+            padding:
+                115px 0 40px;
+        }
+
+
+        .mobile-nav-heading {
+            margin-bottom:
+                20px;
+
+            font-family:
+                monospace;
+
+            font-size:
+                .55rem;
+
+            letter-spacing:
+                .2em;
+
+            color:
+                rgba(255, 255, 255, .3);
+        }
+
+
+        .mobile-nav-inner a {
+            display: flex;
+
+            align-items: center;
+
+            gap: 20px;
+
+            padding:
+                21px 0;
+
+            border-bottom:
+                1px solid rgba(255, 255, 255, .11);
+
+            color:
+                #fff;
+
+            text-decoration:
+                none;
+
+            font-size:
+                1.5rem;
 
             font-weight:
                 800;
 
             letter-spacing:
-                1.5px;
+                -.035em;
+        }
+
+
+        .mobile-nav-inner a span {
+            width:
+                25px;
+
+            font-family:
+                monospace;
+
+            font-size:
+                .55rem;
+
+            font-weight:
+                400;
+
+            letter-spacing:
+                .08em;
+
+            color:
+                rgba(255, 255, 255, .28);
+        }
+
+
+        /* =========================================================
+           FLASH MESSAGES
+           ========================================================= */
+
+        .flash-container {
+            position: fixed;
+
+            z-index: 10000;
+
+            top:
+                100px;
+
+            right:
+                25px;
+
+            width:
+                min(390px, calc(100% - 40px));
+
+            display:
+                flex;
+
+            flex-direction:
+                column;
+
+            gap:
+                10px;
+        }
+
+
+        .flash-message {
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            gap:
+                12px;
+
+            padding:
+                14px 17px;
+
+            border:
+                1px solid rgba(255, 255, 255, .2);
+
+            background:
+                rgba(5, 5, 5, .92);
+
+            color:
+                #fff;
+
+            backdrop-filter:
+                blur(15px);
+
+            font-family:
+                monospace;
+
+            font-size:
+                .64rem;
+
+            line-height:
+                1.5;
+
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, .4);
+
+            transition:
+                opacity .45s ease,
+                transform .45s ease;
+        }
+
+
+        .flash-indicator {
+            width:
+                5px;
+
+            height:
+                5px;
+
+            flex-shrink:
+                0;
+
+            border-radius:
+                50%;
+
+            background:
+                #fff;
+        }
+
+
+        .flash-hidden {
+            opacity:
+                0;
+
+            transform:
+                translateX(30px);
+        }
+
+
+        /* =========================================================
+           BRAND
+           ========================================================= */
+
+        .brand {
+            display:
+                flex !important;
+
+            align-items:
+                center !important;
+
+            gap:
+                13px !important;
+
+            flex-shrink:
+                0 !important;
+
+            height:
+                43px !important;
+
+            text-decoration:
+                none !important;
+
+            border:
+                none !important;
+
+            outline:
+                none !important;
+
+            background:
+                transparent !important;
+
+            box-shadow:
+                none !important;
+        }
+
+
+        .brand-mark {
+            width:
+                43px !important;
+
+            height:
+                43px !important;
+
+            flex:
+                0 0 43px !important;
+
+            display:
+                grid !important;
+
+            place-items:
+                center !important;
+
+            border:
+                1px solid rgba(255, 255, 255, .65) !important;
+
+            background:
+                transparent !important;
+
+            color:
+                #fff !important;
+
+            font-size:
+                10px !important;
+
+            line-height:
+                1 !important;
+
+            font-weight:
+                900 !important;
+
+            letter-spacing:
+                -.06em !important;
+
+            text-decoration:
+                none !important;
+
+            box-shadow:
+                none !important;
+
+            transition:
+                background .25s ease,
+                color .25s ease,
+                transform .25s ease;
+        }
+
+
+        .brand:hover .brand-mark {
+            background:
+                #fff !important;
+
+            color:
+                #050505 !important;
+
+            transform:
+                rotate(-5deg) scale(1.05);
+        }
+
+
+        .brand-name {
+            display:
+                flex !important;
+
+            flex-direction:
+                column !important;
+
+            justify-content:
+                center !important;
+
+            align-items:
+                flex-start !important;
+
+            height:
+                43px !important;
+
+            margin:
+                0 !important;
+
+            padding:
+                0 !important;
+
+            max-width:
+                180px !important;
+
+            color:
+                rgba(255, 255, 255, .82) !important;
+
+            font-size:
+                9px !important;
+
+            line-height:
+                1.05 !important;
+
+            font-weight:
+                800 !important;
+
+            letter-spacing:
+                .12em !important;
+
+            text-transform:
+                uppercase !important;
+
+            white-space:
+                nowrap !important;
+
+            border:
+                none !important;
+
+            background:
+                transparent !important;
+
+            box-shadow:
+                none !important;
+        }
+
+
+        .brand-name span {
+            display:
+                block !important;
+
+            width:
+                auto !important;
+
+            height:
+                auto !important;
+
+            margin:
+                0 !important;
+
+            padding:
+                0 !important;
+
+            border:
+                none !important;
+
+            background:
+                transparent !important;
+
+            box-shadow:
+                none !important;
+
+            color:
+                inherit !important;
+
+            line-height:
+                1.05 !important;
+        }
+
+
+        .brand-divider,
+        .brand-subtitle {
+            display:
+                none !important;
+        }
+
+
+        /* =========================================================
+           RESPONSIVE
+           ========================================================= */
+
+        @media (max-width: 900px) {
+
+            .nav-links {
+                display:
+                    none;
+            }
+
+
+            .mobile-menu-button {
+                display:
+                    block;
+            }
+
+
+            .access-button {
+                display:
+                    none;
+            }
+
+
+            .nav-role-indicator {
+                display:
+                    none;
+            }
+
+
+            .access-portal-grid {
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .access-portal {
+                min-height:
+                    290px;
+
+                border-right:
+                    none;
+
+                border-bottom:
+                    1px solid rgba(255, 255, 255, .14);
+            }
+
+
+            .access-portal:last-child {
+                border-bottom:
+                    none;
+            }
+
+
+            .access-portal-role {
+                margin-top:
+                    70px;
+            }
 
         }
 
 
-        /* =====================================================
-           MOBILE
-        ===================================================== */
-
         @media (max-width: 700px) {
 
-            .navbar {
+            .brand {
+                gap:
+                    10px !important;
 
                 height:
-                    70px;
-
-                padding:
-                    0 6%;
-
+                    38px !important;
             }
 
 
-            .nav-links {
+            .brand-mark {
+                width:
+                    38px !important;
 
-                gap:
-                    15px;
+                height:
+                    38px !important;
 
-            }
-
-
-            .nav-link {
+                flex-basis:
+                    38px !important;
 
                 font-size:
-                    9px;
-
-                letter-spacing:
-                    1px;
-
+                    9px !important;
             }
 
 
-            .profile-menu {
+            .brand-name {
+                display:
+                    none !important;
+            }
+
+        }
+
+
+        @media (max-width: 600px) {
+
+            .access-panel-inner {
+                width:
+                    calc(100% - 40px);
+
+                padding-top:
+                    100px;
+
+                max-height:
+                    100vh;
+
+                overflow-y:
+                    auto;
+            }
+
+
+            .access-panel-header {
+                align-items:
+                    flex-start;
+            }
+
+
+            .access-panel-header h2 {
+                font-size:
+                    2.4rem;
+            }
+
+
+            .access-portal {
+                min-height:
+                    250px;
+
+                padding:
+                    22px;
+            }
+
+
+            .access-portal-role {
+                margin-top:
+                    55px;
+
+                font-size:
+                    2rem;
+            }
+
+
+            .access-portal-footer {
+                left:
+                    22px;
 
                 right:
-                    -5px;
+                    22px;
 
-                width:
-                    min(250px,
-                        calc(100vw - 30px));
-
+                bottom:
+                    22px;
             }
 
 
-            footer {
-
+            .access-panel-bottom {
                 flex-direction:
                     column;
 
                 gap:
-                    10px;
-
-                text-align:
-                    center;
-
-            }
-
-        }
-
-
-        @media (max-width: 500px) {
-
-            .logo {
-
-                font-size:
-                    21px;
-
+                    8px;
             }
 
 
-            .nav-link {
+            .flash-container {
+                top:
+                    82px;
 
-                display:
-                    none;
-
-            }
-
-
-            .profile-button {
+                right:
+                    20px;
 
                 width:
-                    40px;
-
-                height:
-                    40px;
-
+                    calc(100% - 40px);
             }
 
         }
 
 
-        /* =====================================================
-           PAGE-SPECIFIC CSS
-        ===================================================== */
+        @media (max-width: 800px) {
 
-            {
-            % block extra_css %
+            .cursor-light {
+                display:
+                    none !important;
+            }
+
         }
 
-            {
-            % endblock %
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .access-panel,
+            .access-panel-inner,
+            .access-portal,
+            .mobile-nav-panel,
+            .mobile-menu-button span,
+            .flash-message,
+            .cursor-light {
+                transition:
+                    none !important;
+            }
+
         }
     </style>
 
@@ -733,134 +1315,323 @@
 <body>
 
 
-    <!-- =====================================================
+    <!-- =========================================================
          CURSOR LIGHT
-    ===================================================== -->
+         ========================================================= -->
 
-    <div id="cursor-light"></div>
-
-
-    <!-- =====================================================
-         NAVBAR
-    ===================================================== -->
-
-    <nav class="navbar">
+    <div class="cursor-light" id="cursorLight" aria-hidden="true">
+    </div>
 
 
-        <a href="{{ url_for('home') }}" class="logo">
-            ACC
-        </a>
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
+    <header class="site-header">
+
+        <nav class="navbar">
 
 
-        <div class="nav-right">
+            <!-- BRAND -->
 
+            <a href="{{ url_for('home') }}" class="brand" aria-label="Arkanian Crisis Committee Home">
+
+                <span class="brand-mark">
+                    ACC
+                </span>
+
+                <span class="brand-name">
+
+                    <span>
+                        ARKANIAN
+                    </span>
+
+                    <span>
+                        CRISIS COMMITTEE
+                    </span>
+
+                </span>
+
+            </a>
+
+
+            <!-- DESKTOP NAVIGATION -->
 
             <div class="nav-links">
 
-                <a href="{{ url_for('home') }}" class="nav-link">
+                <a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">
                     HOME
                 </a>
 
 
-                <a href="{{ url_for('articles') }}" class="nav-link">
+                <a href="{{ url_for('articles') }}"
+                    class="{% if request.endpoint in ['articles', 'article'] %}active{% endif %}">
                     ARTICLES
                 </a>
+
+
+                {% if user %}
+
+                {% if user.role == "delegate" %}
+
+                <a href="{{ url_for('notes') }}"
+                    class="{% if request.endpoint in ['notes', 'new_note', 'update_note', 'delete_note'] %}active{% endif %}">
+                    NOTES
+                </a>
+
+                {% elif user.role == "press" %}
+
+                <a href="{{ url_for('press_upload') }}"
+                    class="{% if request.endpoint == 'press_upload' %}active{% endif %}">
+                    PUBLISH
+                </a>
+
+                {% elif user.role == "chair" %}
+
+                <a href="{{ url_for('crises') }}"
+                    class="{% if request.endpoint in ['crises', 'publish_crisis', 'delete_crisis'] %}active{% endif %}">
+                    CRISES
+                </a>
+
+                {% endif %}
+
+                {% endif %}
 
             </div>
 
 
-            <!-- PROFILE -->
+            <!-- RIGHT SIDE -->
 
-            <div class="profile-wrapper" id="profileWrapper">
+            <div class="nav-actions">
+
+                {% if user %}
+
+                <div class="nav-role-indicator">
+
+                    <span class="nav-role-dot"></span>
+
+                    <span>
+                        {{ user.role|upper }}
+                    </span>
+
+                </div>
 
 
-                <button type="button" class="profile-button" id="profileButton" aria-label="Open account menu">
+                <a href="{{ url_for('profile') }}" class="profile-button" aria-label="Open profile" title="Profile">
 
-                    <span class="person-icon"></span>
+                    {{ user.username[0]|upper }}
+
+                </a>
+
+                {% else %}
+
+                <button class="access-button" id="accessButton" type="button" aria-expanded="false"
+                    aria-controls="accessPanel">
+
+                    <span>
+                        ACCESS
+                    </span>
+
+                    <span class="access-arrow">
+                        ↓
+                    </span>
 
                 </button>
 
+                {% endif %}
 
-                <div class="profile-menu" id="profileMenu">
+
+                <button class="mobile-menu-button" id="mobileMenuButton" type="button" aria-label="Open navigation"
+                    aria-expanded="false" aria-controls="mobileNavPanel">
+
+                    <span></span>
+                    <span></span>
+
+                </button>
+
+            </div>
+
+        </nav>
 
 
-                    {% if session.get("press_authenticated") %}
+        <!-- =====================================================
+             ACCESS PANEL
+             ===================================================== -->
 
-                    <div class="profile-heading">
-                        PRESS ACCOUNT
+        {% if not user %}
+
+        <div class="access-panel" id="accessPanel" aria-hidden="true">
+
+            <div class="access-panel-inner">
+
+                <div class="access-panel-header">
+
+                    <div>
+
+                        <span class="access-panel-eyebrow">
+                            ACC / SECURE ACCESS
+                        </span>
+
+                        <h2>
+                            Choose your portal.
+                        </h2>
+
                     </div>
 
 
-                    <div class="profile-name">
-                        {{ session.get("press_name") }}
-                    </div>
+                    <button class="access-close" id="accessClose" type="button" aria-label="Close access menu">
+                        ×
+                    </button>
+
+                </div>
 
 
-                    <div class="profile-publication">
-                        {{ session.get("press_publication") }}
-                    </div>
+                <div class="access-portal-grid">
 
 
-                    <a href="{{ url_for('articles') }}">
-                        ARTICLES →
+                    <!-- DELEGATE -->
+
+                    <a href="{{ url_for('login') }}" class="access-portal">
+
+                        <div class="access-portal-top">
+
+                            <span class="access-portal-number">
+                                01
+                            </span>
+
+                            <span class="access-portal-arrow">
+                                ↗
+                            </span>
+
+                        </div>
+
+
+                        <div class="access-portal-role">
+                            DELEGATE
+                        </div>
+
+
+                        <p>
+                            Enter the committee workspace,
+                            access private notes, and manage
+                            your personal delegate workspace.
+                        </p>
+
+
+                        <div class="access-portal-footer">
+
+                            <span>
+                                DELEGATE LOGIN
+                            </span>
+
+                            <span>
+                                →
+                            </span>
+
+                        </div>
+
                     </a>
 
 
-                    <a href="{{ url_for('press_upload') }}">
-                        UPLOAD ARTICLE →
+                    <!-- PRESS -->
+
+                    <a href="{{ url_for('press_login') }}" class="access-portal">
+
+                        <div class="access-portal-top">
+
+                            <span class="access-portal-number">
+                                02
+                            </span>
+
+                            <span class="access-portal-arrow">
+                                ↗
+                            </span>
+
+                        </div>
+
+
+                        <div class="access-portal-role">
+                            PRESS CORPS
+                        </div>
+
+
+                        <p>
+                            Access the editorial desk, write
+                            reports, publish articles, and
+                            document the committee.
+                        </p>
+
+
+                        <div class="access-portal-footer">
+
+                            <span>
+                                PRESS LOGIN
+                            </span>
+
+                            <span>
+                                →
+                            </span>
+
+                        </div>
+
                     </a>
 
 
-                    <a href="{{ url_for('press_logout') }}">
-                        LOG OUT →
+                    <!-- CHAIR -->
+
+                    <a href="{{ url_for('chair_login') }}" class="access-portal">
+
+                        <div class="access-portal-top">
+
+                            <span class="access-portal-number">
+                                03
+                            </span>
+
+                            <span class="access-portal-arrow">
+                                ↗
+                            </span>
+
+                        </div>
+
+
+                        <div class="access-portal-role">
+                            CHAIR
+                        </div>
+
+
+                        <p>
+                            Access crisis administration,
+                            publish crisis developments,
+                            and manage committee operations.
+                        </p>
+
+
+                        <div class="access-portal-footer">
+
+                            <span>
+                                CHAIR LOGIN
+                            </span>
+
+                            <span>
+                                →
+                            </span>
+
+                        </div>
+
                     </a>
 
-
-                    {% elif session.get("chair_authenticated") %}
-
-                    <div class="profile-heading">
-                        CHAIR ACCOUNT
-                    </div>
+                </div>
 
 
-                    <div class="profile-name">
-                        CHAIR
-                    </div>
+                <div class="access-panel-bottom">
 
+                    <span>
+                        AUTHENTICATED ACCESS ONLY
+                    </span>
 
-                    <a href="{{ url_for('articles') }}">
-                        ARTICLES →
-                    </a>
-
-
-                    <a href="{{ url_for('chair_logout') }}">
-                        LOG OUT →
-                    </a>
-
-
-                    {% else %}
-
-                    <div class="profile-heading">
-                        ACCOUNT
-                    </div>
-
-
-                    <div class="profile-name">
-                        NOT SIGNED IN
-                    </div>
-
-
-                    <a href="{{ url_for('press_login') }}">
-                        PRESS LOGIN →
-                    </a>
-
-
-                    <a href="{{ url_for('chair_login') }}">
-                        CHAIR LOGIN →
-                    </a>
-
-                    {% endif %}
-
+                    <span>
+                        ARKANIAN CRISIS COMMITTEE
+                    </span>
 
                 </div>
 
@@ -868,223 +1639,819 @@
 
         </div>
 
-    </nav>
+        {% endif %}
 
 
-    <!-- =====================================================
-         PAGE CONTENT
-    ===================================================== -->
+        <!-- =====================================================
+             MOBILE NAVIGATION
+             ===================================================== -->
 
-    {% block content %}
-    {% endblock %}
+        <div class="mobile-nav-panel" id="mobileNavPanel" aria-hidden="true">
+
+            <div class="mobile-nav-inner">
+
+                <div class="mobile-nav-heading">
+                    NAVIGATION
+                </div>
 
 
-    <!-- =====================================================
+                <a href="{{ url_for('home') }}">
+
+                    <span>
+                        01
+                    </span>
+
+                    HOME
+
+                </a>
+
+
+                <a href="{{ url_for('articles') }}">
+
+                    <span>
+                        02
+                    </span>
+
+                    ARTICLES
+
+                </a>
+
+
+                {% if user %}
+
+
+                {% if user.role == "delegate" %}
+
+                <a href="{{ url_for('notes') }}">
+
+                    <span>
+                        03
+                    </span>
+
+                    NOTES
+
+                </a>
+
+                {% elif user.role == "press" %}
+
+                <a href="{{ url_for('press_upload') }}">
+
+                    <span>
+                        03
+                    </span>
+
+                    PUBLISH
+
+                </a>
+
+                {% elif user.role == "chair" %}
+
+                <a href="{{ url_for('crises') }}">
+
+                    <span>
+                        03
+                    </span>
+
+                    CRISES
+
+                </a>
+
+                {% endif %}
+
+
+                <a href="{{ url_for('profile') }}">
+
+                    <span>
+                        04
+                    </span>
+
+                    PROFILE
+
+                </a>
+
+
+                <a href="{{ url_for('logout') }}">
+
+                    <span>
+                        05
+                    </span>
+
+                    LOG OUT
+
+                </a>
+
+
+                {% else %}
+
+
+                <a href="{{ url_for('login') }}">
+
+                    <span>
+                        03
+                    </span>
+
+                    DELEGATE LOGIN
+
+                </a>
+
+
+                <a href="{{ url_for('press_login') }}">
+
+                    <span>
+                        04
+                    </span>
+
+                    PRESS LOGIN
+
+                </a>
+
+
+                <a href="{{ url_for('chair_login') }}">
+
+                    <span>
+                        05
+                    </span>
+
+                    CHAIR LOGIN
+
+                </a>
+
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================================
+         FLASH MESSAGES
+         ========================================================= -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+    {% if messages %}
+
+    <div class="flash-container">
+
+        {% for category, message in messages %}
+
+        <div class="flash-message flash-{{ category }}">
+
+            <span class="flash-indicator"></span>
+
+            <span>
+                {{ message }}
+            </span>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+    {% endwith %}
+
+
+    <!-- =========================================================
+         MAIN CONTENT
+         ========================================================= -->
+
+    <main>
+
+        {% block content %}{% endblock %}
+
+    </main>
+
+
+    <!-- =========================================================
          FOOTER
-    ===================================================== -->
+         ========================================================= -->
 
-    <footer>
+    <footer class="site-footer">
 
-        <span>
-            ARKANIAN JOINT CRISIS COMMITTEE
-        </span>
+        <div class="footer-main">
+
+            <div class="footer-brand">
+
+                <div class="footer-acronym">
+                    ACC
+                </div>
+
+                <div class="footer-description">
+                    ARKANIAN<br>
+                    CRISIS COMMITTEE
+                </div>
+
+            </div>
 
 
-        <span>
-            ACC PRESS ARCHIVE
-        </span>
+            <div class="footer-links">
+
+                <div class="footer-column">
+
+                    <span class="footer-label">
+                        NAVIGATE
+                    </span>
+
+                    <a href="{{ url_for('home') }}">
+                        Home
+                    </a>
+
+                    <a href="{{ url_for('articles') }}">
+                        Articles
+                    </a>
+
+                </div>
+
+
+                <div class="footer-column">
+
+                    <span class="footer-label">
+                        ACCESS
+                    </span>
+
+                    {% if user %}
+
+                    <a href="{{ url_for('profile') }}">
+                        Profile
+                    </a>
+
+                    <a href="{{ url_for('logout') }}">
+                        Log out
+                    </a>
+
+                    {% else %}
+
+                    <a href="{{ url_for('login') }}">
+                        Delegate
+                    </a>
+
+                    <a href="{{ url_for('press_login') }}">
+                        Press
+                    </a>
+
+                    <a href="{{ url_for('chair_login') }}">
+                        Chair
+                    </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="footer-bottom">
+
+            <span>
+                ARKANIAN CRISIS COMMITTEE
+            </span>
+
+            <span>
+                CRISIS / DIPLOMACY / DECISION
+            </span>
+
+            <span>
+                © 2026
+            </span>
+
+        </div>
 
     </footer>
 
 
-    <!-- =====================================================
-         JAVASCRIPT
-    ===================================================== -->
+    <!-- =========================================================
+         GLOBAL JAVASCRIPT
+         ========================================================= -->
 
     <script>
 
-
-        /* =================================================
-           PROFILE MENU
-        ================================================= */
-
-        const profileButton =
-            document.getElementById(
-                "profileButton"
-            );
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
 
 
-        const profileWrapper =
-            document.getElementById(
-                "profileWrapper"
-            );
+                /* =================================================
+                   CURSOR LIGHT
+                   ================================================= */
+
+                const cursorLight =
+                    document.getElementById(
+                        "cursorLight"
+                    );
 
 
-        if (
-            profileButton &&
-            profileWrapper
-        ) {
+                if (
+                    cursorLight &&
+                    window.matchMedia(
+                        "(pointer: fine)"
+                    ).matches &&
+                    !window.matchMedia(
+                        "(prefers-reduced-motion: reduce)"
+                    ).matches
+                ) {
+
+                    let cursorHasMoved = false;
 
 
-            profileButton.addEventListener(
-                "click",
-                function (event) {
+                    function moveCursorLight(event) {
 
-                    event.stopPropagation();
+                        if (
+                            event.pointerType !== "mouse"
+                        ) {
+                            return;
+                        }
 
-                    profileWrapper.classList.toggle(
-                        "open"
+
+                        cursorLight.style.setProperty(
+                            "--cursor-x",
+                            event.clientX + "px"
+                        );
+
+
+                        cursorLight.style.setProperty(
+                            "--cursor-y",
+                            event.clientY + "px"
+                        );
+
+
+                        if (!cursorHasMoved) {
+
+                            cursorHasMoved = true;
+
+                            requestAnimationFrame(
+                                function () {
+
+                                    cursorLight.classList.add(
+                                        "visible"
+                                    );
+
+                                }
+                            );
+
+                        }
+
+                    }
+
+
+                    window.addEventListener(
+                        "pointermove",
+                        moveCursorLight,
+                        {
+                            passive: true
+                        }
                     );
 
                 }
-            );
 
 
-            document.addEventListener(
-                "click",
-                function (event) {
+                /* =================================================
+                   ACCESS PANEL
+                   ================================================= */
 
-                    if (
-                        !profileWrapper.contains(
-                            event.target
-                        )
-                    ) {
+                const accessButton =
+                    document.getElementById(
+                        "accessButton"
+                    );
 
-                        profileWrapper.classList.remove(
+                const accessPanel =
+                    document.getElementById(
+                        "accessPanel"
+                    );
+
+                const accessClose =
+                    document.getElementById(
+                        "accessClose"
+                    );
+
+
+                function closeMobileMenu() {
+
+                    const mobilePanel =
+                        document.getElementById(
+                            "mobileNavPanel"
+                        );
+
+                    const mobileButton =
+                        document.getElementById(
+                            "mobileMenuButton"
+                        );
+
+
+                    if (!mobilePanel) {
+                        return;
+                    }
+
+
+                    mobilePanel.classList.remove(
+                        "open"
+                    );
+
+
+                    mobilePanel.setAttribute(
+                        "aria-hidden",
+                        "true"
+                    );
+
+
+                    if (mobileButton) {
+
+                        mobileButton.classList.remove(
                             "open"
+                        );
+
+
+                        mobileButton.setAttribute(
+                            "aria-expanded",
+                            "false"
                         );
 
                     }
 
+
+                    document.body.classList.remove(
+                        "mobile-nav-open"
+                    );
+
                 }
-            );
 
 
-            document.addEventListener(
-                "keydown",
-                function (event) {
+                function openAccess() {
 
-                    if (
-                        event.key === "Escape"
-                    ) {
+                    if (!accessPanel) {
+                        return;
+                    }
 
-                        profileWrapper.classList.remove(
-                            "open"
+
+                    closeMobileMenu();
+
+
+                    accessPanel.classList.add(
+                        "open"
+                    );
+
+
+                    accessPanel.setAttribute(
+                        "aria-hidden",
+                        "false"
+                    );
+
+
+                    if (accessButton) {
+
+                        accessButton.setAttribute(
+                            "aria-expanded",
+                            "true"
                         );
 
                     }
 
+
+                    document.body.classList.add(
+                        "access-panel-open"
+                    );
+
                 }
-            );
-
-        }
 
 
-        /* =================================================
-           CURSOR LIGHT
-        ================================================= */
+                function closeAccess() {
 
-        const cursorLight =
-            document.getElementById(
-                "cursor-light"
-            );
+                    if (!accessPanel) {
+                        return;
+                    }
 
 
-        if (cursorLight) {
-
-            let mouseX = 0;
-            let mouseY = 0;
-
-            let lightX = 0;
-            let lightY = 0;
-
-            let mouseDetected = false;
+                    accessPanel.classList.remove(
+                        "open"
+                    );
 
 
-            document.addEventListener(
-                "mousemove",
-                function (event) {
-
-                    mouseX =
-                        event.clientX;
-
-                    mouseY =
-                        event.clientY;
+                    accessPanel.setAttribute(
+                        "aria-hidden",
+                        "true"
+                    );
 
 
-                    if (!mouseDetected) {
+                    if (accessButton) {
 
-                        lightX =
-                            mouseX;
-
-                        lightY =
-                            mouseY;
-
-                        mouseDetected =
-                            true;
+                        accessButton.setAttribute(
+                            "aria-expanded",
+                            "false"
+                        );
 
                     }
 
 
-                    cursorLight.style.opacity =
-                        "1";
+                    document.body.classList.remove(
+                        "access-panel-open"
+                    );
 
                 }
-            );
 
 
-            document.addEventListener(
-                "mouseleave",
-                function () {
+                if (accessButton) {
 
-                    cursorLight.style.opacity =
-                        "0";
+                    accessButton.addEventListener(
+                        "click",
+                        function () {
+
+                            if (
+                                accessPanel &&
+                                accessPanel.classList.contains(
+                                    "open"
+                                )
+                            ) {
+
+                                closeAccess();
+
+                            } else {
+
+                                openAccess();
+
+                            }
+
+                        }
+                    );
 
                 }
-            );
 
 
-            function animateCursorLight() {
+                if (accessClose) {
 
-                lightX +=
-                    (
-                        mouseX -
-                        lightX
-                    ) * 0.72;
+                    accessClose.addEventListener(
+                        "click",
+                        closeAccess
+                    );
 
-
-                lightY +=
-                    (
-                        mouseY -
-                        lightY
-                    ) * 0.72;
+                }
 
 
-                cursorLight.style.left =
-                    lightX + "px";
+                if (accessPanel) {
+
+                    accessPanel.addEventListener(
+                        "click",
+                        function (event) {
+
+                            if (
+                                event.target ===
+                                accessPanel
+                            ) {
+
+                                closeAccess();
+
+                            }
+
+                        }
+                    );
+
+                }
 
 
-                cursorLight.style.top =
-                    lightY + "px";
+                /* =================================================
+                   MOBILE MENU
+                   ================================================= */
+
+                const mobileButton =
+                    document.getElementById(
+                        "mobileMenuButton"
+                    );
 
 
-                requestAnimationFrame(
-                    animateCursorLight
+                const mobilePanel =
+                    document.getElementById(
+                        "mobileNavPanel"
+                    );
+
+
+                function openMobileMenu() {
+
+                    if (!mobilePanel) {
+                        return;
+                    }
+
+
+                    closeAccess();
+
+
+                    mobilePanel.classList.add(
+                        "open"
+                    );
+
+
+                    mobilePanel.setAttribute(
+                        "aria-hidden",
+                        "false"
+                    );
+
+
+                    if (mobileButton) {
+
+                        mobileButton.classList.add(
+                            "open"
+                        );
+
+
+                        mobileButton.setAttribute(
+                            "aria-expanded",
+                            "true"
+                        );
+
+                    }
+
+
+                    document.body.classList.add(
+                        "mobile-nav-open"
+                    );
+
+                }
+
+
+                if (mobileButton) {
+
+                    mobileButton.addEventListener(
+                        "click",
+                        function () {
+
+                            if (
+                                mobilePanel &&
+                                mobilePanel.classList.contains(
+                                    "open"
+                                )
+                            ) {
+
+                                closeMobileMenu();
+
+                            } else {
+
+                                openMobileMenu();
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                /* =================================================
+                   CLOSE MOBILE MENU AFTER LINK CLICK
+                   ================================================= */
+
+                if (mobilePanel) {
+
+                    const mobileLinks =
+                        mobilePanel.querySelectorAll(
+                            "a"
+                        );
+
+
+                    mobileLinks.forEach(
+                        function (link) {
+
+                            link.addEventListener(
+                                "click",
+                                function () {
+
+                                    closeMobileMenu();
+
+                                }
+                            );
+
+                        }
+                    );
+
+                }
+
+
+                /* =================================================
+                   ESCAPE KEY
+                   ================================================= */
+
+                document.addEventListener(
+                    "keydown",
+                    function (event) {
+
+                        if (
+                            event.key === "Escape"
+                        ) {
+
+                            closeAccess();
+
+                            closeMobileMenu();
+
+                        }
+
+                    }
+                );
+
+
+                /* =================================================
+                   ACCESS PORTAL HOVER
+                   ================================================= */
+
+                const portals =
+                    document.querySelectorAll(
+                        ".access-portal"
+                    );
+
+
+                portals.forEach(
+                    function (portal) {
+
+                        portal.addEventListener(
+                            "mouseenter",
+                            function () {
+
+                                portals.forEach(
+                                    function (other) {
+
+                                        if (
+                                            other !== portal
+                                        ) {
+
+                                            other.style.opacity =
+                                                "0.42";
+
+                                        }
+
+                                    }
+                                );
+
+                            }
+                        );
+
+
+                        portal.addEventListener(
+                            "mouseleave",
+                            function () {
+
+                                portals.forEach(
+                                    function (other) {
+
+                                        other.style.opacity =
+                                            "";
+
+                                    }
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+
+                /* =================================================
+                   FLASH MESSAGE AUTO DISMISS
+                   ================================================= */
+
+                const flashMessages =
+                    document.querySelectorAll(
+                        ".flash-message"
+                    );
+
+
+                flashMessages.forEach(
+                    function (message) {
+
+                        setTimeout(
+                            function () {
+
+                                message.classList.add(
+                                    "flash-hidden"
+                                );
+
+
+                                setTimeout(
+                                    function () {
+
+                                        message.remove();
+
+                                    },
+                                    500
+                                );
+
+                            },
+                            4500
+                        );
+
+                    }
                 );
 
             }
-
-
-            animateCursorLight();
-
-        }
+        );
 
     </script>
 
 
-    {% block extra_js %}
-    {% endblock %}
-
+    {% block scripts %}{% endblock %}
 
 </body>
 
