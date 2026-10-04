@@ -4,6 +4,7 @@
 # ============================================================
 
 from datetime import datetime
+from functools import wraps
 
 from flask import (
     Flask,
@@ -16,10 +17,10 @@ from flask import (
     send_from_directory,
     abort,
 )
+
 import sqlite3
 import os
 import json
-from functools import wraps
 
 
 # ============================================================
@@ -252,11 +253,6 @@ DELEGATES = {
 # ============================================================
 
 def get_db():
-    """
-    Open a SQLite connection configured to tolerate temporary
-    locks and support concurrent reads/writes better.
-    """
-
     conn = sqlite3.connect(
         DB_PATH,
         timeout=30,
@@ -280,147 +276,181 @@ def init_db():
 
     conn = get_db()
 
-    # --------------------------------------------------------
-    # Enable WAL once during startup.
-    # Do NOT run journal_mode=WAL on every request.
-    # --------------------------------------------------------
-
     try:
-        conn.execute(
-            "PRAGMA journal_mode = WAL"
-        )
-    except sqlite3.OperationalError:
-        pass
 
-    # --------------------------------------------------------
-    # NOTES
-    # --------------------------------------------------------
+        try:
+            conn.execute(
+                "PRAGMA journal_mode = WAL"
+            )
+        except sqlite3.OperationalError:
+            pass
 
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS notes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL,
-            title TEXT NOT NULL DEFAULT 'Untitled',
-            content TEXT NOT NULL DEFAULT '',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-
-    # --------------------------------------------------------
-    # DELEGATE STATUS / ATTENDANCE
-    # --------------------------------------------------------
-
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS delegate_status (
-            username TEXT PRIMARY KEY,
-            attendance TEXT NOT NULL DEFAULT 'ABSENT',
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-
-    # --------------------------------------------------------
-    # ANNOUNCEMENTS
-    # --------------------------------------------------------
-
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS announcements (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            kind TEXT NOT NULL DEFAULT 'GENERAL',
-            title TEXT NOT NULL,
-            body TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-
-    # --------------------------------------------------------
-    # DIRECTIVES
-    # --------------------------------------------------------
-
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS directives (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL,
-            delegation TEXT NOT NULL,
-            title TEXT NOT NULL,
-            body TEXT NOT NULL,
-            status TEXT NOT NULL DEFAULT 'UNDER REVIEW',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-
-    # --------------------------------------------------------
-    # CRISIS RESPONSES
-    # --------------------------------------------------------
-
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS crisis_responses (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            crisis_index INTEGER NOT NULL,
-            username TEXT NOT NULL,
-            delegation TEXT NOT NULL,
-            response TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-
-    # --------------------------------------------------------
-    # VOTES
-    # --------------------------------------------------------
-
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS votes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            motion TEXT NOT NULL,
-            status TEXT NOT NULL DEFAULT 'OPEN',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            closed_at TIMESTAMP
-        )
-    """)
-
-    # --------------------------------------------------------
-    # VOTE RECORDS
-    # --------------------------------------------------------
-
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS vote_records (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            vote_id INTEGER NOT NULL,
-            username TEXT NOT NULL,
-            choice TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE(vote_id, username)
-        )
-    """)
-
-    # --------------------------------------------------------
-    # INITIALIZE NORMAL DELEGATES
-    # --------------------------------------------------------
-
-    for username, account in DELEGATES.items():
-
-        if account.get(
-            "role",
-            "delegate"
-        ) != "delegate":
-
-            continue
+        # ----------------------------------------------------
+        # NOTES
+        # ----------------------------------------------------
 
         conn.execute("""
-            INSERT OR IGNORE INTO delegate_status
-            (
-                username,
-                attendance
+            CREATE TABLE IF NOT EXISTS notes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL,
+                title TEXT NOT NULL DEFAULT 'Untitled',
+                content TEXT NOT NULL DEFAULT '',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-            VALUES (?, 'ABSENT')
-        """, (
-            username,
-        ))
+        """)
 
-    conn.commit()
-    conn.close()
+        # ----------------------------------------------------
+        # DELEGATE STATUS
+        # ----------------------------------------------------
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS delegate_status (
+                username TEXT PRIMARY KEY,
+                attendance TEXT NOT NULL DEFAULT 'ABSENT',
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        # ----------------------------------------------------
+        # ANNOUNCEMENTS
+        # ----------------------------------------------------
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS announcements (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                kind TEXT NOT NULL DEFAULT 'GENERAL',
+                title TEXT NOT NULL,
+                body TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        # ----------------------------------------------------
+        # DIRECTIVES
+        # ----------------------------------------------------
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS directives (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL,
+                delegation TEXT NOT NULL,
+                title TEXT NOT NULL,
+                body TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'UNDER REVIEW',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        # ----------------------------------------------------
+        # CRISIS RESPONSES
+        # ----------------------------------------------------
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS crisis_responses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                crisis_index INTEGER NOT NULL,
+                username TEXT NOT NULL,
+                delegation TEXT NOT NULL,
+                response TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        # ----------------------------------------------------
+        # VOTES
+        # ----------------------------------------------------
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS votes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                motion TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'OPEN',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                closed_at TIMESTAMP
+            )
+        """)
+
+        # ----------------------------------------------------
+        # VOTE RECORDS
+        # ----------------------------------------------------
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS vote_records (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                vote_id INTEGER NOT NULL,
+                username TEXT NOT NULL,
+                choice TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE(vote_id, username)
+            )
+        """)
+
+        # ----------------------------------------------------
+        # MESSAGES
+        # ----------------------------------------------------
+
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                sender TEXT NOT NULL,
+                recipient TEXT NOT NULL,
+                subject TEXT NOT NULL,
+                body TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                is_read INTEGER NOT NULL DEFAULT 0
+            )
+        """)
+
+        # ----------------------------------------------------
+        # INDEXES FOR MESSAGES
+        # ----------------------------------------------------
+
+        conn.execute("""
+            CREATE INDEX IF NOT EXISTS
+            idx_messages_recipient
+            ON messages(recipient)
+        """)
+
+        conn.execute("""
+            CREATE INDEX IF NOT EXISTS
+            idx_messages_unread
+            ON messages(recipient, is_read)
+        """)
+
+        # ----------------------------------------------------
+        # INITIALIZE NORMAL DELEGATES
+        # ----------------------------------------------------
+
+        for username, account in DELEGATES.items():
+
+            if account.get(
+                "role",
+                "delegate"
+            ) != "delegate":
+                continue
+
+            conn.execute("""
+                INSERT OR IGNORE INTO delegate_status
+                (
+                    username,
+                    attendance
+                )
+                VALUES (?, 'ABSENT')
+            """, (
+                username,
+            ))
+
+        conn.commit()
+
+    except Exception:
+        conn.rollback()
+        raise
+
+    finally:
+        conn.close()
 
 
 # ============================================================
@@ -496,14 +526,6 @@ def current_user():
     return None
 
 
-@app.context_processor
-def inject_user():
-
-    return {
-        "user": current_user()
-    }
-
-
 # ============================================================
 # AUTH DECORATORS
 # ============================================================
@@ -555,7 +577,8 @@ def role_required(required_role):
             ) != required_role:
 
                 flash(
-                    "You do not have permission to access that page."
+                    "You do not have permission to access that page.",
+                    "error"
                 )
 
                 return redirect(
@@ -570,6 +593,49 @@ def role_required(required_role):
         return wrapper
 
     return decorator
+
+
+# ============================================================
+# GLOBAL TEMPLATE CONTEXT
+# ============================================================
+
+@app.context_processor
+def inject_user():
+
+    user = current_user()
+
+    unread_count = 0
+
+    if user:
+
+        conn = None
+
+        try:
+
+            conn = get_db()
+
+            unread_count = conn.execute("""
+                SELECT COUNT(*)
+                FROM messages
+                WHERE recipient = ?
+                AND is_read = 0
+            """, (
+                user["username"],
+            )).fetchone()[0]
+
+        except sqlite3.Error:
+
+            unread_count = 0
+
+        finally:
+
+            if conn:
+                conn.close()
+
+    return {
+        "user": user,
+        "unread_count": unread_count
+    }
 
 
 # ============================================================
@@ -607,17 +673,12 @@ def login():
             ""
         )
 
-        # ----------------------------------------------------
-        # MAIN CHAIR
-        # ----------------------------------------------------
-
         if (
             username.lower() == "chair"
             and password == CHAIR_PASSWORD
         ):
 
             session.clear()
-
             session["username"] = "__chair__"
 
             flash(
@@ -627,10 +688,6 @@ def login():
             return redirect(
                 url_for("home")
             )
-
-        # ----------------------------------------------------
-        # DELEGATE / SPECIAL ACCOUNTS
-        # ----------------------------------------------------
 
         if username in DELEGATES:
 
@@ -643,7 +700,6 @@ def login():
             ) == password:
 
                 session.clear()
-
                 session["username"] = username
 
                 flash(
@@ -703,7 +759,6 @@ def delegate_login():
             ):
 
                 session.clear()
-
                 session["username"] = username
 
                 flash(
@@ -746,17 +801,12 @@ def chair_login():
             ""
         )
 
-        # ----------------------------------------------------
-        # MAIN CHAIR
-        # ----------------------------------------------------
-
         if (
             username.lower() == "chair"
             and password == CHAIR_PASSWORD
         ):
 
             session.clear()
-
             session["username"] = "__chair__"
 
             flash(
@@ -767,10 +817,6 @@ def chair_login():
                 url_for("home")
             )
 
-        # ----------------------------------------------------
-        # SPECIAL CHAIR ACCOUNTS
-        # ----------------------------------------------------
-
         if username in DELEGATES:
 
             account = DELEGATES[
@@ -778,15 +824,11 @@ def chair_login():
             ]
 
             if (
-                account.get("role")
-                == "chair"
-                and account.get(
-                    "password"
-                ) == password
+                account.get("role") == "chair"
+                and account.get("password") == password
             ):
 
                 session.clear()
-
                 session["username"] = username
 
                 flash(
@@ -831,9 +873,7 @@ def press_login():
 
         if (
             username in PRESS_PASSWORDS
-            and PRESS_PASSWORDS[
-                username
-            ] == password
+            and PRESS_PASSWORDS[username] == password
         ):
 
             session.clear()
@@ -887,22 +927,24 @@ def logout():
 def profile():
 
     user = current_user()
-
     attendance = None
 
     if user["role"] == "delegate":
 
         conn = get_db()
 
-        row = conn.execute("""
-            SELECT attendance
-            FROM delegate_status
-            WHERE username = ?
-        """, (
-            user["username"],
-        )).fetchone()
+        try:
 
-        conn.close()
+            row = conn.execute("""
+                SELECT attendance
+                FROM delegate_status
+                WHERE username = ?
+            """, (
+                user["username"],
+            )).fetchone()
+
+        finally:
+            conn.close()
 
         if row:
             attendance = row["attendance"]
@@ -912,6 +954,442 @@ def profile():
         user=user,
         attendance=attendance
     )
+
+
+# ============================================================
+# INBOX
+# ============================================================
+
+@app.route("/inbox")
+@login_required
+def inbox():
+
+    user = current_user()
+    print("INBOX USER:", dict(user))
+
+    conn = get_db()
+
+    try:
+
+        messages = conn.execute("""
+            SELECT
+                id,
+                sender,
+                recipient,
+                subject,
+                body,
+                created_at,
+                is_read
+            FROM messages
+            WHERE recipient = ?
+            ORDER BY
+                is_read ASC,
+                created_at DESC,
+                id DESC
+        """, (
+            user["username"],
+        )).fetchall()
+
+        unread_count = conn.execute("""
+            SELECT COUNT(*)
+            FROM messages
+            WHERE recipient = ?
+            AND is_read = 0
+        """, (
+            user["username"],
+        )).fetchone()[0]
+
+        return render_template(
+            "inbox.html",
+            messages=messages,
+            unread_count=unread_count,
+            user=user
+        )
+
+    except sqlite3.Error:
+
+        flash(
+            "Could not load your inbox.",
+            "error"
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
+    finally:
+        conn.close()
+
+
+# ============================================================
+# READ MESSAGE
+# ============================================================
+
+@app.route(
+    "/inbox/<int:message_id>",
+    methods=["GET"]
+)
+@login_required
+def read_message(message_id):
+
+    user = current_user()
+
+    conn = get_db()
+
+    try:
+
+        message = conn.execute("""
+            SELECT
+                id,
+                sender,
+                recipient,
+                subject,
+                body,
+                created_at,
+                is_read
+            FROM messages
+            WHERE id = ?
+            AND recipient = ?
+        """, (
+            message_id,
+            user["username"]
+        )).fetchone()
+
+        if message is None:
+
+            flash(
+                "Message not found.",
+                "error"
+            )
+
+            return redirect(
+                url_for("inbox")
+            )
+
+        if not message["is_read"]:
+
+            conn.execute("""
+                UPDATE messages
+                SET is_read = 1
+                WHERE id = ?
+                AND recipient = ?
+            """, (
+                message_id,
+                user["username"]
+            ))
+
+            conn.commit()
+
+            message = conn.execute("""
+                SELECT
+                    id,
+                    sender,
+                    recipient,
+                    subject,
+                    body,
+                    created_at,
+                    is_read
+                FROM messages
+                WHERE id = ?
+                AND recipient = ?
+            """, (
+                message_id,
+                user["username"]
+            )).fetchone()
+
+        return render_template(
+            "message.html",
+            message=message,
+            user=user
+        )
+
+    except sqlite3.Error:
+
+        conn.rollback()
+
+        flash(
+            "Could not open message.",
+            "error"
+        )
+
+        return redirect(
+            url_for("inbox")
+        )
+
+    finally:
+        conn.close()
+
+
+# ============================================================
+# DELETE MESSAGE
+# ============================================================
+
+@app.route(
+    "/inbox/<int:message_id>/delete",
+    methods=["POST"]
+)
+@login_required
+def delete_message(message_id):
+
+    user = current_user()
+
+    conn = get_db()
+
+    try:
+
+        message = conn.execute("""
+            SELECT id
+            FROM messages
+            WHERE id = ?
+            AND recipient = ?
+        """, (
+            message_id,
+            user["username"]
+        )).fetchone()
+
+        if message is None:
+
+            flash(
+                "Message not found.",
+                "error"
+            )
+
+            return redirect(
+                url_for("inbox")
+            )
+
+        conn.execute("""
+            DELETE FROM messages
+            WHERE id = ?
+            AND recipient = ?
+        """, (
+            message_id,
+            user["username"]
+        ))
+
+        conn.commit()
+
+        flash(
+            "Message deleted.",
+            "success"
+        )
+
+        return redirect(
+            url_for("inbox")
+        )
+
+    except sqlite3.Error:
+
+        conn.rollback()
+
+        flash(
+            "Could not delete message.",
+            "error"
+        )
+
+        return redirect(
+            url_for("inbox")
+        )
+
+    finally:
+        conn.close()
+
+
+# ============================================================
+# CHAIR — COMPOSE MESSAGE
+# ============================================================
+
+@app.route(
+    "/chair-inbox/compose",
+    methods=["GET", "POST"]
+)
+@role_required("chair")
+def compose_message():
+
+    conn = get_db()
+
+    try:
+
+        if request.method == "POST":
+
+            recipient = request.form.get(
+                "recipient",
+                ""
+            ).strip()
+
+            subject = request.form.get(
+                "subject",
+                ""
+            ).strip()
+
+            body = request.form.get(
+                "body",
+                ""
+            ).strip()
+
+            if not recipient or not subject or not body:
+
+                flash(
+                    "Recipient, subject, and message are required.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("compose_message")
+                )
+
+            chair = current_user()
+
+            sender = chair["display_name"]
+
+            now = datetime.now().isoformat(
+                timespec="seconds"
+            )
+
+            # ------------------------------------------------
+            # SEND TO ALL NORMAL DELEGATES
+            # ------------------------------------------------
+
+            if recipient == "__ALL_DELEGATES__":
+
+                recipients = [
+                    username
+                    for username, account
+                    in DELEGATES.items()
+                    if account.get(
+                        "role",
+                        "delegate"
+                    ) == "delegate"
+                ]
+
+                for username in recipients:
+
+                    conn.execute("""
+                        INSERT INTO messages
+                        (
+                            sender,
+                            recipient,
+                            subject,
+                            body,
+                            created_at,
+                            is_read
+                        )
+                        VALUES (?, ?, ?, ?, ?, 0)
+                    """, (
+                        sender,
+                        username,
+                        subject,
+                        body,
+                        now
+                    ))
+
+                conn.commit()
+
+                flash(
+                    "Message sent to all delegates.",
+                    "success"
+                )
+
+                return redirect(
+                    url_for("compose_message")
+                )
+
+            # ------------------------------------------------
+            # SEND TO ONE DELEGATE
+            # ------------------------------------------------
+
+            if recipient not in DELEGATES:
+
+                flash(
+                    "Invalid recipient.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("compose_message")
+                )
+
+            if DELEGATES[recipient].get(
+                "role",
+                "delegate"
+            ) != "delegate":
+
+                flash(
+                    "That account cannot receive delegate messages.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("compose_message")
+                )
+
+            conn.execute("""
+                INSERT INTO messages
+                (
+                    sender,
+                    recipient,
+                    subject,
+                    body,
+                    created_at,
+                    is_read
+                )
+                VALUES (?, ?, ?, ?, ?, 0)
+            """, (
+                sender,
+                recipient,
+                subject,
+                body,
+                now
+            ))
+
+            conn.commit()
+
+            flash(
+                "Message sent.",
+                "success"
+            )
+
+            return redirect(
+                url_for("compose_message")
+            )
+
+        delegates = [
+            {
+                "username": username,
+                "delegation": account.get(
+                    "delegation",
+                    username
+                )
+            }
+            for username, account
+            in DELEGATES.items()
+            if account.get(
+                "role",
+                "delegate"
+            ) == "delegate"
+        ]
+
+        return render_template(
+            "compose_message.html",
+            delegates=delegates,
+            user=current_user()
+        )
+
+    except sqlite3.Error:
+
+        conn.rollback()
+
+        flash(
+            "Could not send message.",
+            "error"
+        )
+
+        return redirect(
+            url_for("compose_message")
+        )
+
+    finally:
+        conn.close()
 
 
 # ============================================================
@@ -980,7 +1458,6 @@ def notes():
         )
 
     finally:
-
         conn.close()
 
 
@@ -1046,11 +1523,9 @@ def new_note():
         except Exception:
 
             conn.rollback()
-
             raise
 
         finally:
-
             conn.close()
 
         flash(
@@ -1187,11 +1662,9 @@ def edit_note(note_id):
     except Exception:
 
         conn.rollback()
-
         raise
 
     finally:
-
         conn.close()
 
 
@@ -1284,11 +1757,9 @@ def update_note(note_id):
     except Exception:
 
         conn.rollback()
-
         raise
 
     finally:
-
         conn.close()
 
 
@@ -1354,11 +1825,9 @@ def delete_note(note_id):
     except Exception:
 
         conn.rollback()
-
         raise
 
     finally:
-
         conn.close()
 
 
@@ -1419,25 +1888,15 @@ def save_articles(articles):
     )
 
 
-# ============================================================
-# ARTICLES PAGE
-# ============================================================
-
 @app.route("/articles")
 def articles():
 
-    articles_data = load_articles()
-
     return render_template(
         "articles.html",
-        articles=articles_data,
+        articles=load_articles(),
         user=current_user()
     )
 
-
-# ============================================================
-# ARTICLE VIEW
-# ============================================================
 
 @app.route(
     "/articles/<int:index>"
@@ -1452,11 +1911,9 @@ def article_view(index):
     ):
         abort(404)
 
-    article = articles_data[index]
-
     return render_template(
         "article.html",
-        article=article,
+        article=articles_data[index],
         index=index,
         user=current_user()
     )
@@ -1526,7 +1983,10 @@ def press_upload():
 
         articles_data.append({
             "title": title,
-            "author": author or current_user()["username"],
+            "author": (
+                author
+                or current_user()["username"]
+            ),
             "content": content,
             "image": image_filename,
             "created_at": datetime.now().isoformat(
@@ -1572,9 +2032,7 @@ def delete_article(index):
     ):
         abort(404)
 
-    articles_data.pop(
-        index
-    )
+    articles_data.pop(index)
 
     save_articles(
         articles_data
@@ -1646,10 +2104,6 @@ def save_crises(crises):
         CRISES_FILE
     )
 
-
-# ============================================================
-# CRISIS PAGE / CREATE CRISIS
-# ============================================================
 
 @app.route(
     "/crises",
@@ -1730,9 +2184,7 @@ def delete_crisis(index):
     ):
         abort(404)
 
-    crises_data.pop(
-        index
-    )
+    crises_data.pop(index)
 
     save_crises(
         crises_data
@@ -1773,7 +2225,6 @@ def chair_control():
         )
 
     finally:
-
         conn.close()
 
 
@@ -1802,7 +2253,6 @@ def committee():
         )
 
     finally:
-
         conn.close()
 
 
@@ -1832,7 +2282,6 @@ def api_delegates():
         }
 
     finally:
-
         conn.close()
 
 
@@ -1884,7 +2333,6 @@ def api_live_state():
         }
 
     finally:
-
         conn.close()
 
 
@@ -1915,7 +2363,6 @@ def api_announcements():
         }
 
     finally:
-
         conn.close()
 
 
@@ -1988,11 +2435,9 @@ def chair_attendance():
     except Exception:
 
         conn.rollback()
-
         raise
 
     finally:
-
         conn.close()
 
     return redirect(
@@ -2081,7 +2526,6 @@ def chair_announcements():
         )
 
     finally:
-
         conn.close()
 
 
@@ -2098,11 +2542,10 @@ def directives():
 
     user = current_user()
 
-    # --------------------------------------------------------
-    # BOTH DELEGATES AND CHAIRS CAN VIEW DIRECTIVES
-    # --------------------------------------------------------
-
-    if user["role"] not in ("delegate", "chair"):
+    if user["role"] not in (
+        "delegate",
+        "chair"
+    ):
 
         flash(
             "You do not have permission to access directives.",
@@ -2116,11 +2559,6 @@ def directives():
     conn = get_db()
 
     try:
-
-        # ----------------------------------------------------
-        # SUBMIT DIRECTIVE
-        # ONLY NORMAL DELEGATES CAN DO THIS
-        # ----------------------------------------------------
 
         if request.method == "POST":
 
@@ -2156,10 +2594,6 @@ def directives():
                     url_for("directives")
                 )
 
-            # ------------------------------------------------
-            # CHECK ATTENDANCE
-            # ------------------------------------------------
-
             attendance_row = conn.execute("""
                 SELECT attendance
                 FROM delegate_status
@@ -2184,10 +2618,6 @@ def directives():
                 return redirect(
                     url_for("directives")
                 )
-
-            # ------------------------------------------------
-            # CREATE DIRECTIVE
-            # ------------------------------------------------
 
             now = datetime.now().isoformat(
                 timespec="seconds"
@@ -2225,13 +2655,8 @@ def directives():
                 url_for("directives")
             )
 
-        # ----------------------------------------------------
-        # VIEW DIRECTIVES
-        # ----------------------------------------------------
-
         if user["role"] == "chair":
 
-            # Chairs see ALL directives
             rows = conn.execute("""
                 SELECT *
                 FROM directives
@@ -2240,7 +2665,6 @@ def directives():
 
         else:
 
-            # Delegates see only their own directives
             rows = conn.execute("""
                 SELECT *
                 FROM directives
@@ -2249,10 +2673,6 @@ def directives():
             """, (
                 user["username"],
             )).fetchall()
-
-        # ----------------------------------------------------
-        # ATTENDANCE FOR TEMPLATE
-        # ----------------------------------------------------
 
         attendance = None
 
@@ -2267,7 +2687,6 @@ def directives():
             )).fetchone()
 
             if attendance_row:
-
                 attendance = attendance_row["attendance"]
 
         template_user = {
@@ -2282,12 +2701,12 @@ def directives():
         )
 
     finally:
-
         conn.close()
+
+
 # ============================================================
 # CHAIR DIRECTIVES
 # ============================================================
-
 
 @app.route(
     "/chair-directives",
@@ -2299,10 +2718,6 @@ def chair_directives():
     conn = get_db()
 
     try:
-
-        # ----------------------------------------------------
-        # UPDATE DIRECTIVE STATUS
-        # ----------------------------------------------------
 
         if request.method == "POST":
 
@@ -2323,8 +2738,8 @@ def chair_directives():
                 "EXECUTED"
             }
 
-            # Make sure this is actually a status update.
             if directive_id is None:
+
                 flash(
                     "Invalid directive update.",
                     "error"
@@ -2335,6 +2750,7 @@ def chair_directives():
                 )
 
             if status not in valid_statuses:
+
                 flash(
                     "Invalid directive status.",
                     "error"
@@ -2344,7 +2760,6 @@ def chair_directives():
                     url_for("chair_directives")
                 )
 
-            # Make sure directive exists.
             directive = conn.execute("""
                 SELECT id
                 FROM directives
@@ -2354,6 +2769,7 @@ def chair_directives():
             )).fetchone()
 
             if directive is None:
+
                 flash(
                     "Directive not found.",
                     "error"
@@ -2363,7 +2779,6 @@ def chair_directives():
                     url_for("chair_directives")
                 )
 
-            # Update status.
             conn.execute("""
                 UPDATE directives
                 SET
@@ -2389,10 +2804,6 @@ def chair_directives():
                 url_for("chair_directives")
             )
 
-        # ----------------------------------------------------
-        # LOAD ALL DIRECTIVES
-        # ----------------------------------------------------
-
         rows = conn.execute("""
             SELECT
                 id,
@@ -2409,29 +2820,29 @@ def chair_directives():
                 id DESC
         """).fetchall()
 
-        # ----------------------------------------------------
-        # COUNTS
-        # ----------------------------------------------------
-
         total = len(rows)
 
         under_review = sum(
-            1 for row in rows
+            1
+            for row in rows
             if row["status"] == "UNDER REVIEW"
         )
 
         approved = sum(
-            1 for row in rows
+            1
+            for row in rows
             if row["status"] == "APPROVED"
         )
 
         rejected = sum(
-            1 for row in rows
+            1
+            for row in rows
             if row["status"] == "REJECTED"
         )
 
         executed = sum(
-            1 for row in rows
+            1
+            for row in rows
             if row["status"] == "EXECUTED"
         )
 
@@ -2460,7 +2871,6 @@ def chair_directives():
         )
 
     finally:
-
         conn.close()
 
 
@@ -2478,10 +2888,6 @@ def delete_directive(directive_id):
     conn = get_db()
 
     try:
-
-        # ----------------------------------------------------
-        # CHECK DIRECTIVE EXISTS
-        # ----------------------------------------------------
 
         directive = conn.execute("""
             SELECT
@@ -2503,10 +2909,6 @@ def delete_directive(directive_id):
             return redirect(
                 url_for("chair_directives")
             )
-
-        # ----------------------------------------------------
-        # DELETE
-        # ----------------------------------------------------
 
         conn.execute("""
             DELETE FROM directives
@@ -2540,13 +2942,12 @@ def delete_directive(directive_id):
         )
 
     finally:
-
         conn.close()
+
 
 # ============================================================
 # CRISIS RESPONSE
 # ============================================================
-
 
 @app.route(
     "/crises/<int:index>/respond",
@@ -2650,7 +3051,6 @@ def crisis_response(index):
         )
 
     finally:
-
         conn.close()
 
 
@@ -2683,10 +3083,6 @@ def votes():
                 ""
             ).strip().upper()
 
-            # ------------------------------------------------
-            # ONLY NORMAL DELEGATES CAN VOTE
-            # ------------------------------------------------
-
             if user["role"] != "delegate":
 
                 flash(
@@ -2697,10 +3093,6 @@ def votes():
                 return redirect(
                     url_for("votes")
                 )
-
-            # ------------------------------------------------
-            # CHECK ATTENDANCE
-            # ------------------------------------------------
 
             attendance = conn.execute("""
                 SELECT attendance
@@ -2725,10 +3117,6 @@ def votes():
                     url_for("votes")
                 )
 
-            # ------------------------------------------------
-            # VALIDATE CHOICE
-            # ------------------------------------------------
-
             if choice not in [
                 "FOR",
                 "AGAINST",
@@ -2743,10 +3131,6 @@ def votes():
                 return redirect(
                     url_for("votes")
                 )
-
-            # ------------------------------------------------
-            # CHECK VOTE
-            # ------------------------------------------------
 
             vote = conn.execute("""
                 SELECT *
@@ -2767,10 +3151,6 @@ def votes():
                 return redirect(
                     url_for("votes")
                 )
-
-            # ------------------------------------------------
-            # RECORD VOTE
-            # ------------------------------------------------
 
             try:
 
@@ -2821,7 +3201,6 @@ def votes():
         )
 
     finally:
-
         conn.close()
 
 
@@ -2840,10 +3219,6 @@ def chair_votes():
 
     try:
 
-        # ----------------------------------------------------
-        # CHAIR ACTIONS
-        # ----------------------------------------------------
-
         if request.method == "POST":
 
             vote_id = request.form.get(
@@ -2855,10 +3230,6 @@ def chair_votes():
                 "action",
                 ""
             ).strip().lower()
-
-            # ------------------------------------------------
-            # CREATE NEW VOTE
-            # ------------------------------------------------
 
             if action == "create":
 
@@ -2883,11 +3254,10 @@ def chair_votes():
                         url_for("chair_votes")
                     )
 
-                # Only one vote can be live at a time.
-
                 conn.execute("""
                     UPDATE votes
-                    SET status = 'CLOSED',
+                    SET
+                        status = 'CLOSED',
                         closed_at = CURRENT_TIMESTAMP
                     WHERE status = 'OPEN'
                 """)
@@ -2921,10 +3291,6 @@ def chair_votes():
                 return redirect(
                     url_for("chair_votes")
                 )
-
-            # ------------------------------------------------
-            # CLOSE VOTE
-            # ------------------------------------------------
 
             if action == "close":
 
@@ -2961,7 +3327,8 @@ def chair_votes():
 
                 conn.execute("""
                     UPDATE votes
-                    SET status = 'CLOSED',
+                    SET
+                        status = 'CLOSED',
                         closed_at = CURRENT_TIMESTAMP
                     WHERE id = ?
                 """, (
@@ -2979,19 +3346,11 @@ def chair_votes():
                     url_for("chair_votes")
                 )
 
-        # ----------------------------------------------------
-        # LOAD VOTES
-        # ----------------------------------------------------
-
         rows = conn.execute("""
             SELECT *
             FROM votes
             ORDER BY id DESC
         """).fetchall()
-
-        # ----------------------------------------------------
-        # BUILD RESULTS FOR EVERY VOTE
-        # ----------------------------------------------------
 
         vote_data = []
 
@@ -3024,10 +3383,6 @@ def chair_votes():
                 "results": results,
                 "total_votes": total_votes
             })
-
-        # ----------------------------------------------------
-        # CURRENT OPEN VOTE
-        # ----------------------------------------------------
 
         open_vote = conn.execute("""
             SELECT *
@@ -3083,13 +3438,12 @@ def chair_votes():
         raise
 
     finally:
-
         conn.close()
+
 
 # ============================================================
 # VOTE RESULTS
 # ============================================================
-
 
 @app.route(
     "/votes/<int:vote_id>/results"
@@ -3143,7 +3497,6 @@ def vote_results(vote_id):
         )
 
     finally:
-
         conn.close()
 
 
@@ -3198,11 +3551,10 @@ def api_vote_results(vote_id):
             "results": results,
             "total_votes": sum(
                 results.values()
-            ),
+            )
         }
 
     finally:
-
         conn.close()
 
 

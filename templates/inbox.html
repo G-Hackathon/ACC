@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}
+Inbox — Arkanian Crisis Committee
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .inbox-page {
+        width: min(1200px, 92%);
+        margin: 0 auto;
+        padding: 80px 0 120px;
+    }
+
+    .inbox-eyebrow {
+        font-size: 11px;
+        letter-spacing: .22em;
+        text-transform: uppercase;
+        opacity: .4;
+        margin-bottom: 18px;
+    }
+
+    .inbox-title {
+        margin: 0;
+        font-size: clamp(55px, 9vw, 120px);
+        line-height: .82;
+        letter-spacing: -.07em;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .inbox-title span {
+        display: block;
+        opacity: .12;
+    }
+
+    .inbox-header {
+        margin-top: 45px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding: 20px 0;
+        border-top: 1px solid rgba(255, 255, 255, .1);
+        border-bottom: 1px solid rgba(255, 255, 255, .1);
+    }
+
+    .inbox-count {
+        font-size: 11px;
+        letter-spacing: .15em;
+        text-transform: uppercase;
+        opacity: .45;
+    }
+
+    .inbox-count strong {
+        color: white;
+        opacity: 1;
+    }
+
+    .compose-button {
+        display: inline-flex;
+        padding: 12px 18px;
+        background: white;
+        color: black;
+        text-decoration: none;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+        border: 1px solid white;
+        transition: .2s ease;
+    }
+
+    .compose-button:hover {
+        background: transparent;
+        color: white;
+    }
+
+    .message-list {
+        margin-top: 35px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .message-row {
+        position: relative;
+        display: grid;
+        grid-template-columns: 15px 1fr auto;
+        gap: 22px;
+        align-items: center;
+        padding: 25px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, .08);
+        text-decoration: none;
+        color: white;
+        transition: .2s ease;
+    }
+
+    .message-row:hover {
+        background: rgba(255, 255, 255, .035);
+        padding-left: 25px;
+    }
+
+    .message-row.unread {
+        background: rgba(255, 255, 255, .045);
+    }
+
+    .message-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: white;
+        opacity: 0;
+    }
+
+    .message-row.unread .message-dot {
+        opacity: 1;
+    }
+
+    .message-sender {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: .16em;
+        opacity: .45;
+        margin-bottom: 8px;
+    }
+
+    .message-subject {
+        font-size: 20px;
+        letter-spacing: -.025em;
+        font-weight: 600;
+    }
+
+    .message-preview {
+        margin-top: 7px;
+        font-size: 12px;
+        line-height: 1.6;
+        opacity: .38;
+        max-width: 700px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .message-date {
+        font-size: 9px;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        opacity: .3;
+        white-space: nowrap;
+    }
+
+    .empty-inbox {
+        margin-top: 35px;
+        padding: 90px 20px;
+        border: 1px solid rgba(255, 255, 255, .1);
+        text-align: center;
+    }
+
+    .empty-title {
+        font-size: 30px;
+        letter-spacing: -.04em;
+        text-transform: uppercase;
+    }
+
+    .empty-text {
+        margin-top: 12px;
+        font-size: 12px;
+        opacity: .4;
+    }
+
+    @media (max-width: 650px) {
+
+        .inbox-page {
+            padding-top: 55px;
+        }
+
+        .inbox-title {
+            font-size: 60px;
+        }
+
+        .message-row {
+            grid-template-columns: 10px 1fr;
+            gap: 15px;
+        }
+
+        .message-date {
+            grid-column: 2;
+        }
+
+        .message-preview {
+            white-space: normal;
+        }
+
+    }
+</style>
+
+
+<div class="inbox-page">
+
+    <div class="inbox-eyebrow">
+        ACC / COMMUNICATIONS
+    </div>
+
+    <h1 class="inbox-title">
+        INBOX
+        <span>MESSAGES</span>
+    </h1>
+
+
+    <div class="inbox-header">
+
+        <div class="inbox-count">
+
+            <strong>{{ unread_count }}</strong>
+            unread message{% if unread_count != 1 %}s{% endif %}
+
+        </div>
+
+
+        {% if user.role == "chair" %}
+
+        <a href="{{ url_for('compose_message') }}" class="compose-button">
+            Compose
+        </a>
+
+        {% endif %}
+
+    </div>
+
+
+    {% if messages %}
+
+    <div class="message-list">
+
+        {% for message in messages %}
+
+        <a href="{{ url_for('read_message', message_id=message.id) }}"
+            class="message-row {% if not message.is_read %}unread{% endif %}">
+
+            <span class="message-dot"></span>
+
+            <div>
+
+                <div class="message-sender">
+                    {{ message.sender }}
+                </div>
+
+                <div class="message-subject">
+                    {{ message.subject }}
+                </div>
+
+                <div class="message-preview">
+                    {{ message.body }}
+                </div>
+
+            </div>
+
+            <div class="message-date">
+                {{ message.created_at }}
+            </div>
+
+        </a>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="empty-inbox">
+
+        <div class="empty-title">
+            Inbox empty
+        </div>
+
+        <div class="empty-text">
+            No messages have been received yet.
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}
+Compose Message — Arkanian Crisis Committee
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+    .compose-page {
+        width: min(900px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 110px 0 100px;
+    }
+
+
+    .compose-header {
+        margin-bottom: 45px;
+    }
+
+
+    .compose-eyebrow {
+        display: block;
+        margin-bottom: 15px;
+        font-family: monospace;
+        font-size: .58rem;
+        letter-spacing: .2em;
+        color: rgba(255, 255, 255, .35);
+    }
+
+
+    .compose-header h1 {
+        margin: 0;
+        font-size: clamp(2.5rem, 7vw, 5rem);
+        line-height: .9;
+        letter-spacing: -.065em;
+    }
+
+
+    .compose-header p {
+        max-width: 600px;
+        margin-top: 20px;
+        color: rgba(255, 255, 255, .42);
+        font-size: .8rem;
+        line-height: 1.7;
+    }
+
+
+    .compose-form {
+        border-top: 1px solid rgba(255, 255, 255, .15);
+    }
+
+
+    .compose-field {
+        padding: 25px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, .12);
+    }
+
+
+    .compose-field label {
+        display: block;
+        margin-bottom: 12px;
+        font-family: monospace;
+        font-size: .57rem;
+        letter-spacing: .16em;
+        color: rgba(255, 255, 255, .35);
+        text-transform: uppercase;
+    }
+
+
+    .compose-field input,
+    .compose-field select,
+    .compose-field textarea {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid rgba(255, 255, 255, .16);
+        background: rgba(255, 255, 255, .025);
+        color: #fff;
+        padding: 15px 16px;
+        font-family: inherit;
+        font-size: .82rem;
+        outline: none;
+        transition:
+            border-color .2s ease,
+            background .2s ease;
+    }
+
+
+    .compose-field input:focus,
+    .compose-field select:focus,
+    .compose-field textarea:focus {
+        border-color: rgba(255, 255, 255, .5);
+        background: rgba(255, 255, 255, .045);
+    }
+
+
+    .compose-field select {
+        appearance: none;
+        cursor: pointer;
+    }
+
+
+    .compose-field select option {
+        background: #050505;
+        color: #fff;
+    }
+
+
+    .compose-field textarea {
+        min-height: 300px;
+        resize: vertical;
+        line-height: 1.7;
+    }
+
+
+    .compose-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding-top: 30px;
+    }
+
+
+    .compose-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 13px 22px;
+        border: 1px solid rgba(255, 255, 255, .25);
+        background: transparent;
+        color: #fff;
+        text-decoration: none;
+        font-family: monospace;
+        font-size: .6rem;
+        font-weight: 700;
+        letter-spacing: .12em;
+        cursor: pointer;
+        transition:
+            background .2s ease,
+            color .2s ease,
+            border-color .2s ease,
+            transform .2s ease;
+    }
+
+
+    .compose-button:hover {
+        background: #fff;
+        color: #050505;
+        border-color: #fff;
+        transform: translateY(-2px);
+    }
+
+
+    .compose-button.primary {
+        background: #fff;
+        color: #050505;
+        border-color: #fff;
+    }
+
+
+    .compose-button.primary:hover {
+        background: transparent;
+        color: #fff;
+    }
+
+
+    @media (max-width: 600px) {
+
+        .compose-page {
+            width: calc(100% - 30px);
+            padding: 90px 0 70px;
+        }
+
+
+        .compose-actions {
+            flex-direction: column-reverse;
+        }
+
+
+        .compose-button {
+            width: 100%;
+        }
+
+    }
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="compose-page">
+
+    <div class="compose-header">
+
+        <span class="compose-eyebrow">
+            ACC / SECURE COMMUNICATION
+        </span>
+
+        <h1>
+            Compose.
+        </h1>
+
+        <p>
+            Send a private message to a member of the
+            Arkanian Crisis Committee.
+        </p>
+
+    </div>
+
+
+    <form method="POST" class="compose-form">
+
+        <div class="compose-field">
+
+            <label for="recipient">
+                Recipient
+            </label>
+
+            <select id="recipient" name="recipient" required>
+
+                <option value="" disabled selected>
+                    Select recipient
+                </option>
+
+                {% for delegate in delegates %}
+                <option value="{{ delegate.username }}">
+                    {{ delegate.delegation }}
+                </option>
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <div class="compose-field">
+
+            <label for="subject">
+                Subject
+            </label>
+
+            <input type="text" id="subject" name="subject" placeholder="Message subject" maxlength="200" required>
+
+        </div>
+
+
+        <div class="compose-field">
+
+            <label for="body">
+                Message
+            </label>
+
+            <textarea id="body" name="body" placeholder="Write your message..." required></textarea>
+
+        </div>
+
+
+        <div class="compose-actions">
+
+            <a href="{{ url_for('inbox') }}" class="compose-button">
+
+                CANCEL
+
+            </a>
+
+
+            <button type="submit" class="compose-button primary">
+
+                SEND MESSAGE
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

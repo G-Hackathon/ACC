@@ -2,13 +2,9 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <meta name="theme-color" content="#050505">
-
     <meta name="description" content="Arkanian Crisis Committee — Crisis. Diplomacy. Decision.">
 
     <title>
@@ -21,10 +17,9 @@
 
     {% block extra_css %}{% endblock %}
 
-
     <style>
         /* =========================================================
-           NAVIGATION PANELS — HIDDEN BY DEFAULT
+           NAVIGATION PANELS
            ========================================================= */
 
         .access-panel,
@@ -48,29 +43,20 @@
 
         .cursor-light {
             position: fixed !important;
-
             left: 0 !important;
             top: 0 !important;
-
             width: 420px !important;
             height: 420px !important;
-
             border-radius: 50%;
-
             pointer-events: none !important;
 
             background:
                 radial-gradient(circle,
-                    rgba(255, 255, 255, 0.028) 0%,
-                    rgba(255, 255, 255, 0.010) 32%,
-                    rgba(255, 255, 255, 0.004) 50%,
+                    rgba(255, 255, 255, .028) 0%,
+                    rgba(255, 255, 255, .010) 32%,
+                    rgba(255, 255, 255, .004) 50%,
                     transparent 72%);
 
-            /*
-             * IMPORTANT:
-             * The glow must stay BELOW the navigation.
-             * It cannot interfere with Profile / Logout / buttons.
-             */
             z-index: 1 !important;
 
             transform:
@@ -79,17 +65,10 @@
                     0) translate(-50%, -50%);
 
             opacity: 0 !important;
-
             visibility: hidden !important;
-
             mix-blend-mode: normal;
-
-            will-change:
-                transform,
-                opacity;
-
-            transition:
-                opacity 350ms ease;
+            will-change: transform, opacity;
+            transition: opacity 350ms ease;
         }
 
         .cursor-light.visible {
@@ -133,42 +112,26 @@
 
         .nav-actions {
             display: flex;
-
             align-items: center;
-
             gap: 15px;
         }
 
-
         .nav-role-indicator {
             display: flex;
-
             align-items: center;
-
             gap: 8px;
-
             font-family: monospace;
-
             font-size: .55rem;
-
             letter-spacing: .13em;
-
-            color:
-                rgba(255, 255, 255, .38);
+            color: rgba(255, 255, 255, .38);
         }
-
 
         .nav-role-dot {
             width: 5px;
-
             height: 5px;
-
             border-radius: 50%;
-
             background: #fff;
-
-            box-shadow:
-                0 0 9px rgba(255, 255, 255, .7);
+            box-shadow: 0 0 9px rgba(255, 255, 255, .7);
         }
 
 
@@ -178,31 +141,17 @@
 
         .profile-button {
             width: 38px;
-
             height: 38px;
-
             display: flex;
-
             align-items: center;
-
             justify-content: center;
-
-            border:
-                1px solid rgba(255, 255, 255, .22);
-
-            background:
-                transparent;
-
+            border: 1px solid rgba(255, 255, 255, .22);
+            background: transparent;
             color: #fff;
-
             text-decoration: none;
-
             font-family: monospace;
-
             font-size: .68rem;
-
             font-weight: 800;
-
             cursor: pointer;
 
             transition:
@@ -212,16 +161,11 @@
                 transform .25s ease;
         }
 
-
         .profile-button:hover {
             background: #fff;
-
             color: #050505;
-
             border-color: #fff;
-
-            transform:
-                translateY(-2px);
+            transform: translateY(-2px);
         }
 
 
@@ -231,31 +175,17 @@
 
         .access-button {
             position: relative;
-
             display: flex;
-
             align-items: center;
-
             gap: 12px;
-
             padding: 11px 16px;
-
-            border:
-                1px solid rgba(255, 255, 255, .22);
-
-            background:
-                transparent;
-
+            border: 1px solid rgba(255, 255, 255, .22);
+            background: transparent;
             color: #fff;
-
             cursor: pointer;
-
             font-family: inherit;
-
             font-size: .62rem;
-
             font-weight: 700;
-
             letter-spacing: .13em;
 
             transition:
@@ -264,26 +194,19 @@
                 color .25s ease;
         }
 
-
         .access-button:hover,
         .access-button[aria-expanded="true"] {
             background: #fff;
-
             border-color: #fff;
-
             color: #050505;
         }
 
-
         .access-arrow {
-            transition:
-                transform .25s ease;
+            transition: transform .25s ease;
         }
 
-
         .access-button[aria-expanded="true"] .access-arrow {
-            transform:
-                rotate(180deg);
+            transform: rotate(180deg);
         }
 
 
@@ -293,119 +216,62 @@
 
         .access-panel {
             position: fixed !important;
-
             z-index: 9000 !important;
-
             inset: 0;
-
-            background:
-                rgba(0, 0, 0, .78);
-
-            backdrop-filter:
-                blur(16px);
-
-            -webkit-backdrop-filter:
-                blur(16px);
+            background: rgba(0, 0, 0, .78);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
 
             transition:
                 opacity .35s ease,
                 visibility .35s ease;
         }
 
-
         .access-panel-inner {
-            width:
-                min(1200px, 90%);
-
-            margin:
-                0 auto;
-
-            padding:
-                130px 0 50px;
-
-            transform:
-                translateY(-25px);
-
-            transition:
-                transform .4s cubic-bezier(.22, 1, .36, 1);
+            width: min(1200px, 90%);
+            margin: 0 auto;
+            padding: 130px 0 50px;
+            transform: translateY(-25px);
+            transition: transform .4s cubic-bezier(.22, 1, .36, 1);
         }
-
 
         .access-panel.open .access-panel-inner {
-            transform:
-                translateY(0);
+            transform: translateY(0);
         }
-
 
         .access-panel-header {
             display: flex;
-
-            justify-content:
-                space-between;
-
-            align-items:
-                flex-end;
-
+            justify-content: space-between;
+            align-items: flex-end;
             gap: 30px;
-
-            margin-bottom:
-                35px;
+            margin-bottom: 35px;
         }
-
 
         .access-panel-eyebrow {
             display: block;
-
-            margin-bottom:
-                14px;
-
-            font-family:
-                monospace;
-
-            font-size:
-                .58rem;
-
-            letter-spacing:
-                .2em;
-
-            color:
-                rgba(255, 255, 255, .35);
+            margin-bottom: 14px;
+            font-family: monospace;
+            font-size: .58rem;
+            letter-spacing: .2em;
+            color: rgba(255, 255, 255, .35);
         }
-
 
         .access-panel-header h2 {
             margin: 0;
-
-            font-size:
-                clamp(2.2rem, 5vw, 4.8rem);
-
-            line-height:
-                .9;
-
-            letter-spacing:
-                -.065em;
+            font-size: clamp(2.2rem, 5vw, 4.8rem);
+            line-height: .9;
+            letter-spacing: -.065em;
         }
-
 
         .access-close {
             width: 46px;
-
             height: 46px;
-
             flex-shrink: 0;
-
-            border:
-                1px solid rgba(255, 255, 255, .2);
-
-            background:
-                transparent;
-
+            border: 1px solid rgba(255, 255, 255, .2);
+            background: transparent;
             color: #fff;
-
             cursor: pointer;
-
             font-size: 1.5rem;
-
             line-height: 1;
 
             transition:
@@ -413,10 +279,8 @@
                 color .2s ease;
         }
 
-
         .access-close:hover {
             background: #fff;
-
             color: #050505;
         }
 
@@ -427,32 +291,18 @@
 
         .access-portal-grid {
             display: grid;
-
-            grid-template-columns:
-                repeat(3, minmax(0, 1fr));
-
-            border-top:
-                1px solid rgba(255, 255, 255, .14);
-
-            border-bottom:
-                1px solid rgba(255, 255, 255, .14);
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            border-top: 1px solid rgba(255, 255, 255, .14);
+            border-bottom: 1px solid rgba(255, 255, 255, .14);
         }
-
 
         .access-portal {
             position: relative;
-
             min-height: 390px;
-
             padding: 28px;
-
             color: #fff;
-
             text-decoration: none;
-
-            border-right:
-                1px solid rgba(255, 255, 255, .14);
-
+            border-right: 1px solid rgba(255, 255, 255, .14);
             overflow: hidden;
 
             transition:
@@ -461,17 +311,13 @@
                 opacity .3s ease;
         }
 
-
         .access-portal:last-child {
             border-right: none;
         }
 
-
         .access-portal::before {
             content: "";
-
             position: absolute;
-
             inset: 0;
 
             background:
@@ -480,177 +326,87 @@
                     transparent 50%);
 
             opacity: 0;
-
-            transition:
-                opacity .3s ease;
+            transition: opacity .3s ease;
         }
-
 
         .access-portal:hover {
-            background:
-                rgba(255, 255, 255, .035);
-
-            transform:
-                translateY(-6px);
+            background: rgba(255, 255, 255, .035);
+            transform: translateY(-6px);
         }
-
 
         .access-portal:hover::before {
             opacity: 1;
         }
 
-
         .access-portal-top {
             position: relative;
-
             z-index: 2;
-
             display: flex;
-
-            justify-content:
-                space-between;
-
-            align-items:
-                center;
+            justify-content: space-between;
+            align-items: center;
         }
-
 
         .access-portal-number {
-            font-family:
-                monospace;
-
-            font-size:
-                .62rem;
-
-            letter-spacing:
-                .12em;
-
-            color:
-                rgba(255, 255, 255, .3);
+            font-family: monospace;
+            font-size: .62rem;
+            letter-spacing: .12em;
+            color: rgba(255, 255, 255, .3);
         }
-
 
         .access-portal-arrow {
-            font-size:
-                1.2rem;
-
-            transition:
-                transform .25s ease;
+            font-size: 1.2rem;
+            transition: transform .25s ease;
         }
-
 
         .access-portal:hover .access-portal-arrow {
-            transform:
-                translate(4px, -4px);
+            transform: translate(4px, -4px);
         }
-
 
         .access-portal-role {
             position: relative;
-
             z-index: 2;
-
-            margin-top:
-                110px;
-
-            font-size:
-                clamp(1.8rem, 3vw, 3rem);
-
-            line-height:
-                .9;
-
-            letter-spacing:
-                -.055em;
-
-            font-weight:
-                900;
+            margin-top: 110px;
+            font-size: clamp(1.8rem, 3vw, 3rem);
+            line-height: .9;
+            letter-spacing: -.055em;
+            font-weight: 900;
         }
-
 
         .access-portal p {
             position: relative;
-
             z-index: 2;
-
-            max-width:
-                330px;
-
-            margin:
-                18px 0 0;
-
-            color:
-                rgba(255, 255, 255, .43);
-
-            font-size:
-                .77rem;
-
-            line-height:
-                1.7;
+            max-width: 330px;
+            margin: 18px 0 0;
+            color: rgba(255, 255, 255, .43);
+            font-size: .77rem;
+            line-height: 1.7;
         }
-
 
         .access-portal-footer {
             position: absolute;
-
             z-index: 2;
-
-            bottom:
-                28px;
-
-            left:
-                28px;
-
-            right:
-                28px;
-
+            bottom: 28px;
+            left: 28px;
+            right: 28px;
             display: flex;
-
-            justify-content:
-                space-between;
-
-            align-items:
-                center;
-
-            padding-top:
-                17px;
-
-            border-top:
-                1px solid rgba(255, 255, 255, .12);
-
-            font-family:
-                monospace;
-
-            font-size:
-                .57rem;
-
-            letter-spacing:
-                .13em;
-
-            color:
-                rgba(255, 255, 255, .45);
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 17px;
+            border-top: 1px solid rgba(255, 255, 255, .12);
+            font-family: monospace;
+            font-size: .57rem;
+            letter-spacing: .13em;
+            color: rgba(255, 255, 255, .45);
         }
-
 
         .access-panel-bottom {
             display: flex;
-
-            justify-content:
-                space-between;
-
-            padding-top:
-                18px;
-
-            font-family:
-                monospace;
-
-            font-size:
-                .52rem;
-
-            letter-spacing:
-                .13em;
-
-            color:
-                rgba(255, 255, 255, .2);
+            justify-content: space-between;
+            padding-top: 18px;
+            font-family: monospace;
+            font-size: .52rem;
+            letter-spacing: .13em;
+            color: rgba(255, 255, 255, .2);
         }
 
 
@@ -660,52 +416,32 @@
 
         .mobile-menu-button {
             display: none;
-
             width: 42px;
-
             height: 42px;
-
-            border:
-                1px solid rgba(255, 255, 255, .2);
-
-            background:
-                transparent;
-
-            cursor:
-                pointer;
-
-            padding:
-                0;
+            border: 1px solid rgba(255, 255, 255, .2);
+            background: transparent;
+            cursor: pointer;
+            padding: 0;
         }
-
 
         .mobile-menu-button span {
             display: block;
-
             width: 17px;
-
             height: 1px;
-
             margin: 5px auto;
-
-            background:
-                #fff;
+            background: #fff;
 
             transition:
                 transform .25s ease,
                 opacity .25s ease;
         }
 
-
         .mobile-menu-button.open span:first-child {
-            transform:
-                translateY(3px) rotate(45deg);
+            transform: translateY(3px) rotate(45deg);
         }
 
-
         .mobile-menu-button.open span:last-child {
-            transform:
-                translateY(-3px) rotate(-45deg);
+            transform: translateY(-3px) rotate(-45deg);
         }
 
 
@@ -715,98 +451,49 @@
 
         .mobile-nav-panel {
             position: fixed !important;
-
             z-index: 8500 !important;
-
             inset: 0;
-
-            background:
-                #050505;
+            background: #050505;
 
             transition:
                 opacity .3s ease,
                 visibility .3s ease;
         }
 
-
         .mobile-nav-inner {
-            width:
-                calc(100% - 40px);
-
-            margin:
-                0 auto;
-
-            padding:
-                115px 0 40px;
+            width: calc(100% - 40px);
+            margin: 0 auto;
+            padding: 115px 0 40px;
         }
-
 
         .mobile-nav-heading {
-            margin-bottom:
-                20px;
-
-            font-family:
-                monospace;
-
-            font-size:
-                .55rem;
-
-            letter-spacing:
-                .2em;
-
-            color:
-                rgba(255, 255, 255, .3);
+            margin-bottom: 20px;
+            font-family: monospace;
+            font-size: .55rem;
+            letter-spacing: .2em;
+            color: rgba(255, 255, 255, .3);
         }
-
 
         .mobile-nav-inner a {
             display: flex;
-
             align-items: center;
-
             gap: 20px;
-
-            padding:
-                21px 0;
-
-            border-bottom:
-                1px solid rgba(255, 255, 255, .11);
-
-            color:
-                #fff;
-
-            text-decoration:
-                none;
-
-            font-size:
-                1.5rem;
-
-            font-weight:
-                800;
-
-            letter-spacing:
-                -.035em;
+            padding: 21px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, .11);
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -.035em;
         }
 
-
         .mobile-nav-inner a span {
-            width:
-                25px;
-
-            font-family:
-                monospace;
-
-            font-size:
-                .55rem;
-
-            font-weight:
-                400;
-
-            letter-spacing:
-                .08em;
-
-            color:
-                rgba(255, 255, 255, .28);
+            width: 25px;
+            font-family: monospace;
+            font-size: .55rem;
+            font-weight: 400;
+            letter-spacing: .08em;
+            color: rgba(255, 255, 255, .28);
         }
 
 
@@ -816,96 +503,45 @@
 
         .flash-container {
             position: fixed;
-
             z-index: 10000;
-
-            top:
-                100px;
-
-            right:
-                25px;
-
-            width:
-                min(390px, calc(100% - 40px));
-
-            display:
-                flex;
-
-            flex-direction:
-                column;
-
-            gap:
-                10px;
+            top: 100px;
+            right: 25px;
+            width: min(390px, calc(100% - 40px));
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-
         .flash-message {
-            display:
-                flex;
-
-            align-items:
-                center;
-
-            gap:
-                12px;
-
-            padding:
-                14px 17px;
-
-            border:
-                1px solid rgba(255, 255, 255, .2);
-
-            background:
-                rgba(5, 5, 5, .92);
-
-            color:
-                #fff;
-
-            backdrop-filter:
-                blur(15px);
-
-            font-family:
-                monospace;
-
-            font-size:
-                .64rem;
-
-            line-height:
-                1.5;
-
-            box-shadow:
-                0 20px 50px rgba(0, 0, 0, .4);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 17px;
+            border: 1px solid rgba(255, 255, 255, .2);
+            background: rgba(5, 5, 5, .92);
+            color: #fff;
+            backdrop-filter: blur(15px);
+            font-family: monospace;
+            font-size: .64rem;
+            line-height: 1.5;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, .4);
 
             transition:
                 opacity .45s ease,
                 transform .45s ease;
         }
 
-
         .flash-indicator {
-            width:
-                5px;
-
-            height:
-                5px;
-
-            flex-shrink:
-                0;
-
-            border-radius:
-                50%;
-
-            background:
-                #fff;
+            width: 5px;
+            height: 5px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: #fff;
         }
 
-
         .flash-hidden {
-            opacity:
-                0;
-
-            transform:
-                translateX(30px);
+            opacity: 0;
+            transform: translateX(30px);
         }
 
 
@@ -914,80 +550,33 @@
            ========================================================= */
 
         .brand {
-            display:
-                flex !important;
-
-            align-items:
-                center !important;
-
-            gap:
-                13px !important;
-
-            flex-shrink:
-                0 !important;
-
-            height:
-                43px !important;
-
-            text-decoration:
-                none !important;
-
-            border:
-                none !important;
-
-            outline:
-                none !important;
-
-            background:
-                transparent !important;
-
-            box-shadow:
-                none !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 13px !important;
+            flex-shrink: 0 !important;
+            height: 43px !important;
+            text-decoration: none !important;
+            border: none !important;
+            outline: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
         }
 
-
         .brand-mark {
-            width:
-                43px !important;
-
-            height:
-                43px !important;
-
-            flex:
-                0 0 43px !important;
-
-            display:
-                grid !important;
-
-            place-items:
-                center !important;
-
-            border:
-                1px solid rgba(255, 255, 255, .65) !important;
-
-            background:
-                transparent !important;
-
-            color:
-                #fff !important;
-
-            font-size:
-                10px !important;
-
-            line-height:
-                1 !important;
-
-            font-weight:
-                900 !important;
-
-            letter-spacing:
-                -.06em !important;
-
-            text-decoration:
-                none !important;
-
-            box-shadow:
-                none !important;
+            width: 43px !important;
+            height: 43px !important;
+            flex: 0 0 43px !important;
+            display: grid !important;
+            place-items: center !important;
+            border: 1px solid rgba(255, 255, 255, .65) !important;
+            background: transparent !important;
+            color: #fff !important;
+            font-size: 10px !important;
+            line-height: 1 !important;
+            font-weight: 900 !important;
+            letter-spacing: -.06em !important;
+            text-decoration: none !important;
+            box-shadow: none !important;
 
             transition:
                 background .25s ease,
@@ -995,113 +584,49 @@
                 transform .25s ease;
         }
 
-
         .brand:hover .brand-mark {
-            background:
-                #fff !important;
-
-            color:
-                #050505 !important;
-
-            transform:
-                rotate(-5deg) scale(1.05);
+            background: #fff !important;
+            color: #050505 !important;
+            transform: rotate(-5deg) scale(1.05);
         }
-
 
         .brand-name {
-            display:
-                flex !important;
-
-            flex-direction:
-                column !important;
-
-            justify-content:
-                center !important;
-
-            align-items:
-                flex-start !important;
-
-            height:
-                43px !important;
-
-            margin:
-                0 !important;
-
-            padding:
-                0 !important;
-
-            max-width:
-                180px !important;
-
-            color:
-                rgba(255, 255, 255, .82) !important;
-
-            font-size:
-                9px !important;
-
-            line-height:
-                1.05 !important;
-
-            font-weight:
-                800 !important;
-
-            letter-spacing:
-                .12em !important;
-
-            text-transform:
-                uppercase !important;
-
-            white-space:
-                nowrap !important;
-
-            border:
-                none !important;
-
-            background:
-                transparent !important;
-
-            box-shadow:
-                none !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: flex-start !important;
+            height: 43px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            max-width: 180px !important;
+            color: rgba(255, 255, 255, .82) !important;
+            font-size: 9px !important;
+            line-height: 1.05 !important;
+            font-weight: 800 !important;
+            letter-spacing: .12em !important;
+            text-transform: uppercase !important;
+            white-space: nowrap !important;
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
         }
-
 
         .brand-name span {
-            display:
-                block !important;
-
-            width:
-                auto !important;
-
-            height:
-                auto !important;
-
-            margin:
-                0 !important;
-
-            padding:
-                0 !important;
-
-            border:
-                none !important;
-
-            background:
-                transparent !important;
-
-            box-shadow:
-                none !important;
-
-            color:
-                inherit !important;
-
-            line-height:
-                1.05 !important;
+            display: block !important;
+            width: auto !important;
+            height: auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            color: inherit !important;
+            line-height: 1.05 !important;
         }
-
 
         .brand-divider,
         .brand-subtitle {
-            display:
-                none !important;
+            display: none !important;
         }
 
 
@@ -1112,184 +637,112 @@
         @media (max-width: 900px) {
 
             .nav-links {
-                display:
-                    none;
+                display: none;
             }
-
 
             .mobile-menu-button {
-                display:
-                    block;
+                display: block;
             }
-
 
             .access-button {
-                display:
-                    none;
+                display: none;
             }
-
 
             .nav-role-indicator {
-                display:
-                    none;
+                display: none;
             }
-
 
             .access-portal-grid {
-                grid-template-columns:
-                    1fr;
+                grid-template-columns: 1fr;
             }
-
 
             .access-portal {
-                min-height:
-                    290px;
-
-                border-right:
-                    none;
-
-                border-bottom:
-                    1px solid rgba(255, 255, 255, .14);
+                min-height: 290px;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, .14);
             }
-
 
             .access-portal:last-child {
-                border-bottom:
-                    none;
+                border-bottom: none;
             }
-
 
             .access-portal-role {
-                margin-top:
-                    70px;
+                margin-top: 70px;
             }
-
         }
 
 
         @media (max-width: 700px) {
 
             .brand {
-                gap:
-                    10px !important;
-
-                height:
-                    38px !important;
+                gap: 10px !important;
+                height: 38px !important;
             }
-
 
             .brand-mark {
-                width:
-                    38px !important;
-
-                height:
-                    38px !important;
-
-                flex-basis:
-                    38px !important;
-
-                font-size:
-                    9px !important;
+                width: 38px !important;
+                height: 38px !important;
+                flex-basis: 38px !important;
+                font-size: 9px !important;
             }
-
 
             .brand-name {
-                display:
-                    none !important;
+                display: none !important;
             }
-
         }
 
 
         @media (max-width: 600px) {
 
             .access-panel-inner {
-                width:
-                    calc(100% - 40px);
-
-                padding-top:
-                    100px;
-
-                max-height:
-                    100vh;
-
-                overflow-y:
-                    auto;
+                width: calc(100% - 40px);
+                padding-top: 100px;
+                max-height: 100vh;
+                overflow-y: auto;
             }
-
 
             .access-panel-header {
-                align-items:
-                    flex-start;
+                align-items: flex-start;
             }
-
 
             .access-panel-header h2 {
-                font-size:
-                    2.4rem;
+                font-size: 2.4rem;
             }
-
 
             .access-portal {
-                min-height:
-                    250px;
-
-                padding:
-                    22px;
+                min-height: 250px;
+                padding: 22px;
             }
-
 
             .access-portal-role {
-                margin-top:
-                    55px;
-
-                font-size:
-                    2rem;
+                margin-top: 55px;
+                font-size: 2rem;
             }
-
 
             .access-portal-footer {
-                left:
-                    22px;
-
-                right:
-                    22px;
-
-                bottom:
-                    22px;
+                left: 22px;
+                right: 22px;
+                bottom: 22px;
             }
-
 
             .access-panel-bottom {
-                flex-direction:
-                    column;
-
-                gap:
-                    8px;
+                flex-direction: column;
+                gap: 8px;
             }
-
 
             .flash-container {
-                top:
-                    82px;
-
-                right:
-                    20px;
-
-                width:
-                    calc(100% - 40px);
+                top: 82px;
+                right: 20px;
+                width: calc(100% - 40px);
             }
-
         }
 
 
         @media (max-width: 800px) {
 
             .cursor-light {
-                display:
-                    none !important;
+                display: none !important;
             }
-
         }
 
 
@@ -1302,10 +755,8 @@
             .mobile-menu-button span,
             .flash-message,
             .cursor-light {
-                transition:
-                    none !important;
+                transition: none !important;
             }
-
         }
     </style>
 
@@ -1314,13 +765,11 @@
 
 <body>
 
-
     <!-- =========================================================
          CURSOR LIGHT
          ========================================================= -->
 
-    <div class="cursor-light" id="cursorLight" aria-hidden="true">
-    </div>
+    <div class="cursor-light" id="cursorLight" aria-hidden="true"></div>
 
 
     <!-- =========================================================
@@ -1330,7 +779,6 @@
     <header class="site-header">
 
         <nav class="navbar">
-
 
             <!-- BRAND -->
 
@@ -1355,7 +803,9 @@
             </a>
 
 
-            <!-- DESKTOP NAVIGATION -->
+            <!-- =====================================================
+                 DESKTOP NAVIGATION
+                 ===================================================== -->
 
             <div class="nav-links">
 
@@ -1372,22 +822,41 @@
 
                 {% if user %}
 
+                <!-- ================= DELEGATE ================= -->
+
                 {% if user.role == "delegate" %}
 
+                <a href="{{ url_for('inbox') }}"
+                    class="{% if request.endpoint in ['inbox', 'read_message'] %}active{% endif %}">
+                    INBOX
+
+                    {% if unread_count > 0 %}
+                    <span class="nav-badge">
+                        {{ unread_count }}
+                    </span>
+                    {% endif %}
+                </a>
+
+
                 <a href="{{ url_for('notes') }}"
-                    class="{% if request.endpoint in ['notes', 'new_note', 'update_note', 'delete_note'] %}active{% endif %}">
+                    class="{% if request.endpoint in ['notes', 'new_note', 'edit_note', 'update_note', 'delete_note'] %}active{% endif %}">
                     NOTES
                 </a>
+
 
                 <a href="{{ url_for('directives') }}"
                     class="{% if request.endpoint in ['directives'] %}active{% endif %}">
                     DIRECTIVES
                 </a>
 
+
                 <a href="{{ url_for('votes') }}"
                     class="{% if request.endpoint in ['votes', 'cast_vote'] %}active{% endif %}">
                     VOTES
                 </a>
+
+
+                <!-- ================= PRESS ==================== -->
 
                 {% elif user.role == "press" %}
 
@@ -1396,17 +865,34 @@
                     PUBLISH
                 </a>
 
+
+                <!-- ================= CHAIR ==================== -->
+
                 {% elif user.role == "chair" %}
+
+                <a href="{{ url_for('inbox') }}"
+                    class="{% if request.endpoint in ['inbox', 'read_message', 'delete_message'] %}active{% endif %}">
+                    INBOX
+
+                    {% if unread_count > 0 %}
+                    <span class="nav-badge">
+                        {{ unread_count }}
+                    </span>
+                    {% endif %}
+                </a>
+
 
                 <a href="{{ url_for('crises') }}"
                     class="{% if request.endpoint in ['crises', 'publish_crisis', 'delete_crisis'] %}active{% endif %}">
                     CRISES
                 </a>
 
+
                 <a href="{{ url_for('chair_directives') }}"
                     class="{% if request.endpoint in ['chair_directives'] %}active{% endif %}">
                     DIRECTIVES
                 </a>
+
 
                 <a href="{{ url_for('chair_votes') }}"
                     class="{% if request.endpoint in ['chair_votes'] %}active{% endif %}">
@@ -1420,7 +906,9 @@
             </div>
 
 
-            <!-- RIGHT SIDE -->
+            <!-- =====================================================
+                 RIGHT SIDE
+                 ===================================================== -->
 
             <div class="nav-actions">
 
@@ -1474,9 +962,9 @@
         </nav>
 
 
-        <!-- =====================================================
+        <!-- =========================================================
              ACCESS PANEL
-             ===================================================== -->
+             ========================================================= -->
 
         {% if not user %}
 
@@ -1507,7 +995,6 @@
 
 
                 <div class="access-portal-grid">
-
 
                     <!-- DELEGATE -->
 
@@ -1662,9 +1149,9 @@
         {% endif %}
 
 
-        <!-- =====================================================
+        <!-- =========================================================
              MOBILE NAVIGATION
-             ===================================================== -->
+             ========================================================= -->
 
         <div class="mobile-nav-panel" id="mobileNavPanel" aria-hidden="true">
 
@@ -1676,64 +1163,76 @@
 
 
                 <a href="{{ url_for('home') }}">
-
-                    <span>
-                        01
-                    </span>
-
+                    <span>01</span>
                     HOME
-
                 </a>
 
 
                 <a href="{{ url_for('articles') }}">
-
-                    <span>
-                        02
-                    </span>
-
+                    <span>02</span>
                     ARTICLES
-
                 </a>
 
 
                 {% if user %}
 
+                <!-- ================= DELEGATE ================= -->
 
                 {% if user.role == "delegate" %}
 
-                <a href="{{ url_for('notes') }}">
-
-                    <span>
-                        03
-                    </span>
-
-                    NOTES
-
+                <a href="{{ url_for('inbox') }}">
+                    <span>03</span>
+                    INBOX
                 </a>
+
+                <a href="{{ url_for('notes') }}">
+                    <span>04</span>
+                    NOTES
+                </a>
+
+                <a href="{{ url_for('directives') }}">
+                    <span>05</span>
+                    DIRECTIVES
+                </a>
+
+                <a href="{{ url_for('votes') }}">
+                    <span>06</span>
+                    VOTES
+                </a>
+
+
+                <!-- ================= PRESS ==================== -->
 
                 {% elif user.role == "press" %}
 
                 <a href="{{ url_for('press_upload') }}">
-
-                    <span>
-                        03
-                    </span>
-
+                    <span>03</span>
                     PUBLISH
-
                 </a>
+
+
+                <!-- ================= CHAIR ==================== -->
 
                 {% elif user.role == "chair" %}
 
+                <a href="{{ url_for('inbox') }}">
+                    <span>03</span>
+                    INBOX
+                </a>
+
                 <a href="{{ url_for('crises') }}">
-
-                    <span>
-                        03
-                    </span>
-
+                    <span>04</span>
                     CRISES
+                </a>
 
+                <a href="{{ url_for('chair_directives') }}">
+                    <span>05</span>
+                    DIRECTIVES
+                </a>
+
+                <a href="{{ url_for('chair_votes') }}">
+                    <span>06</span>
+                    VOTES
                 </a>
 
                 {% endif %}
@@ -1741,9 +1240,13 @@
 
                 <a href="{{ url_for('profile') }}">
 
-                    <span>
-                        04
-                    </span>
+                    {% if user.role == "delegate" %}
+                    <span>07</span>
+                    {% elif user.role == "chair" %}
+                    <span>07</span>
+                    {% else %}
+                    <span>04</span>
+                    {% endif %}
 
                     PROFILE
 
@@ -1752,9 +1255,13 @@
 
                 <a href="{{ url_for('logout') }}">
 
-                    <span>
-                        05
-                    </span>
+                    {% if user.role == "delegate" %}
+                    <span>08</span>
+                    {% elif user.role == "chair" %}
+                    <span>08</span>
+                    {% else %}
+                    <span>05</span>
+                    {% endif %}
 
                     LOG OUT
 
@@ -1763,39 +1270,22 @@
 
                 {% else %}
 
-
                 <a href="{{ url_for('login') }}">
-
-                    <span>
-                        03
-                    </span>
-
+                    <span>03</span>
                     DELEGATE LOGIN
-
                 </a>
 
 
                 <a href="{{ url_for('press_login') }}">
-
-                    <span>
-                        04
-                    </span>
-
+                    <span>04</span>
                     PRESS LOGIN
-
                 </a>
 
 
                 <a href="{{ url_for('chair_login') }}">
-
-                    <span>
-                        05
-                    </span>
-
+                    <span>05</span>
                     CHAIR LOGIN
-
                 </a>
-
 
                 {% endif %}
 
@@ -1957,22 +1447,17 @@
             "DOMContentLoaded",
             function () {
 
-
                 /* =================================================
                    CURSOR LIGHT
                    ================================================= */
 
                 const cursorLight =
-                    document.getElementById(
-                        "cursorLight"
-                    );
+                    document.getElementById("cursorLight");
 
 
                 if (
                     cursorLight &&
-                    window.matchMedia(
-                        "(pointer: fine)"
-                    ).matches &&
+                    window.matchMedia("(pointer: fine)").matches &&
                     !window.matchMedia(
                         "(prefers-reduced-motion: reduce)"
                     ).matches
@@ -1983,9 +1468,7 @@
 
                     function moveCursorLight(event) {
 
-                        if (
-                            event.pointerType !== "mouse"
-                        ) {
+                        if (event.pointerType !== "mouse") {
                             return;
                         }
 
@@ -2037,19 +1520,13 @@
                    ================================================= */
 
                 const accessButton =
-                    document.getElementById(
-                        "accessButton"
-                    );
+                    document.getElementById("accessButton");
 
                 const accessPanel =
-                    document.getElementById(
-                        "accessPanel"
-                    );
+                    document.getElementById("accessPanel");
 
                 const accessClose =
-                    document.getElementById(
-                        "accessClose"
-                    );
+                    document.getElementById("accessClose");
 
 
                 function closeMobileMenu() {
@@ -2070,10 +1547,7 @@
                     }
 
 
-                    mobilePanel.classList.remove(
-                        "open"
-                    );
-
+                    mobilePanel.classList.remove("open");
 
                     mobilePanel.setAttribute(
                         "aria-hidden",
@@ -2083,10 +1557,7 @@
 
                     if (mobileButton) {
 
-                        mobileButton.classList.remove(
-                            "open"
-                        );
-
+                        mobileButton.classList.remove("open");
 
                         mobileButton.setAttribute(
                             "aria-expanded",
@@ -2113,10 +1584,7 @@
                     closeMobileMenu();
 
 
-                    accessPanel.classList.add(
-                        "open"
-                    );
-
+                    accessPanel.classList.add("open");
 
                     accessPanel.setAttribute(
                         "aria-hidden",
@@ -2148,10 +1616,7 @@
                     }
 
 
-                    accessPanel.classList.remove(
-                        "open"
-                    );
-
+                    accessPanel.classList.remove("open");
 
                     accessPanel.setAttribute(
                         "aria-hidden",
@@ -2184,9 +1649,7 @@
 
                             if (
                                 accessPanel &&
-                                accessPanel.classList.contains(
-                                    "open"
-                                )
+                                accessPanel.classList.contains("open")
                             ) {
 
                                 closeAccess();
@@ -2220,8 +1683,7 @@
                         function (event) {
 
                             if (
-                                event.target ===
-                                accessPanel
+                                event.target === accessPanel
                             ) {
 
                                 closeAccess();
@@ -2243,7 +1705,6 @@
                         "mobileMenuButton"
                     );
 
-
                 const mobilePanel =
                     document.getElementById(
                         "mobileNavPanel"
@@ -2260,10 +1721,7 @@
                     closeAccess();
 
 
-                    mobilePanel.classList.add(
-                        "open"
-                    );
-
+                    mobilePanel.classList.add("open");
 
                     mobilePanel.setAttribute(
                         "aria-hidden",
@@ -2273,10 +1731,7 @@
 
                     if (mobileButton) {
 
-                        mobileButton.classList.add(
-                            "open"
-                        );
-
+                        mobileButton.classList.add("open");
 
                         mobileButton.setAttribute(
                             "aria-expanded",
@@ -2301,9 +1756,7 @@
 
                             if (
                                 mobilePanel &&
-                                mobilePanel.classList.contains(
-                                    "open"
-                                )
+                                mobilePanel.classList.contains("open")
                             ) {
 
                                 closeMobileMenu();
@@ -2327,9 +1780,7 @@
                 if (mobilePanel) {
 
                     const mobileLinks =
-                        mobilePanel.querySelectorAll(
-                            "a"
-                        );
+                        mobilePanel.querySelectorAll("a");
 
 
                     mobileLinks.forEach(
@@ -2358,12 +1809,9 @@
                     "keydown",
                     function (event) {
 
-                        if (
-                            event.key === "Escape"
-                        ) {
+                        if (event.key === "Escape") {
 
                             closeAccess();
-
                             closeMobileMenu();
 
                         }
@@ -2392,9 +1840,7 @@
                                 portals.forEach(
                                     function (other) {
 
-                                        if (
-                                            other !== portal
-                                        ) {
+                                        if (other !== portal) {
 
                                             other.style.opacity =
                                                 "0.42";
@@ -2415,8 +1861,7 @@
                                 portals.forEach(
                                     function (other) {
 
-                                        other.style.opacity =
-                                            "";
+                                        other.style.opacity = "";
 
                                     }
                                 );

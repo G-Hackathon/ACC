@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}
+Message — Arkanian Crisis Committee
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .message-page {
+        width: min(900px, 92%);
+        margin: 0 auto;
+        padding: 80px 0 120px;
+    }
+
+    .message-back {
+        display: inline-block;
+        color: white;
+        text-decoration: none;
+        font-size: 10px;
+        letter-spacing: .16em;
+        text-transform: uppercase;
+        opacity: .4;
+        margin-bottom: 50px;
+        transition: .2s ease;
+    }
+
+    .message-back:hover {
+        opacity: 1;
+    }
+
+    .message-eyebrow {
+        font-size: 10px;
+        letter-spacing: .2em;
+        text-transform: uppercase;
+        opacity: .4;
+        margin-bottom: 18px;
+    }
+
+    .message-title {
+        margin: 0;
+        font-size: clamp(38px, 6vw, 72px);
+        line-height: .95;
+        letter-spacing: -.055em;
+        font-weight: 700;
+    }
+
+    .message-meta {
+        margin-top: 30px;
+        padding: 18px 0;
+        border-top: 1px solid rgba(255, 255, 255, .1);
+        border-bottom: 1px solid rgba(255, 255, 255, .1);
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        font-size: 10px;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        opacity: .4;
+    }
+
+    .message-content {
+        margin-top: 55px;
+        font-size: 15px;
+        line-height: 2;
+        white-space: pre-wrap;
+        color: rgba(255, 255, 255, .72);
+    }
+
+    .message-actions {
+        margin-top: 60px;
+        padding-top: 25px;
+        border-top: 1px solid rgba(255, 255, 255, .1);
+    }
+
+    .delete-message {
+        padding: 12px 18px;
+        background: transparent;
+        color: white;
+        border: 1px solid rgba(255, 255, 255, .18);
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .13em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+    .delete-message:hover {
+        background: white;
+        color: black;
+    }
+
+    @media (max-width: 600px) {
+
+        .message-page {
+            padding-top: 55px;
+        }
+
+        .message-meta {
+            flex-direction: column;
+        }
+
+        .message-content {
+            font-size: 14px;
+        }
+
+    }
+</style>
+
+
+<div class="message-page">
+
+    <a href="{{ url_for('inbox') }}" class="message-back">
+        ← Back to inbox
+    </a>
+
+
+    <div class="message-eyebrow">
+        Message / {{ message.sender }}
+    </div>
+
+
+    <h1 class="message-title">
+        {{ message.subject }}
+    </h1>
+
+
+    <div class="message-meta">
+
+        <span>
+            FROM {{ message.sender }}
+        </span>
+
+        <span>
+            {{ message.created_at }}
+        </span>
+
+    </div>
+
+
+    <div class="message-content">
+        {{ message.body }}
+    </div>
+
+
+    <div class="message-actions">
+
+        <form method="POST" action="{{ url_for('delete_message', message_id=message.id) }}"
+            onsubmit="return confirm('Delete this message permanently?');">
+
+            <button type="submit" class="delete-message">
+                Delete Message
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
