@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Announcements · ACC{% endblock %}
+
+{% block content %}
+
+<style>
+    .announcement-shell {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 40px 20px 80px;
+    }
+
+    .announcement-shell h1 {
+        font: 900 clamp(42px, 7vw, 80px)/.9 Arial Black, Impact, sans-serif;
+        margin: 0 0 30px;
+    }
+
+    .announcement-form {
+        border: 2px solid #111;
+        padding: 25px;
+        margin-bottom: 35px;
+    }
+
+    .announcement-form input,
+    .announcement-form textarea,
+    .announcement-form select {
+        width: 100%;
+        box-sizing: border-box;
+        border: 2px solid #111;
+        padding: 13px;
+        margin-bottom: 14px;
+        font: 600 14px Arial, sans-serif;
+    }
+
+    .announcement-form textarea {
+        min-height: 150px;
+        resize: vertical;
+    }
+
+    .announcement-form button {
+        background: #111;
+        color: #fff;
+        border: 0;
+        padding: 14px 20px;
+        font: 900 11px Arial Black, Impact, sans-serif;
+    }
+
+    .announcement-item {
+        border: 2px solid #111;
+        padding: 20px;
+        margin-bottom: 14px;
+    }
+
+    .announcement-item h2 {
+        font: 900 22px Arial Black, Impact, sans-serif;
+        margin: 7px 0;
+    }
+
+    .announcement-kind {
+        font: 900 10px Arial Black, Impact, sans-serif;
+        letter-spacing: .12em;
+    }
+
+    .announcement-item p {
+        white-space: pre-wrap;
+    }
+</style>
+
+<div class="announcement-shell">
+
+    <h1>Announcements.</h1>
+
+    <form method="POST" class="announcement-form">
+
+        <select name="kind">
+            <option value="GENERAL">GENERAL</option>
+            <option value="CRISIS">CRISIS</option>
+            <option value="PROCEDURE">PROCEDURE</option>
+            <option value="URGENT">URGENT</option>
+        </select>
+
+        <input type="text" name="title" placeholder="Announcement title" required>
+
+        <textarea name="body" placeholder="Write the announcement..." required></textarea>
+
+        <button type="submit">
+            PUBLISH ANNOUNCEMENT
+        </button>
+
+    </form>
+
+    {% for a in announcements %}
+
+    <div class="announcement-item">
+
+        <div class="announcement-kind">
+            {{ a.kind }}
+        </div>
+
+        <h2>{{ a.title }}</h2>
+
+        <p>{{ a.body }}</p>
+
+        <small>{{ a.created_at }}</small>
+
+    </div>
+
+    {% else %}
+
+    <p>No announcements yet.</p>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

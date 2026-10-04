@@ -1,0 +1,615 @@
+{% extends "base.html" %}
+
+{% block title %}
+Directive Control — ACC
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+    .control-page {
+        width: min(1400px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 110px 0 100px;
+    }
+
+    .control-eyebrow {
+        font-family: monospace;
+        font-size: .58rem;
+        letter-spacing: .22em;
+        color: rgba(255, 255, 255, .35);
+        margin-bottom: 18px;
+    }
+
+    .control-title {
+        margin: 0;
+        font-size: clamp(3.5rem, 9vw, 8.5rem);
+        line-height: .82;
+        letter-spacing: -.075em;
+        font-weight: 900;
+    }
+
+    .control-title span {
+        display: block;
+        color: rgba(255, 255, 255, .18);
+    }
+
+    .control-intro {
+        max-width: 650px;
+        margin-top: 28px;
+        color: rgba(255, 255, 255, .42);
+        line-height: 1.7;
+        font-size: .78rem;
+    }
+
+
+    /* =========================================================
+       STAT STRIP
+       ========================================================= */
+
+    .control-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        margin-top: 60px;
+        border-top: 1px solid rgba(255, 255, 255, .14);
+        border-bottom: 1px solid rgba(255, 255, 255, .14);
+    }
+
+    .control-stat {
+        padding: 24px;
+        border-right: 1px solid rgba(255, 255, 255, .12);
+    }
+
+    .control-stat:last-child {
+        border-right: none;
+    }
+
+    .control-stat-label {
+        display: block;
+        font-family: monospace;
+        font-size: .52rem;
+        letter-spacing: .16em;
+        color: rgba(255, 255, 255, .3);
+        margin-bottom: 12px;
+    }
+
+    .control-stat-value {
+        font-size: 2.2rem;
+        font-weight: 900;
+        letter-spacing: -.05em;
+    }
+
+
+    /* =========================================================
+       SECTION HEADER
+       ========================================================= */
+
+    .control-section {
+        margin-top: 75px;
+    }
+
+    .control-section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 20px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid rgba(255, 255, 255, .15);
+    }
+
+    .control-section-number {
+        font-family: monospace;
+        font-size: .55rem;
+        color: rgba(255, 255, 255, .28);
+        letter-spacing: .15em;
+    }
+
+    .control-section-title {
+        margin: 5px 0 0;
+        font-size: 1.8rem;
+        letter-spacing: -.045em;
+    }
+
+
+    /* =========================================================
+       FILTER
+       ========================================================= */
+
+    .directive-filter {
+        margin: 22px 0;
+    }
+
+    .directive-filter input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 15px 17px;
+        border: 1px solid rgba(255, 255, 255, .15);
+        background: rgba(255, 255, 255, .025);
+        color: #fff;
+        outline: none;
+        font-family: monospace;
+        font-size: .68rem;
+    }
+
+    .directive-filter input:focus {
+        border-color: rgba(255, 255, 255, .5);
+    }
+
+
+    /* =========================================================
+       DIRECTIVE CARD
+       ========================================================= */
+
+    .directive-list {
+        display: grid;
+        gap: 18px;
+    }
+
+    .directive-card {
+        border: 1px solid rgba(255, 255, 255, .13);
+        background: rgba(255, 255, 255, .025);
+        transition:
+            transform .3s ease,
+            border-color .3s ease,
+            background .3s ease;
+    }
+
+    .directive-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(255, 255, 255, .3);
+        background: rgba(255, 255, 255, .045);
+    }
+
+    .directive-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 25px;
+        padding: 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, .1);
+    }
+
+    .directive-id {
+        font-family: monospace;
+        font-size: .55rem;
+        color: rgba(255, 255, 255, .28);
+        letter-spacing: .15em;
+        margin-bottom: 10px;
+    }
+
+    .directive-title {
+        margin: 0;
+        font-size: 1.5rem;
+        letter-spacing: -.035em;
+        line-height: 1;
+    }
+
+    .directive-author {
+        margin-top: 9px;
+        font-family: monospace;
+        font-size: .57rem;
+        letter-spacing: .08em;
+        color: rgba(255, 255, 255, .4);
+    }
+
+    .directive-status {
+        flex-shrink: 0;
+        padding: 8px 11px;
+        border: 1px solid rgba(255, 255, 255, .2);
+        font-family: monospace;
+        font-size: .5rem;
+        letter-spacing: .12em;
+        white-space: nowrap;
+    }
+
+
+    /* =========================================================
+       BODY
+       ========================================================= */
+
+    .directive-body {
+        padding: 25px;
+    }
+
+    .directive-body-label {
+        font-family: monospace;
+        font-size: .5rem;
+        letter-spacing: .15em;
+        color: rgba(255, 255, 255, .28);
+        margin-bottom: 12px;
+    }
+
+    .directive-body-text {
+        color: rgba(255, 255, 255, .68);
+        line-height: 1.75;
+        font-size: .82rem;
+        white-space: pre-wrap;
+    }
+
+    .directive-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 25px;
+        margin-top: 25px;
+        padding-top: 18px;
+        border-top: 1px solid rgba(255, 255, 255, .08);
+    }
+
+    .directive-meta-item {
+        font-family: monospace;
+        font-size: .52rem;
+        color: rgba(255, 255, 255, .32);
+    }
+
+    .directive-meta-item strong {
+        color: rgba(255, 255, 255, .65);
+        font-weight: 400;
+    }
+
+
+    /* =========================================================
+       CONTROLS
+       ========================================================= */
+
+    .directive-controls {
+        padding: 20px 25px;
+        border-top: 1px solid rgba(255, 255, 255, .1);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        align-items: center;
+    }
+
+    .status-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .control-button {
+        padding: 10px 14px;
+        border: 1px solid rgba(255, 255, 255, .2);
+        background: transparent;
+        color: #fff;
+        font-family: monospace;
+        font-size: .52rem;
+        letter-spacing: .1em;
+        cursor: pointer;
+        transition:
+            background .2s ease,
+            color .2s ease,
+            border-color .2s ease,
+            transform .2s ease;
+    }
+
+    .control-button:hover {
+        background: #fff;
+        color: #050505;
+        border-color: #fff;
+        transform: translateY(-2px);
+    }
+
+    .delete-button {
+        margin-left: auto;
+        border-color: rgba(255, 255, 255, .12);
+        color: rgba(255, 255, 255, .45);
+    }
+
+    .delete-button:hover {
+        background: #fff;
+        color: #050505;
+    }
+
+
+    /* =========================================================
+       EMPTY
+       ========================================================= */
+
+    .empty-control {
+        padding: 70px 25px;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, .1);
+        color: rgba(255, 255, 255, .3);
+        font-family: monospace;
+        font-size: .6rem;
+        letter-spacing: .13em;
+    }
+
+
+    @media (max-width: 800px) {
+
+        .control-page {
+            padding-top: 80px;
+        }
+
+        .control-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .control-stat:nth-child(2) {
+            border-right: none;
+        }
+
+        .control-stat:nth-child(-n+2) {
+            border-bottom: 1px solid rgba(255, 255, 255, .12);
+        }
+
+        .directive-top {
+            flex-direction: column;
+        }
+
+        .directive-status {
+            align-self: flex-start;
+        }
+
+        .delete-button {
+            margin-left: 0;
+        }
+
+    }
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="control-page">
+
+    <div class="control-eyebrow">
+        ACC / CHAIR AUTHORITY / DIRECTIVE SYSTEM
+    </div>
+
+    <h1 class="control-title">
+        DIRECTIVE
+        <span>CONTROL</span>
+    </h1>
+
+    <p class="control-intro">
+        Review, process and execute all directives submitted
+        by committee delegates. Chair actions are applied
+        immediately to the committee record.
+    </p>
+
+
+    <!-- =====================================================
+         STATS
+         ===================================================== -->
+
+    {% set total = directives|length %}
+    {% set review = directives|selectattr("status", "equalto", "UNDER REVIEW")|list|length %}
+    {% set approved = directives|selectattr("status", "equalto", "APPROVED")|list|length %}
+    {% set executed = directives|selectattr("status", "equalto", "EXECUTED")|list|length %}
+
+    <div class="control-stats">
+
+        <div class="control-stat">
+            <span class="control-stat-label">TOTAL</span>
+            <div class="control-stat-value">{{ total }}</div>
+        </div>
+
+        <div class="control-stat">
+            <span class="control-stat-label">UNDER REVIEW</span>
+            <div class="control-stat-value">{{ review }}</div>
+        </div>
+
+        <div class="control-stat">
+            <span class="control-stat-label">APPROVED</span>
+            <div class="control-stat-value">{{ approved }}</div>
+        </div>
+
+        <div class="control-stat">
+            <span class="control-stat-label">EXECUTED</span>
+            <div class="control-stat-value">{{ executed }}</div>
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         DIRECTIVES
+         ===================================================== -->
+
+    <section class="control-section">
+
+        <div class="control-section-header">
+
+            <div>
+                <div class="control-section-number">
+                    01 / INCOMING QUEUE
+                </div>
+
+                <h2 class="control-section-title">
+                    All directives
+                </h2>
+            </div>
+
+        </div>
+
+
+        <div class="directive-filter">
+
+            <input type="text" id="directiveSearch" placeholder="SEARCH DIRECTIVES..." autocomplete="off">
+
+        </div>
+
+
+        {% if directives %}
+
+        <div class="directive-list" id="directiveList">
+
+            {% for directive in directives %}
+
+            <article class="directive-card" data-search="
+                    {{ directive.title }}
+                    {{ directive.username }}
+                    {{ directive.delegation }}
+                    {{ directive.body }}
+                    {{ directive.status }}
+                ">
+
+                <div class="directive-top">
+
+                    <div>
+
+                        <div class="directive-id">
+                            DIRECTIVE {{ "%03d"|format(directive.id) }}
+                        </div>
+
+                        <h3 class="directive-title">
+                            {{ directive.title }}
+                        </h3>
+
+                        <div class="directive-author">
+                            {{ directive.username|upper }}
+                            /
+                            {{ directive.delegation|upper }}
+                        </div>
+
+                    </div>
+
+
+                    <div class="directive-status">
+                        {{ directive.status }}
+                    </div>
+
+                </div>
+
+
+                <div class="directive-body">
+
+                    <div class="directive-body-label">
+                        SUBMITTED CONTENT
+                    </div>
+
+                    <div class="directive-body-text">
+                        {{ directive.body }}
+                    </div>
+
+
+                    <div class="directive-meta">
+
+                        <div class="directive-meta-item">
+                            SUBMITTED
+                            <strong>{{ directive.created_at }}</strong>
+                        </div>
+
+                        <div class="directive-meta-item">
+                            LAST UPDATED
+                            <strong>{{ directive.updated_at }}</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="directive-controls">
+
+                    <form method="POST" class="status-form">
+
+                        <input type="hidden" name="directive_id" value="{{ directive.id }}">
+
+                        <input type="hidden" name="action" value="status">
+
+                        <button type="submit" name="status" value="APPROVED" class="control-button">
+                            APPROVE
+                        </button>
+
+                        <button type="submit" name="status" value="REVISION REQUESTED" class="control-button">
+                            REQUEST REVISION
+                        </button>
+
+                        <button type="submit" name="status" value="REJECTED" class="control-button">
+                            REJECT
+                        </button>
+
+                        <button type="submit" name="status" value="EXECUTED" class="control-button">
+                            EXECUTE
+                        </button>
+
+                    </form>
+
+
+                    <form method="POST"
+                        onsubmit="return confirm('PERMANENTLY DELETE THIS DIRECTIVE?\\n\\nThis action cannot be undone.');">
+
+                        <input type="hidden" name="directive_id" value="{{ directive.id }}">
+
+                        <input type="hidden" name="action" value="delete">
+
+                        <button type="submit" class="control-button delete-button">
+                            DELETE
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </article>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-control">
+            NO DIRECTIVES HAVE BEEN SUBMITTED.
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+
+<script>
+
+    const search =
+        document.getElementById("directiveSearch");
+
+    const cards =
+        document.querySelectorAll(".directive-card");
+
+    if (search) {
+
+        search.addEventListener(
+            "input",
+            function () {
+
+                const query =
+                    this.value
+                        .toLowerCase()
+                        .trim();
+
+                cards.forEach(
+                    function (card) {
+
+                        const content =
+                            card
+                                .dataset
+                                .search
+                                .toLowerCase();
+
+                        card.style.display =
+                            content.includes(query)
+                                ? ""
+                                : "none";
+
+                    }
+                );
+
+            }
+        );
+
+    }
+
+</script>
+
+{% endblock %}

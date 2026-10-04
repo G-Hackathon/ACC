@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Crisis Response · ACC{% endblock %}
+
+{% block content %}
+
+<style>
+    .response-shell {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 40px 20px 80px;
+    }
+
+    .response-shell h1 {
+        font: 900 clamp(42px, 7vw, 80px)/.9 Arial Black, Impact, sans-serif;
+        margin: 0 0 12px;
+    }
+
+    .crisis-info {
+        border: 2px solid #111;
+        padding: 22px;
+        margin-bottom: 30px;
+    }
+
+    .crisis-info h2 {
+        font: 900 24px Arial Black, Impact, sans-serif;
+    }
+
+    .crisis-info p {
+        white-space: pre-wrap;
+    }
+
+    .response-form {
+        border: 2px solid #111;
+        padding: 25px;
+    }
+
+    .response-form textarea {
+        width: 100%;
+        box-sizing: border-box;
+        min-height: 220px;
+        resize: vertical;
+        border: 2px solid #111;
+        padding: 14px;
+        font: 600 14px Arial, sans-serif;
+        margin-bottom: 15px;
+    }
+
+    .response-form button {
+        background: #111;
+        color: #fff;
+        border: 0;
+        padding: 14px 20px;
+        font: 900 11px Arial Black, Impact, sans-serif;
+    }
+
+    .responses {
+        margin-top: 35px;
+    }
+
+    .response {
+        border-left: 5px solid #111;
+        background: #f4f4f4;
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+
+    .response strong {
+        font: 900 12px Arial Black, Impact, sans-serif;
+    }
+</style>
+
+<div class="response-shell">
+
+    <h1>Crisis Response.</h1>
+
+    <div class="crisis-info">
+
+        <small>ACTIVE CRISIS</small>
+
+        <h2>{{ crisis.title }}</h2>
+
+        <p>{{ crisis.description }}</p>
+
+    </div>
+
+    {% if user.role == "delegate" and user.attendance != "ABSENT" %}
+
+    <form method="POST" class="response-form">
+
+        <textarea name="response" placeholder="Submit your response to this crisis..." required></textarea>
+
+        <button type="submit">
+            SUBMIT RESPONSE
+        </button>
+
+    </form>
+
+    {% endif %}
+
+    <div class="responses">
+
+        {% for response in responses %}
+
+        <div class="response">
+
+            <strong>
+                {{ response.username }}
+                ·
+                {{ response.delegation }}
+            </strong>
+
+            <p>
+                {{ response.response }}
+            </p>
+
+            <small>
+                {{ response.created_at }}
+            </small>
+
+        </div>
+
+        {% else %}
+
+        <p>No responses have been submitted yet.</p>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

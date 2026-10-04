@@ -1,0 +1,852 @@
+{% extends "base.html" %}
+
+{% block title %}
+Directives — Arkanian Crisis Committee
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* =========================================================
+       DIRECTIVES PAGE
+    ========================================================= */
+
+    .directive-page {
+        min-height: calc(100vh - 80px);
+        padding: 80px 24px 120px;
+    }
+
+    .directive-inner {
+        max-width: 1180px;
+        margin: 0 auto;
+    }
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+
+    .directive-header {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 40px;
+        align-items: end;
+        margin-bottom: 55px;
+    }
+
+    .directive-eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        opacity: 0.45;
+        margin-bottom: 18px;
+        font-weight: 600;
+    }
+
+    .directive-title {
+        margin: 0;
+        font-size: clamp(64px, 10vw, 145px);
+        line-height: 0.82;
+        letter-spacing: -0.07em;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .directive-title span {
+        display: block;
+        opacity: 0.25;
+    }
+
+    .directive-description {
+        max-width: 540px;
+        margin: 25px 0 0;
+        font-size: 15px;
+        line-height: 1.7;
+        opacity: 0.58;
+    }
+
+    .directive-status {
+        min-width: 230px;
+        padding: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.025);
+        backdrop-filter: blur(12px);
+    }
+
+    .directive-status-label {
+        font-size: 9px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        opacity: 0.4;
+        margin-bottom: 12px;
+    }
+
+    .directive-status-value {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .directive-status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        animation: directivePulse 1.8s infinite;
+    }
+
+    @keyframes directivePulse {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.35;
+            transform: scale(0.7);
+        }
+    }
+
+    /* =========================================================
+       SECTIONS
+    ========================================================= */
+
+    .directive-section {
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 42px 0 0;
+        margin-top: 65px;
+    }
+
+    .directive-section-layout {
+        display: grid;
+        grid-template-columns: 130px 1fr;
+        gap: 35px;
+    }
+
+    .directive-section-number {
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        opacity: 0.32;
+        padding-top: 7px;
+    }
+
+    .directive-section-heading {
+        margin: 0;
+        font-size: 35px;
+        letter-spacing: -0.04em;
+        line-height: 1;
+    }
+
+    .directive-section-subtitle {
+        margin: 12px 0 35px;
+        font-size: 13px;
+        line-height: 1.6;
+        opacity: 0.42;
+    }
+
+    /* =========================================================
+       ATTENDANCE NOTICE
+    ========================================================= */
+
+    .directive-notice {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 15px 17px;
+        border: 1px solid rgba(255, 255, 255, 0.11);
+        background: rgba(255, 255, 255, 0.025);
+        margin-bottom: 28px;
+    }
+
+    .directive-notice-icon {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        font-size: 12px;
+        flex-shrink: 0;
+    }
+
+    .directive-notice-text {
+        font-size: 11px;
+        line-height: 1.5;
+        opacity: 0.55;
+    }
+
+    /* =========================================================
+       FORM
+    ========================================================= */
+
+    .directive-form {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .directive-field {
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+    }
+
+    .directive-field-label {
+        font-size: 10px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        opacity: 0.42;
+        font-weight: 600;
+    }
+
+    .directive-input,
+    .directive-textarea {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.025);
+        color: inherit;
+        font-family: inherit;
+        outline: none;
+        transition:
+            border-color 0.25s ease,
+            background 0.25s ease,
+            transform 0.25s ease;
+    }
+
+    .directive-input {
+        height: 58px;
+        padding: 0 18px;
+        font-size: 15px;
+    }
+
+    .directive-textarea {
+        min-height: 190px;
+        padding: 17px 18px;
+        resize: vertical;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .directive-input::placeholder,
+    .directive-textarea::placeholder {
+        color: currentColor;
+        opacity: 0.23;
+    }
+
+    .directive-input:focus,
+    .directive-textarea:focus {
+        border-color: rgba(255, 255, 255, 0.4);
+        background: rgba(255, 255, 255, 0.045);
+    }
+
+    /* =========================================================
+       FORM FOOTER
+    ========================================================= */
+
+    .directive-form-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding-top: 5px;
+    }
+
+    .directive-counter {
+        font-size: 10px;
+        opacity: 0.3;
+    }
+
+    .directive-submit {
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: #fff;
+        color: #000;
+        padding: 15px 24px;
+        font-family: inherit;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition:
+            transform 0.25s ease,
+            background 0.25s ease,
+            color 0.25s ease;
+    }
+
+    .directive-submit:hover {
+        transform: translateY(-3px);
+        background: transparent;
+        color: #fff;
+    }
+
+    .directive-submit:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* =========================================================
+       DIRECTIVE CARDS
+    ========================================================= */
+
+    .directive-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .directive-card {
+        position: relative;
+        display: grid;
+        grid-template-columns: 70px 1fr auto;
+        gap: 25px;
+        align-items: start;
+        padding: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.02);
+        transition:
+            transform 0.3s ease,
+            border-color 0.3s ease,
+            background 0.3s ease;
+    }
+
+    .directive-card:hover {
+        border-color: rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.035);
+    }
+
+    .directive-index {
+        font-size: 11px;
+        letter-spacing: 0.15em;
+        opacity: 0.28;
+        padding-top: 4px;
+    }
+
+    .directive-card-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 9px;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        opacity: 0.48;
+        margin-bottom: 12px;
+    }
+
+    .directive-card-status::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: 0.8;
+    }
+
+    .directive-card-title {
+        margin: 0;
+        font-size: 21px;
+        letter-spacing: -0.025em;
+        line-height: 1.25;
+    }
+
+    .directive-card-body {
+        margin-top: 12px;
+        max-width: 760px;
+        font-size: 13px;
+        line-height: 1.7;
+        opacity: 0.5;
+        white-space: pre-wrap;
+    }
+
+    .directive-meta {
+        margin-top: 17px;
+        font-size: 9px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        opacity: 0.28;
+    }
+
+    .directive-status-large {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 9px 12px;
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        opacity: 0.55;
+    }
+
+    /* =========================================================
+       EMPTY STATE
+    ========================================================= */
+
+    .directive-empty {
+        border: 1px dashed rgba(255, 255, 255, 0.12);
+        padding: 65px 25px;
+        text-align: center;
+    }
+
+    .directive-empty-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 9px;
+    }
+
+    .directive-empty-text {
+        font-size: 12px;
+        opacity: 0.35;
+        line-height: 1.6;
+    }
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media (max-width: 800px) {
+
+        .directive-page {
+            padding: 55px 18px 90px;
+        }
+
+        .directive-header {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .directive-status {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .directive-section-layout {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .directive-section-number {
+            padding-top: 0;
+        }
+
+        .directive-card {
+            grid-template-columns: 42px 1fr;
+            gap: 18px;
+        }
+
+        .directive-status-large {
+            grid-column: 2;
+            justify-self: start;
+        }
+    }
+
+    @media (max-width: 520px) {
+
+        .directive-title {
+            font-size: 58px;
+        }
+
+        .directive-section {
+            margin-top: 50px;
+        }
+
+        .directive-section-heading {
+            font-size: 29px;
+        }
+
+        .directive-form-footer {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .directive-submit {
+            width: 100%;
+        }
+
+        .directive-card {
+            padding: 21px;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .directive-index {
+            display: none;
+        }
+
+        .directive-status-large {
+            grid-column: auto;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="directive-page">
+
+    <div class="directive-inner">
+
+        <!-- =====================================================
+             HEADER
+        ====================================================== -->
+
+        <header class="directive-header">
+
+            <div>
+
+                <div class="directive-eyebrow">
+                    Arkanian Crisis Committee / Command
+                </div>
+
+                <h1 class="directive-title">
+                    DIRECTIVES
+                    <span>Command.</span>
+                </h1>
+
+                <p class="directive-description">
+                    Submit official directives for consideration and
+                    track their status throughout the committee.
+                </p>
+
+            </div>
+
+            <div class="directive-status">
+
+                <div class="directive-status-label">
+                    Committee Status
+                </div>
+
+                <div class="directive-status-value">
+                    <span class="directive-status-dot"></span>
+                    Directive System Live
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =====================================================
+             SUBMIT DIRECTIVE
+        ====================================================== -->
+
+        {% if user.attendance != "ABSENT" %}
+
+        <section class="directive-section">
+
+            <div class="directive-section-layout">
+
+                <div class="directive-section-number">
+                    01 / Submit
+                </div>
+
+                <div>
+
+                    <h2 class="directive-section-heading">
+                        Create Directive
+                    </h2>
+
+                    <p class="directive-section-subtitle">
+                        Submit a formal directive to be reviewed by
+                        the Chair during the committee.
+                    </p>
+
+                    <div class="directive-notice">
+
+                        <div class="directive-notice-icon">
+                            ✓
+                        </div>
+
+                        <div class="directive-notice-text">
+                            You are currently eligible to submit
+                            directives. Ensure your proposal is clear,
+                            specific and actionable.
+                        </div>
+
+                    </div>
+
+
+                    <form method="POST" class="directive-form" id="directiveForm">
+
+                        <div class="directive-field">
+
+                            <label class="directive-field-label" for="directiveTitle">
+                                Directive Title
+                            </label>
+
+                            <input type="text" id="directiveTitle" name="title" class="directive-input" maxlength="120"
+                                placeholder="Enter directive title..." required>
+
+                        </div>
+
+
+                        <div class="directive-field">
+
+                            <label class="directive-field-label" for="directiveBody">
+                                Directive
+                            </label>
+
+                            <textarea id="directiveBody" name="body" class="directive-textarea" maxlength="5000"
+                                placeholder="Describe the directive..." required></textarea>
+
+                        </div>
+
+
+                        <div class="directive-form-footer">
+
+                            <div class="directive-counter" id="directiveCounter">
+                                0 / 5000 characters
+                            </div>
+
+                            <button type="submit" class="directive-submit" id="directiveSubmit">
+                                Submit Directive →
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        {% endif %}
+
+
+        <!-- =====================================================
+             DIRECTIVE RECORD
+        ====================================================== -->
+
+        <section class="directive-section">
+
+            <div class="directive-section-layout">
+
+                <div class="directive-section-number">
+                    {% if user.attendance != "ABSENT" %}
+                    02 / Record
+                    {% else %}
+                    01 / Record
+                    {% endif %}
+                </div>
+
+                <div>
+
+                    <h2 class="directive-section-heading">
+                        Directive Record
+                    </h2>
+
+                    <p class="directive-section-subtitle">
+                        Official directives submitted during the
+                        Arkanian Crisis Committee.
+                    </p>
+
+
+                    {% if directives %}
+
+                    <div class="directive-grid">
+
+                        {% for d in directives %}
+
+                        <article class="directive-card" data-directive-card>
+
+                            <div class="directive-index">
+                                {{ "%02d"|format(loop.index) }}
+                            </div>
+
+
+                            <div>
+
+                                <div class="directive-card-status">
+                                    {{ d.status }}
+                                </div>
+
+                                <h3 class="directive-card-title">
+                                    {{ d.title }}
+                                </h3>
+
+                                <div class="directive-card-body">
+                                    {{ d.body }}
+                                </div>
+
+                                <div class="directive-meta">
+                                    Submitted by
+                                    {{ d.username }}
+                                    /
+                                    {{ d.created_at }}
+                                </div>
+
+                            </div>
+
+
+                            <div class="directive-status-large">
+                                {{ d.status }}
+                            </div>
+
+                        </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="directive-empty">
+
+                        <div class="directive-empty-title">
+                            No directives submitted
+                        </div>
+
+                        <div class="directive-empty-text">
+                            Directives submitted during the committee
+                            will appear here.
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        /* =====================================================
+           CHARACTER COUNTER
+        ====================================================== */
+
+        const body =
+            document.getElementById("directiveBody");
+
+        const counter =
+            document.getElementById("directiveCounter");
+
+        if (body && counter) {
+
+            function updateCounter() {
+
+                counter.textContent =
+                    body.value.length +
+                    " / 5000 characters";
+
+            }
+
+            body.addEventListener(
+                "input",
+                updateCounter
+            );
+
+            updateCounter();
+        }
+
+
+        /* =====================================================
+           SUBMIT BUTTON
+        ====================================================== */
+
+        const form =
+            document.getElementById("directiveForm");
+
+        const submit =
+            document.getElementById("directiveSubmit");
+
+        if (form && submit) {
+
+            form.addEventListener(
+                "submit",
+                function () {
+
+                    submit.disabled = true;
+
+                    submit.textContent =
+                        "Submitting...";
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           SUBTLE CARD TILT
+        ====================================================== */
+
+        const cards =
+            document.querySelectorAll(
+                "[data-directive-card]"
+            );
+
+        cards.forEach(function (card) {
+
+            card.addEventListener(
+                "mousemove",
+                function (event) {
+
+                    if (window.innerWidth < 800) {
+                        return;
+                    }
+
+                    const rect =
+                        card.getBoundingClientRect();
+
+                    const x =
+                        event.clientX - rect.left;
+
+                    const y =
+                        event.clientY - rect.top;
+
+                    const centerX =
+                        rect.width / 2;
+
+                    const centerY =
+                        rect.height / 2;
+
+                    const rotateX =
+                        ((y - centerY) / centerY) * -1.0;
+
+                    const rotateY =
+                        ((x - centerX) / centerX) * 1.0;
+
+                    card.style.transform =
+                        "perspective(900px) " +
+                        "rotateX(" + rotateX + "deg) " +
+                        "rotateY(" + rotateY + "deg) " +
+                        "translateY(-2px)";
+
+                }
+            );
+
+
+            card.addEventListener(
+                "mouseleave",
+                function () {
+
+                    card.style.transform = "";
+
+                }
+            );
+
+        });
+
+    });
+</script>
+
+{% endblock %}

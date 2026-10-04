@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Control · ACC{% endblock %}
+
+{% block content %}
+
+<style>
+    .attendance-shell {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 40px 20px 80px;
+    }
+
+    .attendance-header {
+        border-bottom: 3px solid #111;
+        padding-bottom: 25px;
+        margin-bottom: 30px;
+    }
+
+    .attendance-header h1 {
+        margin: 0;
+        font: 900 clamp(42px, 7vw, 80px)/.9 Arial Black, Impact, sans-serif;
+        text-transform: uppercase;
+    }
+
+    .attendance-header p {
+        margin: 12px 0 0;
+        font-weight: 700;
+        letter-spacing: .08em;
+    }
+
+    .attendance-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 2px solid #111;
+    }
+
+    .attendance-table th,
+    .attendance-table td {
+        padding: 16px;
+        border-bottom: 1px solid #ccc;
+        text-align: left;
+    }
+
+    .attendance-table th {
+        background: #111;
+        color: #fff;
+        font: 900 11px Arial Black, Impact, sans-serif;
+        letter-spacing: .1em;
+    }
+
+    .attendance-name {
+        font-weight: 900;
+    }
+
+    .attendance-delegation {
+        font-size: 12px;
+        color: #666;
+    }
+
+    .status-select {
+        width: 100%;
+        border: 2px solid #111;
+        padding: 11px;
+        background: #fff;
+        font-weight: 800;
+    }
+
+    .save-button {
+        margin-top: 25px;
+        background: #111;
+        color: #fff;
+        border: 2px solid #111;
+        padding: 14px 22px;
+        font: 900 12px Arial Black, Impact, sans-serif;
+        cursor: pointer;
+    }
+
+    @media(max-width:700px) {
+        .attendance-table thead {
+            display: none;
+        }
+
+        .attendance-table,
+        .attendance-table tbody,
+        .attendance-table tr,
+        .attendance-table td {
+            display: block;
+            width: 100%;
+        }
+
+        .attendance-table tr {
+            border-bottom: 2px solid #111;
+            padding: 10px 0;
+        }
+
+        .attendance-table td {
+            border: 0;
+        }
+    }
+</style>
+
+<div class="attendance-shell">
+
+    <div class="attendance-header">
+        <h1>Attendance.</h1>
+        <p>CHAIR CONTROL / ROLL CALL</p>
+    </div>
+
+    <form method="POST">
+
+        <table class="attendance-table">
+
+            <thead>
+                <tr>
+                    <th>DELEGATE</th>
+                    <th>DELEGATION</th>
+                    <th>STATUS</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for d in delegates %}
+
+                <tr>
+
+                    <td>
+                        <div class="attendance-name">
+                            {{ d.username }}
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="attendance-delegation">
+                            {{ d.delegation }}
+                        </div>
+                    </td>
+
+                    <td>
+
+                        <select class="status-select" name="attendance_{{ d.username }}">
+
+                            <option value="PRESENT" {% if d.attendance=="PRESENT" %}selected{% endif %}>
+                                PRESENT
+                            </option>
+
+                            <option value="PRESENT & VOTING" {% if d.attendance=="PRESENT & VOTING" %}selected{% endif
+                                %}>
+                                PRESENT & VOTING
+                            </option>
+
+                            <option value="ABSENT" {% if d.attendance=="ABSENT" %}selected{% endif %}>
+                                ABSENT
+                            </option>
+
+                        </select>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        <button class="save-button" type="submit">
+            SAVE ROLL CALL
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

@@ -1,7 +1,9 @@
-import os
-import sqlite3
+# ============================================================
+# ARKANIAN CRISIS COMMITTEE
+# COMPLETE FLASK APPLICATION
+# ============================================================
+
 from datetime import datetime
-from functools import wraps
 
 from flask import (
     Flask,
@@ -9,11 +11,15 @@ from flask import (
     request,
     redirect,
     url_for,
-    flash,
     session,
+    flash,
     send_from_directory,
     abort,
 )
+import sqlite3
+import os
+import json
+from functools import wraps
 
 
 # ============================================================
@@ -24,14 +30,11 @@ app = Flask(__name__)
 
 app.secret_key = os.environ.get(
     "SECRET_KEY",
-    "dev-secret-change-this"
+    "acc-development-secret-key-change-in-production"
 )
 
-app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
-
-
-BASE_DIR = os.path.abspath(
-    os.path.dirname(__file__)
+BASE_DIR = os.path.dirname(
+    os.path.abspath(__file__)
 )
 
 DATA_DIR = os.path.join(
@@ -39,7 +42,12 @@ DATA_DIR = os.path.join(
     "data"
 )
 
-DATABASE = os.path.join(
+os.makedirs(
+    DATA_DIR,
+    exist_ok=True
+)
+
+DB_PATH = os.path.join(
     DATA_DIR,
     "acc.db"
 )
@@ -49,11 +57,18 @@ UPLOAD_FOLDER = os.path.join(
     "uploads"
 )
 
-
-os.makedirs(
-    DATA_DIR,
-    exist_ok=True
+ARTICLES_FILE = os.path.join(
+    BASE_DIR,
+    "articles.json"
 )
+
+CRISES_FILE = os.path.join(
+    BASE_DIR,
+    "crises.json"
+)
+
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
 os.makedirs(
     UPLOAD_FOLDER,
@@ -62,22 +77,48 @@ os.makedirs(
 
 
 # ============================================================
-# PASSWORDS
+# MAIN CHAIR PASSWORD
 # ============================================================
 
-CHAIR_PASSWORD = os.environ.get(
-    "CHAIR_PASSWORD",
-    "welovekishorsir"
-)
+CHAIR_PASSWORD = "welovekishorsir"
 
+
+# ============================================================
+# PRESS ACCOUNTS
+# ============================================================
 
 PRESS_PASSWORDS = {
     "Yukta": "aljazeeraarticles",
     "Nandika": "aarushismybf",
+    "Press Head": "susu",
 }
 
 
+# ============================================================
+# DELEGATE ACCOUNTS
+# ============================================================
+
 DELEGATES = {
+
+    # --------------------------------------------------------
+    # SPECIAL CHAIR ACCOUNTS
+    # --------------------------------------------------------
+
+    "Crisis Director": {
+        "delegation": "Crisis Director",
+        "password": "tungtungtungcrisis",
+        "role": "chair",
+    },
+
+    "fam": {
+        "delegation": "fam",
+        "password": "VCHG",
+        "role": "chair",
+    },
+
+    # --------------------------------------------------------
+    # NORMAL DELEGATES
+    # --------------------------------------------------------
 
     "Siddhiksha": {
         "delegation": "National Liberation Council",
@@ -126,7 +167,7 @@ DELEGATES = {
 
     "Siya": {
         "delegation": "Tavria",
-        "password": "TAV#TavriaSecure!846",
+        "password": "chaddilicker",
     },
 
     "Shruti": {
@@ -211,12 +252,26 @@ DELEGATES = {
 # ============================================================
 
 def get_db():
+    """
+    Open a SQLite connection configured to tolerate temporary
+    locks and support concurrent reads/writes better.
+    """
 
     conn = sqlite3.connect(
-        DATABASE
+        DB_PATH,
+        timeout=30,
+        check_same_thread=False
     )
 
     conn.row_factory = sqlite3.Row
+
+    conn.execute(
+        "PRAGMA busy_timeout = 30000"
+    )
+
+    conn.execute(
+        "PRAGMA synchronous = NORMAL"
+    )
 
     return conn
 
@@ -225,97 +280,151 @@ def init_db():
 
     conn = get_db()
 
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS crises (
+    # --------------------------------------------------------
+    # Enable WAL once during startup.
+    # Do NOT run journal_mode=WAL on every request.
+    # --------------------------------------------------------
 
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-            title TEXT NOT NULL,
-
-            description TEXT NOT NULL,
-
-            filename TEXT,
-
-            created_at TEXT NOT NULL
-
+    try:
+        conn.execute(
+            "PRAGMA journal_mode = WAL"
         )
-    """)
+    except sqlite3.OperationalError:
+        pass
 
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS articles (
-
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-            author TEXT NOT NULL,
-
-            delegation TEXT,
-
-            title TEXT NOT NULL,
-
-            body TEXT NOT NULL,
-
-            created_at TEXT NOT NULL
-
-        )
-    """)
+    # --------------------------------------------------------
+    # NOTES
+    # --------------------------------------------------------
 
     conn.execute("""
         CREATE TABLE IF NOT EXISTS notes (
-
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-
             username TEXT NOT NULL,
-
-            title TEXT NOT NULL,
-
-            content TEXT NOT NULL,
-
-            created_at TEXT NOT NULL,
-
-            updated_at TEXT NOT NULL
-
+            title TEXT NOT NULL DEFAULT 'Untitled',
+            content TEXT NOT NULL DEFAULT '',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
-    conn.commit()
+    # --------------------------------------------------------
+    # DELEGATE STATUS / ATTENDANCE
+    # --------------------------------------------------------
 
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS delegate_status (
+            username TEXT PRIMARY KEY,
+            attendance TEXT NOT NULL DEFAULT 'ABSENT',
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # --------------------------------------------------------
+    # ANNOUNCEMENTS
+    # --------------------------------------------------------
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS announcements (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            kind TEXT NOT NULL DEFAULT 'GENERAL',
+            title TEXT NOT NULL,
+            body TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # --------------------------------------------------------
+    # DIRECTIVES
+    # --------------------------------------------------------
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS directives (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            delegation TEXT NOT NULL,
+            title TEXT NOT NULL,
+            body TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'UNDER REVIEW',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # --------------------------------------------------------
+    # CRISIS RESPONSES
+    # --------------------------------------------------------
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS crisis_responses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            crisis_index INTEGER NOT NULL,
+            username TEXT NOT NULL,
+            delegation TEXT NOT NULL,
+            response TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # --------------------------------------------------------
+    # VOTES
+    # --------------------------------------------------------
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS votes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            motion TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'OPEN',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            closed_at TIMESTAMP
+        )
+    """)
+
+    # --------------------------------------------------------
+    # VOTE RECORDS
+    # --------------------------------------------------------
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS vote_records (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            vote_id INTEGER NOT NULL,
+            username TEXT NOT NULL,
+            choice TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(vote_id, username)
+        )
+    """)
+
+    # --------------------------------------------------------
+    # INITIALIZE NORMAL DELEGATES
+    # --------------------------------------------------------
+
+    for username, account in DELEGATES.items():
+
+        if account.get(
+            "role",
+            "delegate"
+        ) != "delegate":
+
+            continue
+
+        conn.execute("""
+            INSERT OR IGNORE INTO delegate_status
+            (
+                username,
+                attendance
+            )
+            VALUES (?, 'ABSENT')
+        """, (
+            username,
+        ))
+
+    conn.commit()
     conn.close()
 
 
 # ============================================================
-# FILE VALIDATION
-# ============================================================
-
-ALLOWED_EXTENSIONS = {
-    "pdf",
-    "png",
-    "jpg",
-    "jpeg",
-    "webp",
-    "doc",
-    "docx",
-    "txt",
-}
-
-
-def allowed_file(filename):
-
-    if not filename:
-        return False
-
-    if "." not in filename:
-        return False
-
-    extension = filename.rsplit(
-        ".",
-        1
-    )[1].lower()
-
-    return extension in ALLOWED_EXTENSIONS
-
-
-# ============================================================
-# CURRENT USER
+# USER SYSTEM
 # ============================================================
 
 def current_user():
@@ -327,41 +436,65 @@ def current_user():
     if not username:
         return None
 
-    # CHAIR
+    # --------------------------------------------------------
+    # MAIN CHAIR
+    # --------------------------------------------------------
 
     if username == "__chair__":
 
         return {
             "username": "Chair",
+            "display_name": "Chair",
+            "delegation": "Chair",
             "role": "chair",
         }
 
+    # --------------------------------------------------------
     # PRESS
+    # --------------------------------------------------------
 
-    if username in PRESS_PASSWORDS:
+    if username.startswith(
+        "__press__:"
+    ):
+
+        press_name = username.replace(
+            "__press__:",
+            "",
+            1
+        )
 
         return {
-            "username": username,
+            "username": press_name,
+            "display_name": press_name,
+            "delegation": "Press",
             "role": "press",
         }
 
-    # DELEGATE
+    # --------------------------------------------------------
+    # DELEGATES / SPECIAL CHAIRS
+    # --------------------------------------------------------
 
     if username in DELEGATES:
 
+        account = DELEGATES[
+            username
+        ]
+
         return {
             "username": username,
-            "role": "delegate",
-            "delegation":
-                DELEGATES[username]["delegation"],
+            "display_name": username,
+            "delegation": account.get(
+                "delegation",
+                ""
+            ),
+            "role": account.get(
+                "role",
+                "delegate"
+            ),
         }
 
     return None
 
-
-# ============================================================
-# MAKE USER AVAILABLE TO ALL TEMPLATES
-# ============================================================
 
 @app.context_processor
 def inject_user():
@@ -372,17 +505,15 @@ def inject_user():
 
 
 # ============================================================
-# LOGIN REQUIRED
+# AUTH DECORATORS
 # ============================================================
 
-def login_required(view):
+def login_required(function):
 
-    @wraps(view)
-    def wrapped(*args, **kwargs):
+    @wraps(function)
+    def wrapper(*args, **kwargs):
 
-        user = current_user()
-
-        if user is None:
+        if current_user() is None:
 
             flash(
                 "Please log in first."
@@ -392,24 +523,20 @@ def login_required(view):
                 url_for("login")
             )
 
-        return view(
+        return function(
             *args,
             **kwargs
         )
 
-    return wrapped
+    return wrapper
 
 
-# ============================================================
-# ROLE REQUIRED
-# ============================================================
+def role_required(required_role):
 
-def role_required(*roles):
+    def decorator(function):
 
-    def decorator(view):
-
-        @wraps(view)
-        def wrapped(*args, **kwargs):
+        @wraps(function)
+        def wrapper(*args, **kwargs):
 
             user = current_user()
 
@@ -423,22 +550,24 @@ def role_required(*roles):
                     url_for("login")
                 )
 
-            if user["role"] not in roles:
+            if user.get(
+                "role"
+            ) != required_role:
 
                 flash(
-                    "You do not have permission to access that."
+                    "You do not have permission to access that page."
                 )
 
                 return redirect(
                     url_for("home")
                 )
 
-            return view(
+            return function(
                 *args,
                 **kwargs
             )
 
-        return wrapped
+        return wrapper
 
     return decorator
 
@@ -450,33 +579,14 @@ def role_required(*roles):
 @app.route("/")
 def home():
 
-    conn = get_db()
-
-    latest_crisis = conn.execute("""
-        SELECT *
-        FROM crises
-        ORDER BY id DESC
-        LIMIT 1
-    """).fetchone()
-
-    latest_articles = conn.execute("""
-        SELECT *
-        FROM articles
-        ORDER BY id DESC
-        LIMIT 3
-    """).fetchall()
-
-    conn.close()
-
     return render_template(
         "index.html",
-        latest_crisis=latest_crisis,
-        latest_articles=latest_articles,
+        user=current_user()
     )
 
 
 # ============================================================
-# COMBINED LOGIN
+# GENERAL LOGIN
 # ============================================================
 
 @app.route(
@@ -498,42 +608,98 @@ def login():
         )
 
         # ----------------------------------------------------
-        # CHAIR LOGIN
+        # MAIN CHAIR
         # ----------------------------------------------------
 
-        if username.lower() == "chair":
+        if (
+            username.lower() == "chair"
+            and password == CHAIR_PASSWORD
+        ):
 
-            if password == CHAIR_PASSWORD:
+            session.clear()
+
+            session["username"] = "__chair__"
+
+            flash(
+                "Chair access granted."
+            )
+
+            return redirect(
+                url_for("home")
+            )
+
+        # ----------------------------------------------------
+        # DELEGATE / SPECIAL ACCOUNTS
+        # ----------------------------------------------------
+
+        if username in DELEGATES:
+
+            account = DELEGATES[
+                username
+            ]
+
+            if account.get(
+                "password"
+            ) == password:
 
                 session.clear()
 
-                session["username"] = "__chair__"
+                session["username"] = username
 
                 flash(
-                    "Chair access granted."
+                    f"Welcome, {username}."
                 )
 
                 return redirect(
                     url_for("home")
                 )
 
-            flash(
-                "Incorrect chair password."
-            )
+        flash(
+            "Invalid username or password."
+        )
 
-            return render_template(
-                "login.html"
-            )
+    return render_template(
+        "login.html",
+        user=current_user()
+    )
 
-        # ----------------------------------------------------
-        # DELEGATE LOGIN
-        # ----------------------------------------------------
+
+# ============================================================
+# DELEGATE LOGIN
+# ============================================================
+
+@app.route(
+    "/delegate-login",
+    methods=["GET", "POST"]
+)
+def delegate_login():
+
+    if request.method == "POST":
+
+        username = request.form.get(
+            "username",
+            ""
+        ).strip()
+
+        password = request.form.get(
+            "password",
+            ""
+        )
 
         if username in DELEGATES:
 
+            account = DELEGATES[
+                username
+            ]
+
             if (
-                password ==
-                DELEGATES[username]["password"]
+                account.get(
+                    "role",
+                    "delegate"
+                ) == "delegate"
+                and account.get(
+                    "password"
+                ) == password
             ):
 
                 session.clear()
@@ -545,26 +711,78 @@ def login():
                 )
 
                 return redirect(
-                    url_for("profile")
+                    url_for("home")
                 )
 
+        flash(
+            "Invalid delegate credentials."
+        )
+
+    return render_template(
+        "delegate_login.html",
+        user=current_user()
+    )
+
+
+# ============================================================
+# CHAIR LOGIN
+# ============================================================
+
+@app.route(
+    "/chair-login",
+    methods=["GET", "POST"]
+)
+def chair_login():
+
+    if request.method == "POST":
+
+        username = request.form.get(
+            "username",
+            ""
+        ).strip()
+
+        password = request.form.get(
+            "password",
+            ""
+        )
+
+        # ----------------------------------------------------
+        # MAIN CHAIR
+        # ----------------------------------------------------
+
+        if (
+            username.lower() == "chair"
+            and password == CHAIR_PASSWORD
+        ):
+
+            session.clear()
+
+            session["username"] = "__chair__"
+
             flash(
-                "Incorrect password."
+                "Chair access granted."
             )
 
-            return render_template(
-                "login.html"
+            return redirect(
+                url_for("home")
             )
 
         # ----------------------------------------------------
-        # PRESS LOGIN
+        # SPECIAL CHAIR ACCOUNTS
         # ----------------------------------------------------
 
-        if username in PRESS_PASSWORDS:
+        if username in DELEGATES:
+
+            account = DELEGATES[
+                username
+            ]
 
             if (
-                password ==
-                PRESS_PASSWORDS[username]
+                account.get("role")
+                == "chair"
+                and account.get(
+                    "password"
+                ) == password
             ):
 
                 session.clear()
@@ -572,27 +790,20 @@ def login():
                 session["username"] = username
 
                 flash(
-                    "Press access granted."
+                    f"Chair access granted for {username}."
                 )
 
                 return redirect(
-                    url_for("articles")
+                    url_for("home")
                 )
 
-            flash(
-                "Incorrect password."
-            )
-
-            return render_template(
-                "login.html"
-            )
-
         flash(
-            "Account not found."
+            "Invalid chair credentials."
         )
 
     return render_template(
-        "login.html"
+        "chair_login.html",
+        user=current_user()
     )
 
 
@@ -620,20 +831,23 @@ def press_login():
 
         if (
             username in PRESS_PASSWORDS
-            and
-            password == PRESS_PASSWORDS[username]
+            and PRESS_PASSWORDS[
+                username
+            ] == password
         ):
 
             session.clear()
 
-            session["username"] = username
+            session["username"] = (
+                "__press__:" + username
+            )
 
             flash(
-                "Press access granted."
+                f"Welcome, {username}."
             )
 
             return redirect(
-                url_for("articles")
+                url_for("home")
             )
 
         flash(
@@ -641,47 +855,8 @@ def press_login():
         )
 
     return render_template(
-        "press_login.html"
-    )
-
-
-# ============================================================
-# CHAIR LOGIN
-# ============================================================
-
-@app.route(
-    "/chair-login",
-    methods=["GET", "POST"]
-)
-def chair_login():
-
-    if request.method == "POST":
-
-        password = request.form.get(
-            "password",
-            ""
-        )
-
-        if password == CHAIR_PASSWORD:
-
-            session.clear()
-
-            session["username"] = "__chair__"
-
-            flash(
-                "Chair access granted."
-            )
-
-            return redirect(
-                url_for("crises")
-            )
-
-        flash(
-            "Incorrect chair password."
-        )
-
-    return render_template(
-        "chair_login.html"
+        "press_login.html",
+        user=current_user()
     )
 
 
@@ -713,9 +888,29 @@ def profile():
 
     user = current_user()
 
+    attendance = None
+
+    if user["role"] == "delegate":
+
+        conn = get_db()
+
+        row = conn.execute("""
+            SELECT attendance
+            FROM delegate_status
+            WHERE username = ?
+        """, (
+            user["username"],
+        )).fetchone()
+
+        conn.close()
+
+        if row:
+            attendance = row["attendance"]
+
     return render_template(
         "profile.html",
-        profile=user
+        user=user,
+        attendance=attendance
     )
 
 
@@ -724,6 +919,7 @@ def profile():
 # ============================================================
 
 @app.route("/notes")
+@login_required
 @role_required("delegate")
 def notes():
 
@@ -731,37 +927,78 @@ def notes():
 
     conn = get_db()
 
-    notes_list = conn.execute("""
-        SELECT *
-        FROM notes
-        WHERE username = ?
-        ORDER BY updated_at DESC
-    """, (
-        user["username"],
-    )).fetchall()
+    try:
 
-    conn.close()
+        rows = conn.execute("""
+            SELECT
+                id,
+                username,
+                title,
+                content,
+                created_at,
+                updated_at
+            FROM notes
+            WHERE username = ?
+            ORDER BY updated_at DESC, id DESC
+        """, (
+            user["username"],
+        )).fetchall()
 
-    return render_template(
-        "notes.html",
-        notes=notes_list
-    )
+        selected_note = None
+
+        note_id = request.args.get(
+            "note",
+            type=int
+        )
+
+        if note_id:
+
+            selected_note = conn.execute("""
+                SELECT
+                    id,
+                    username,
+                    title,
+                    content,
+                    created_at,
+                    updated_at
+                FROM notes
+                WHERE id = ?
+                AND username = ?
+            """, (
+                note_id,
+                user["username"]
+            )).fetchone()
+
+        if selected_note is None and rows:
+            selected_note = rows[0]
+
+        return render_template(
+            "notes.html",
+            notes=rows,
+            selected_note=selected_note,
+            user=user
+        )
+
+    finally:
+
+        conn.close()
 
 
 # ============================================================
-# NEW NOTE
+# CREATE NOTE
 # ============================================================
 
 @app.route(
     "/notes/new",
     methods=["GET", "POST"]
 )
+@login_required
 @role_required("delegate")
 def new_note():
 
-    if request.method == "POST":
+    user = current_user()
 
-        user = current_user()
+    if request.method == "POST":
 
         title = request.form.get(
             "title",
@@ -774,15 +1011,7 @@ def new_note():
         )
 
         if not title:
-
-            flash(
-                "Please enter a title."
-            )
-
-            return render_template(
-                "note_editor.html",
-                note=None
-            )
+            title = "Untitled"
 
         now = datetime.now().isoformat(
             timespec="seconds"
@@ -790,39 +1019,180 @@ def new_note():
 
         conn = get_db()
 
-        conn.execute("""
-            INSERT INTO notes (
+        try:
+
+            cursor = conn.execute("""
+                INSERT INTO notes
+                (
+                    username,
+                    title,
+                    content,
+                    created_at,
+                    updated_at
+                )
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                user["username"],
+                title,
+                content,
+                now,
+                now
+            ))
+
+            conn.commit()
+
+            note_id = cursor.lastrowid
+
+        except Exception:
+
+            conn.rollback()
+
+            raise
+
+        finally:
+
+            conn.close()
+
+        flash(
+            "Note created.",
+            "success"
+        )
+
+        return redirect(
+            url_for(
+                "notes",
+                note=note_id
+            )
+        )
+
+    return redirect(
+        url_for("notes")
+    )
+
+
+# ============================================================
+# EDIT NOTE
+# ============================================================
+
+@app.route(
+    "/notes/<int:note_id>/edit",
+    methods=["GET", "POST"]
+)
+@login_required
+@role_required("delegate")
+def edit_note(note_id):
+
+    user = current_user()
+
+    conn = get_db()
+
+    try:
+
+        note = conn.execute("""
+            SELECT
+                id,
                 username,
                 title,
                 content,
                 created_at,
                 updated_at
-            )
-            VALUES (?, ?, ?, ?, ?)
+            FROM notes
+            WHERE id = ?
+            AND username = ?
         """, (
-            user["username"],
-            title,
-            content,
-            now,
-            now,
-        ))
+            note_id,
+            user["username"]
+        )).fetchone()
 
-        conn.commit()
+        if note is None:
+
+            flash(
+                "Note not found.",
+                "error"
+            )
+
+            return redirect(
+                url_for("notes")
+            )
+
+        if request.method == "POST":
+
+            title = request.form.get(
+                "title",
+                ""
+            ).strip()
+
+            content = request.form.get(
+                "content",
+                ""
+            )
+
+            if not title:
+                title = "Untitled"
+
+            now = datetime.now().isoformat(
+                timespec="seconds"
+            )
+
+            conn.execute("""
+                UPDATE notes
+                SET
+                    title = ?,
+                    content = ?,
+                    updated_at = ?
+                WHERE id = ?
+                AND username = ?
+            """, (
+                title,
+                content,
+                now,
+                note_id,
+                user["username"]
+            ))
+
+            conn.commit()
+
+            flash(
+                "Note updated.",
+                "success"
+            )
+
+            return redirect(
+                url_for(
+                    "notes",
+                    note=note_id
+                )
+            )
+
+        return render_template(
+            "notes.html",
+            notes=conn.execute("""
+                SELECT
+                    id,
+                    username,
+                    title,
+                    content,
+                    created_at,
+                    updated_at
+                FROM notes
+                WHERE username = ?
+                ORDER BY updated_at DESC, id DESC
+            """, (
+                user["username"],
+            )).fetchall(),
+            selected_note=note,
+            user=user
+        )
+
+    except Exception:
+
+        conn.rollback()
+
+        raise
+
+    finally:
 
         conn.close()
-
-        flash(
-            "Note created."
-        )
-
-        return redirect(
-            url_for("notes")
-        )
-
-    return render_template(
-        "note_editor.html",
-        note=None
-    )
 
 
 # ============================================================
@@ -831,63 +1201,60 @@ def new_note():
 
 @app.route(
     "/notes/<int:note_id>/update",
-    methods=["GET", "POST"]
+    methods=["POST"]
 )
+@login_required
 @role_required("delegate")
 def update_note(note_id):
 
     user = current_user()
 
+    title = request.form.get(
+        "title",
+        ""
+    ).strip()
+
+    content = request.form.get(
+        "content",
+        ""
+    )
+
+    if not title:
+        title = "Untitled"
+
+    now = datetime.now().isoformat(
+        timespec="seconds"
+    )
+
     conn = get_db()
 
-    note = conn.execute("""
-        SELECT *
-        FROM notes
-        WHERE id = ?
-        AND username = ?
-    """, (
-        note_id,
-        user["username"],
-    )).fetchone()
+    try:
 
-    if note is None:
+        note = conn.execute("""
+            SELECT id
+            FROM notes
+            WHERE id = ?
+            AND username = ?
+        """, (
+            note_id,
+            user["username"]
+        )).fetchone()
 
-        conn.close()
-
-        abort(404)
-
-    if request.method == "POST":
-
-        title = request.form.get(
-            "title",
-            ""
-        ).strip()
-
-        content = request.form.get(
-            "content",
-            ""
-        )
-
-        if not title:
+        if note is None:
 
             flash(
-                "Please enter a title."
+                "You do not have permission to edit this note.",
+                "error"
             )
 
-            conn.close()
-
-            return render_template(
-                "note_editor.html",
-                note=note
+            return redirect(
+                url_for("notes")
             )
-
-        now = datetime.now().isoformat(
-            timespec="seconds"
-        )
 
         conn.execute("""
             UPDATE notes
-            SET title = ?,
+            SET
+                title = ?,
                 content = ?,
                 updated_at = ?
             WHERE id = ?
@@ -897,27 +1264,32 @@ def update_note(note_id):
             content,
             now,
             note_id,
-            user["username"],
+            user["username"]
         ))
 
         conn.commit()
 
-        conn.close()
-
         flash(
-            "Note updated."
+            "Note updated.",
+            "success"
         )
 
         return redirect(
-            url_for("notes")
+            url_for(
+                "notes",
+                note=note_id
+            )
         )
 
-    conn.close()
+    except Exception:
 
-    return render_template(
-        "note_editor.html",
-        note=note
-    )
+        conn.rollback()
+
+        raise
+
+    finally:
+
+        conn.close()
 
 
 # ============================================================
@@ -928,6 +1300,7 @@ def update_note(note_id):
     "/notes/<int:note_id>/delete",
     methods=["POST"]
 )
+@login_required
 @role_required("delegate")
 def delete_note(note_id):
 
@@ -935,153 +1308,157 @@ def delete_note(note_id):
 
     conn = get_db()
 
-    conn.execute("""
-        DELETE FROM notes
-        WHERE id = ?
-        AND username = ?
-    """, (
-        note_id,
-        user["username"],
-    ))
+    try:
 
-    conn.commit()
+        note = conn.execute("""
+            SELECT id
+            FROM notes
+            WHERE id = ?
+            AND username = ?
+        """, (
+            note_id,
+            user["username"]
+        )).fetchone()
 
-    conn.close()
+        if note is None:
 
-    flash(
-        "Note deleted."
-    )
+            flash(
+                "You do not have permission to delete this note.",
+                "error"
+            )
 
-    return redirect(
-        url_for("notes")
-    )
+            return redirect(
+                url_for("notes")
+            )
+
+        conn.execute("""
+            DELETE FROM notes
+            WHERE id = ?
+            AND username = ?
+        """, (
+            note_id,
+            user["username"]
+        ))
+
+        conn.commit()
+
+        flash(
+            "Note deleted.",
+            "success"
+        )
+
+        return redirect(
+            url_for("notes")
+        )
+
+    except Exception:
+
+        conn.rollback()
+
+        raise
+
+    finally:
+
+        conn.close()
 
 
 # ============================================================
 # ARTICLES
 # ============================================================
 
-@app.route(
-    "/articles",
-    methods=["GET", "POST"]
-)
-def articles():
+def load_articles():
 
-    user = current_user()
+    if not os.path.exists(
+        ARTICLES_FILE
+    ):
+        return []
 
-    if request.method == "POST":
+    try:
 
-        if (
-            user is None
-            or
-            user["role"] != "press"
-        ):
+        with open(
+            ARTICLES_FILE,
+            "r",
+            encoding="utf-8"
+        ) as file:
 
-            flash(
-                "Only the press desk can publish articles."
-            )
+            data = json.load(file)
 
-            return redirect(
-                url_for("articles")
-            )
+            if isinstance(data, list):
+                return data
 
-        title = request.form.get(
-            "title",
-            ""
-        ).strip()
+            return []
 
-        body = request.form.get(
-            "body",
-            ""
-        ).strip()
+    except (
+        json.JSONDecodeError,
+        OSError
+    ):
 
-        if not title or not body:
+        return []
 
-            flash(
-                "Title and article body are required."
-            )
 
-            return redirect(
-                url_for("articles")
-            )
+def save_articles(articles):
 
-        conn = get_db()
+    temp_file = ARTICLES_FILE + ".tmp"
 
-        conn.execute("""
-            INSERT INTO articles (
-                author,
-                delegation,
-                title,
-                body,
-                created_at
-            )
-            VALUES (?, ?, ?, ?, ?)
-        """, (
-            user["username"],
-            user.get("delegation"),
-            title,
-            body,
-            datetime.now().isoformat(
-                timespec="seconds"
-            ),
-        ))
+    with open(
+        temp_file,
+        "w",
+        encoding="utf-8"
+    ) as file:
 
-        conn.commit()
-
-        conn.close()
-
-        flash(
-            "Article published."
+        json.dump(
+            articles,
+            file,
+            indent=2,
+            ensure_ascii=False
         )
 
-        return redirect(
-            url_for("articles")
-        )
-
-    conn = get_db()
-
-    articles_list = conn.execute("""
-        SELECT *
-        FROM articles
-        ORDER BY id DESC
-    """).fetchall()
-
-    conn.close()
-
-    return render_template(
-        "articles.html",
-        articles=articles_list
+    os.replace(
+        temp_file,
+        ARTICLES_FILE
     )
 
 
 # ============================================================
-# FULL ARTICLE
+# ARTICLES PAGE
+# ============================================================
+
+@app.route("/articles")
+def articles():
+
+    articles_data = load_articles()
+
+    return render_template(
+        "articles.html",
+        articles=articles_data,
+        user=current_user()
+    )
+
+
+# ============================================================
+# ARTICLE VIEW
 # ============================================================
 
 @app.route(
-    "/articles/<int:article_id>"
+    "/articles/<int:index>"
 )
-def article(article_id):
+def article_view(index):
 
-    conn = get_db()
+    articles_data = load_articles()
 
-    article_data = conn.execute("""
-        SELECT *
-        FROM articles
-        WHERE id = ?
-    """, (
-        article_id,
-    )).fetchone()
-
-    conn.close()
-
-    if article_data is None:
-
+    if (
+        index < 0
+        or index >= len(articles_data)
+    ):
         abort(404)
+
+    article = articles_data[index]
 
     return render_template(
         "article.html",
-        article=article_data
+        article=article,
+        index=index,
+        user=current_user()
     )
 
 
@@ -1098,7 +1475,190 @@ def press_upload():
 
     if request.method == "POST":
 
-        user = current_user()
+        title = request.form.get(
+            "title",
+            ""
+        ).strip()
+
+        author = request.form.get(
+            "author",
+            ""
+        ).strip()
+
+        content = request.form.get(
+            "content",
+            ""
+        ).strip()
+
+        image = request.files.get(
+            "image"
+        )
+
+        if not title or not content:
+
+            flash(
+                "Title and article content are required.",
+                "error"
+            )
+
+            return redirect(
+                url_for("press_upload")
+            )
+
+        image_filename = ""
+
+        if image and image.filename:
+
+            filename = os.path.basename(
+                image.filename
+            )
+
+            image_filename = filename
+
+            image.save(
+                os.path.join(
+                    app.config["UPLOAD_FOLDER"],
+                    filename
+                )
+            )
+
+        articles_data = load_articles()
+
+        articles_data.append({
+            "title": title,
+            "author": author or current_user()["username"],
+            "content": content,
+            "image": image_filename,
+            "created_at": datetime.now().isoformat(
+                timespec="seconds"
+            )
+        })
+
+        save_articles(
+            articles_data
+        )
+
+        flash(
+            "Article uploaded.",
+            "success"
+        )
+
+        return redirect(
+            url_for("articles")
+        )
+
+    return render_template(
+        "press_upload.html",
+        user=current_user()
+    )
+
+
+# ============================================================
+# DELETE ARTICLE
+# ============================================================
+
+@app.route(
+    "/articles/<int:index>/delete",
+    methods=["POST"]
+)
+@role_required("chair")
+def delete_article(index):
+
+    articles_data = load_articles()
+
+    if (
+        index < 0
+        or index >= len(articles_data)
+    ):
+        abort(404)
+
+    articles_data.pop(
+        index
+    )
+
+    save_articles(
+        articles_data
+    )
+
+    flash(
+        "Article deleted.",
+        "success"
+    )
+
+    return redirect(
+        url_for("articles")
+    )
+
+
+# ============================================================
+# CRISES
+# ============================================================
+
+def load_crises():
+
+    if not os.path.exists(
+        CRISES_FILE
+    ):
+        return []
+
+    try:
+
+        with open(
+            CRISES_FILE,
+            "r",
+            encoding="utf-8"
+        ) as file:
+
+            data = json.load(file)
+
+            if isinstance(data, list):
+                return data
+
+            return []
+
+    except (
+        json.JSONDecodeError,
+        OSError
+    ):
+
+        return []
+
+
+def save_crises(crises):
+
+    temp_file = CRISES_FILE + ".tmp"
+
+    with open(
+        temp_file,
+        "w",
+        encoding="utf-8"
+    ) as file:
+
+        json.dump(
+            crises,
+            file,
+            indent=2,
+            ensure_ascii=False
+        )
+
+    os.replace(
+        temp_file,
+        CRISES_FILE
+    )
+
+
+# ============================================================
+# CRISIS PAGE / CREATE CRISIS
+# ============================================================
+
+@app.route(
+    "/crises",
+    methods=["GET", "POST"]
+)
+@role_required("chair")
+def crises():
+
+    if request.method == "POST":
 
         title = request.form.get(
             "title",
@@ -1113,212 +1673,74 @@ def press_upload():
         if not title or not body:
 
             flash(
-                "Title and article body are required."
-            )
-
-            return redirect(
-                url_for("press_upload")
-            )
-
-        conn = get_db()
-
-        conn.execute("""
-            INSERT INTO articles (
-                author,
-                delegation,
-                title,
-                body,
-                created_at
-            )
-            VALUES (?, ?, ?, ?, ?)
-        """, (
-            user["username"],
-            user.get("delegation"),
-            title,
-            body,
-            datetime.now().isoformat(
-                timespec="seconds"
-            ),
-        ))
-
-        conn.commit()
-
-        conn.close()
-
-        flash(
-            "Article published."
-        )
-
-        return redirect(
-            url_for("articles")
-        )
-
-    return render_template(
-        "press_upload.html"
-    )
-
-
-# ============================================================
-# DELETE ARTICLE — CHAIR ONLY
-# ============================================================
-
-@app.route(
-    "/articles/<int:article_id>/delete",
-    methods=["POST"]
-)
-@role_required("chair")
-def delete_article(article_id):
-
-    conn = get_db()
-
-    conn.execute("""
-        DELETE FROM articles
-        WHERE id = ?
-    """, (
-        article_id,
-    ))
-
-    conn.commit()
-
-    conn.close()
-
-    flash(
-        "Article deleted."
-    )
-
-    return redirect(
-        url_for("articles")
-    )
-
-
-# ============================================================
-# CRISES — VIEW
-# ============================================================
-
-@app.route(
-    "/crises",
-    methods=["GET"]
-)
-def crises():
-
-    conn = get_db()
-
-    crises_list = conn.execute("""
-        SELECT *
-        FROM crises
-        ORDER BY id DESC
-    """).fetchall()
-
-    conn.close()
-
-    return render_template(
-        "crises.html",
-        crises=crises_list
-    )
-
-
-# ============================================================
-# CRISES — PUBLISH
-#
-# IMPORTANT:
-# This is a separate POST handler.
-# The @role_required("chair") decorator runs BEFORE
-# any crisis can be created.
-# ============================================================
-
-@app.route(
-    "/crises",
-    methods=["POST"]
-)
-@role_required("chair")
-def publish_crisis():
-
-    title = request.form.get(
-        "title",
-        ""
-    ).strip()
-
-    description = request.form.get(
-        "description",
-        ""
-    ).strip()
-
-    file = request.files.get(
-        "file"
-    )
-
-    if not title or not description:
-
-        flash(
-            "Crisis title and description are required."
-        )
-
-        return redirect(
-            url_for("crises")
-        )
-
-    filename = None
-
-    if file and file.filename:
-
-        if not allowed_file(
-            file.filename
-        ):
-
-            flash(
-                "That file type is not allowed."
+                "Crisis title and body are required.",
+                "error"
             )
 
             return redirect(
                 url_for("crises")
             )
 
-        safe_filename = (
-            file.filename
-            .replace("/", "_")
-            .replace("\\", "_")
-        )
+        crises_data = load_crises()
 
-        timestamp = datetime.now().strftime(
-            "%Y%m%d%H%M%S"
-        )
-
-        filename = (
-            f"{timestamp}_{safe_filename}"
-        )
-
-        file.save(
-            os.path.join(
-                UPLOAD_FOLDER,
-                filename
+        crises_data.append({
+            "title": title,
+            "body": body,
+            "created_at": datetime.now().isoformat(
+                timespec="seconds"
             )
+        })
+
+        save_crises(
+            crises_data
         )
 
-    conn = get_db()
-
-    conn.execute("""
-        INSERT INTO crises (
-            title,
-            description,
-            filename,
-            created_at
+        flash(
+            "Crisis published.",
+            "success"
         )
-        VALUES (?, ?, ?, ?)
-    """, (
-        title,
-        description,
-        filename,
-        datetime.now().isoformat(
-            timespec="seconds"
-        ),
-    ))
 
-    conn.commit()
+        return redirect(
+            url_for("crises")
+        )
 
-    conn.close()
+    return render_template(
+        "crises.html",
+        crises=load_crises(),
+        user=current_user()
+    )
+
+
+# ============================================================
+# DELETE CRISIS
+# ============================================================
+
+@app.route(
+    "/crises/<int:index>/delete",
+    methods=["POST"]
+)
+@role_required("chair")
+def delete_crisis(index):
+
+    crises_data = load_crises()
+
+    if (
+        index < 0
+        or index >= len(crises_data)
+    ):
+        abort(404)
+
+    crises_data.pop(
+        index
+    )
+
+    save_crises(
+        crises_data
+    )
 
     flash(
-        "Crisis published."
+        "Crisis deleted.",
+        "success"
     )
 
     return redirect(
@@ -1327,65 +1749,1461 @@ def publish_crisis():
 
 
 # ============================================================
-# DELETE CRISIS — CHAIR ONLY
+# CHAIR CONTROL
 # ============================================================
 
-@app.route(
-    "/crises/<int:crisis_id>/delete",
-    methods=["POST"]
-)
+@app.route("/chair-control")
 @role_required("chair")
-def delete_crisis(crisis_id):
+def chair_control():
 
     conn = get_db()
 
-    crisis = conn.execute("""
-        SELECT *
-        FROM crises
-        WHERE id = ?
-    """, (
-        crisis_id,
-    )).fetchone()
+    try:
 
-    if crisis is not None:
+        statuses = conn.execute("""
+            SELECT *
+            FROM delegate_status
+            ORDER BY username COLLATE NOCASE
+        """).fetchall()
 
-        if crisis["filename"]:
+        return render_template(
+            "chair_control.html",
+            statuses=statuses,
+            user=current_user()
+        )
 
-            file_path = os.path.join(
-                UPLOAD_FOLDER,
-                crisis["filename"]
-            )
+    finally:
 
-            if os.path.exists(
-                file_path
-            ):
+        conn.close()
 
-                try:
-                    os.remove(
-                        file_path
-                    )
 
-                except OSError:
-                    pass
+# ============================================================
+# COMMITTEE
+# ============================================================
+
+@app.route("/committee")
+@login_required
+def committee():
+
+    conn = get_db()
+
+    try:
+
+        statuses = conn.execute("""
+            SELECT *
+            FROM delegate_status
+            ORDER BY username COLLATE NOCASE
+        """).fetchall()
+
+        return render_template(
+            "committee.html",
+            statuses=statuses,
+            user=current_user()
+        )
+
+    finally:
+
+        conn.close()
+
+
+# ============================================================
+# DELEGATES API
+# ============================================================
+
+@app.route("/api/delegates")
+@login_required
+def api_delegates():
+
+    conn = get_db()
+
+    try:
+
+        rows = conn.execute("""
+            SELECT *
+            FROM delegate_status
+            ORDER BY username COLLATE NOCASE
+        """).fetchall()
+
+        return {
+            "delegates": [
+                dict(row)
+                for row in rows
+            ]
+        }
+
+    finally:
+
+        conn.close()
+
+
+# ============================================================
+# LIVE STATE API
+# ============================================================
+
+@app.route("/api/live-state")
+@login_required
+def api_live_state():
+
+    conn = get_db()
+
+    try:
+
+        statuses = conn.execute("""
+            SELECT *
+            FROM delegate_status
+            ORDER BY username COLLATE NOCASE
+        """).fetchall()
+
+        announcements = conn.execute("""
+            SELECT *
+            FROM announcements
+            ORDER BY id DESC
+            LIMIT 20
+        """).fetchall()
+
+        directives = conn.execute("""
+            SELECT *
+            FROM directives
+            ORDER BY updated_at DESC, id DESC
+            LIMIT 20
+        """).fetchall()
+
+        return {
+            "delegates": [
+                dict(row)
+                for row in statuses
+            ],
+            "announcements": [
+                dict(row)
+                for row in announcements
+            ],
+            "directives": [
+                dict(row)
+                for row in directives
+            ]
+        }
+
+    finally:
+
+        conn.close()
+
+
+# ============================================================
+# ANNOUNCEMENTS API
+# ============================================================
+
+@app.route("/api/announcements")
+@login_required
+def api_announcements():
+
+    conn = get_db()
+
+    try:
+
+        rows = conn.execute("""
+            SELECT *
+            FROM announcements
+            ORDER BY id DESC
+            LIMIT 50
+        """).fetchall()
+
+        return {
+            "announcements": [
+                dict(row)
+                for row in rows
+            ]
+        }
+
+    finally:
+
+        conn.close()
+
+
+# ============================================================
+# CHAIR ATTENDANCE
+# ============================================================
+
+@app.route(
+    "/chair-attendance",
+    methods=["POST"]
+)
+@role_required("chair")
+def chair_attendance():
+
+    username = request.form.get(
+        "username",
+        ""
+    ).strip()
+
+    attendance = request.form.get(
+        "attendance",
+        ""
+    ).strip().upper()
+
+    valid_attendance = {
+        "ABSENT",
+        "PRESENT",
+        "PRESENT & VOTING"
+    }
+
+    if attendance not in valid_attendance:
+
+        flash(
+            "Invalid attendance status.",
+            "error"
+        )
+
+        return redirect(
+            url_for("chair_control")
+        )
+
+    conn = get_db()
+
+    try:
 
         conn.execute("""
-            DELETE FROM crises
-            WHERE id = ?
+            INSERT INTO delegate_status
+            (
+                username,
+                attendance,
+                updated_at
+            )
+            VALUES (?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(username)
+            DO UPDATE SET
+                attendance = excluded.attendance,
+                updated_at = CURRENT_TIMESTAMP
         """, (
-            crisis_id,
+            username,
+            attendance
         ))
 
         conn.commit()
 
-    conn.close()
+        flash(
+            f"Attendance updated for {username}.",
+            "success"
+        )
 
-    flash(
-        "Crisis deleted."
-    )
+    except Exception:
+
+        conn.rollback()
+
+        raise
+
+    finally:
+
+        conn.close()
 
     return redirect(
-        url_for("crises")
+        url_for("chair_control")
     )
+
+
+# ============================================================
+# CHAIR ANNOUNCEMENTS
+# ============================================================
+
+@app.route(
+    "/chair-announcements",
+    methods=["GET", "POST"]
+)
+@role_required("chair")
+def chair_announcements():
+
+    conn = get_db()
+
+    try:
+
+        if request.method == "POST":
+
+            kind = request.form.get(
+                "kind",
+                "GENERAL"
+            ).strip().upper()
+
+            title = request.form.get(
+                "title",
+                ""
+            ).strip()
+
+            body = request.form.get(
+                "body",
+                ""
+            ).strip()
+
+            if not title or not body:
+
+                flash(
+                    "Announcement title and body are required.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("chair_announcements")
+                )
+
+            conn.execute("""
+                INSERT INTO announcements
+                (
+                    kind,
+                    title,
+                    body
+                )
+                VALUES (?, ?, ?)
+            """, (
+                kind,
+                title,
+                body
+            ))
+
+            conn.commit()
+
+            flash(
+                "Announcement published.",
+                "success"
+            )
+
+            return redirect(
+                url_for("chair_announcements")
+            )
+
+        rows = conn.execute("""
+            SELECT *
+            FROM announcements
+            ORDER BY id DESC
+        """).fetchall()
+
+        return render_template(
+            "chair_announcements.html",
+            announcements=rows,
+            user=current_user()
+        )
+
+    finally:
+
+        conn.close()
+
+
+# ============================================================
+# DIRECTIVES
+# ============================================================
+
+@app.route(
+    "/directives",
+    methods=["GET", "POST"]
+)
+@login_required
+def directives():
+
+    user = current_user()
+
+    # --------------------------------------------------------
+    # BOTH DELEGATES AND CHAIRS CAN VIEW DIRECTIVES
+    # --------------------------------------------------------
+
+    if user["role"] not in ("delegate", "chair"):
+
+        flash(
+            "You do not have permission to access directives.",
+            "error"
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
+    conn = get_db()
+
+    try:
+
+        # ----------------------------------------------------
+        # SUBMIT DIRECTIVE
+        # ONLY NORMAL DELEGATES CAN DO THIS
+        # ----------------------------------------------------
+
+        if request.method == "POST":
+
+            if user["role"] != "delegate":
+
+                flash(
+                    "Chairs cannot submit directives.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("directives")
+                )
+
+            title = request.form.get(
+                "title",
+                ""
+            ).strip()
+
+            body = request.form.get(
+                "body",
+                ""
+            ).strip()
+
+            if not title or not body:
+
+                flash(
+                    "Directive title and body are required.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("directives")
+                )
+
+            # ------------------------------------------------
+            # CHECK ATTENDANCE
+            # ------------------------------------------------
+
+            attendance_row = conn.execute("""
+                SELECT attendance
+                FROM delegate_status
+                WHERE username = ?
+            """, (
+                user["username"],
+            )).fetchone()
+
+            attendance = (
+                attendance_row["attendance"]
+                if attendance_row
+                else "ABSENT"
+            )
+
+            if attendance == "ABSENT":
+
+                flash(
+                    "You must be marked present before submitting a directive.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("directives")
+                )
+
+            # ------------------------------------------------
+            # CREATE DIRECTIVE
+            # ------------------------------------------------
+
+            now = datetime.now().isoformat(
+                timespec="seconds"
+            )
+
+            conn.execute("""
+                INSERT INTO directives
+                (
+                    username,
+                    delegation,
+                    title,
+                    body,
+                    status,
+                    created_at,
+                    updated_at
+                )
+                VALUES (?, ?, ?, ?, 'UNDER REVIEW', ?, ?)
+            """, (
+                user["username"],
+                user["delegation"],
+                title,
+                body,
+                now,
+                now
+            ))
+
+            conn.commit()
+
+            flash(
+                "Directive submitted.",
+                "success"
+            )
+
+            return redirect(
+                url_for("directives")
+            )
+
+        # ----------------------------------------------------
+        # VIEW DIRECTIVES
+        # ----------------------------------------------------
+
+        if user["role"] == "chair":
+
+            # Chairs see ALL directives
+            rows = conn.execute("""
+                SELECT *
+                FROM directives
+                ORDER BY updated_at DESC, id DESC
+            """).fetchall()
+
+        else:
+
+            # Delegates see only their own directives
+            rows = conn.execute("""
+                SELECT *
+                FROM directives
+                WHERE username = ?
+                ORDER BY updated_at DESC, id DESC
+            """, (
+                user["username"],
+            )).fetchall()
+
+        # ----------------------------------------------------
+        # ATTENDANCE FOR TEMPLATE
+        # ----------------------------------------------------
+
+        attendance = None
+
+        if user["role"] == "delegate":
+
+            attendance_row = conn.execute("""
+                SELECT attendance
+                FROM delegate_status
+                WHERE username = ?
+            """, (
+                user["username"],
+            )).fetchone()
+
+            if attendance_row:
+
+                attendance = attendance_row["attendance"]
+
+        template_user = {
+            **user,
+            "attendance": attendance
+        }
+
+        return render_template(
+            "directives.html",
+            directives=rows,
+            user=template_user
+        )
+
+    finally:
+
+        conn.close()
+# ============================================================
+# CHAIR DIRECTIVES
+# ============================================================
+
+
+@app.route(
+    "/chair-directives",
+    methods=["GET", "POST"]
+)
+@role_required("chair")
+def chair_directives():
+
+    conn = get_db()
+
+    try:
+
+        # ----------------------------------------------------
+        # UPDATE DIRECTIVE STATUS
+        # ----------------------------------------------------
+
+        if request.method == "POST":
+
+            directive_id = request.form.get(
+                "directive_id",
+                type=int
+            )
+
+            status = request.form.get(
+                "status",
+                ""
+            ).strip().upper()
+
+            valid_statuses = {
+                "UNDER REVIEW",
+                "APPROVED",
+                "REJECTED",
+                "EXECUTED"
+            }
+
+            # Make sure this is actually a status update.
+            if directive_id is None:
+                flash(
+                    "Invalid directive update.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("chair_directives")
+                )
+
+            if status not in valid_statuses:
+                flash(
+                    "Invalid directive status.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("chair_directives")
+                )
+
+            # Make sure directive exists.
+            directive = conn.execute("""
+                SELECT id
+                FROM directives
+                WHERE id = ?
+            """, (
+                directive_id,
+            )).fetchone()
+
+            if directive is None:
+                flash(
+                    "Directive not found.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("chair_directives")
+                )
+
+            # Update status.
+            conn.execute("""
+                UPDATE directives
+                SET
+                    status = ?,
+                    updated_at = ?
+                WHERE id = ?
+            """, (
+                status,
+                datetime.now().isoformat(
+                    timespec="seconds"
+                ),
+                directive_id
+            ))
+
+            conn.commit()
+
+            flash(
+                "Directive status updated.",
+                "success"
+            )
+
+            return redirect(
+                url_for("chair_directives")
+            )
+
+        # ----------------------------------------------------
+        # LOAD ALL DIRECTIVES
+        # ----------------------------------------------------
+
+        rows = conn.execute("""
+            SELECT
+                id,
+                username,
+                delegation,
+                title,
+                body,
+                status,
+                created_at,
+                updated_at
+            FROM directives
+            ORDER BY
+                updated_at DESC,
+                id DESC
+        """).fetchall()
+
+        # ----------------------------------------------------
+        # COUNTS
+        # ----------------------------------------------------
+
+        total = len(rows)
+
+        under_review = sum(
+            1 for row in rows
+            if row["status"] == "UNDER REVIEW"
+        )
+
+        approved = sum(
+            1 for row in rows
+            if row["status"] == "APPROVED"
+        )
+
+        rejected = sum(
+            1 for row in rows
+            if row["status"] == "REJECTED"
+        )
+
+        executed = sum(
+            1 for row in rows
+            if row["status"] == "EXECUTED"
+        )
+
+        return render_template(
+            "chair_directives.html",
+            directives=rows,
+            user=current_user(),
+            total=total,
+            under_review=under_review,
+            approved=approved,
+            rejected=rejected,
+            executed=executed
+        )
+
+    except sqlite3.Error:
+
+        conn.rollback()
+
+        flash(
+            "Could not load directives.",
+            "error"
+        )
+
+        return redirect(
+            url_for("home")
+        )
+
+    finally:
+
+        conn.close()
+
+
+# ============================================================
+# DELETE DIRECTIVE
+# ============================================================
+
+@app.route(
+    "/chair-directives/<int:directive_id>/delete",
+    methods=["POST"]
+)
+@role_required("chair")
+def delete_directive(directive_id):
+
+    conn = get_db()
+
+    try:
+
+        # ----------------------------------------------------
+        # CHECK DIRECTIVE EXISTS
+        # ----------------------------------------------------
+
+        directive = conn.execute("""
+            SELECT
+                id,
+                title
+            FROM directives
+            WHERE id = ?
+        """, (
+            directive_id,
+        )).fetchone()
+
+        if directive is None:
+
+            flash(
+                "Directive not found.",
+                "error"
+            )
+
+            return redirect(
+                url_for("chair_directives")
+            )
+
+        # ----------------------------------------------------
+        # DELETE
+        # ----------------------------------------------------
+
+        conn.execute("""
+            DELETE FROM directives
+            WHERE id = ?
+        """, (
+            directive_id,
+        ))
+
+        conn.commit()
+
+        flash(
+            "Directive deleted successfully.",
+            "success"
+        )
+
+        return redirect(
+            url_for("chair_directives")
+        )
+
+    except sqlite3.Error:
+
+        conn.rollback()
+
+        flash(
+            "Could not delete directive.",
+            "error"
+        )
+
+        return redirect(
+            url_for("chair_directives")
+        )
+
+    finally:
+
+        conn.close()
+
+# ============================================================
+# CRISIS RESPONSE
+# ============================================================
+
+
+@app.route(
+    "/crises/<int:index>/respond",
+    methods=["GET", "POST"]
+)
+@login_required
+@role_required("delegate")
+def crisis_response(index):
+
+    user = current_user()
+
+    crises_data = load_crises()
+
+    if (
+        index < 0
+        or index >= len(crises_data)
+    ):
+        abort(404)
+
+    crisis = crises_data[index]
+
+    conn = get_db()
+
+    try:
+
+        if request.method == "POST":
+
+            response = request.form.get(
+                "response",
+                ""
+            ).strip()
+
+            if not response:
+
+                flash(
+                    "Response cannot be empty.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for(
+                        "crisis_response",
+                        index=index
+                    )
+                )
+
+            conn.execute("""
+                INSERT INTO crisis_responses
+                (
+                    crisis_index,
+                    username,
+                    delegation,
+                    response
+                )
+                VALUES (?, ?, ?, ?)
+            """, (
+                index,
+                user["username"],
+                user["delegation"],
+                response
+            ))
+
+            conn.commit()
+
+            flash(
+                "Crisis response submitted.",
+                "success"
+            )
+
+        responses = conn.execute("""
+            SELECT *
+            FROM crisis_responses
+            WHERE crisis_index = ?
+            ORDER BY id DESC
+        """, (
+            index,
+        )).fetchall()
+
+        attendance_row = conn.execute("""
+            SELECT attendance
+            FROM delegate_status
+            WHERE username = ?
+        """, (
+            user["username"],
+        )).fetchone()
+
+        current_attendance = (
+            attendance_row["attendance"]
+            if attendance_row
+            else "ABSENT"
+        )
+
+        return render_template(
+            "crisis_response.html",
+            crisis=crisis,
+            responses=responses,
+            user={
+                **user,
+                "attendance": current_attendance
+            }
+        )
+
+    finally:
+
+        conn.close()
+
+
+# ============================================================
+# VOTING
+# ============================================================
+
+@app.route(
+    "/votes",
+    methods=["GET", "POST"]
+)
+@login_required
+def votes():
+
+    user = current_user()
+
+    conn = get_db()
+
+    try:
+
+        if request.method == "POST":
+
+            vote_id = request.form.get(
+                "vote_id",
+                type=int
+            )
+
+            choice = request.form.get(
+                "choice",
+                ""
+            ).strip().upper()
+
+            # ------------------------------------------------
+            # ONLY NORMAL DELEGATES CAN VOTE
+            # ------------------------------------------------
+
+            if user["role"] != "delegate":
+
+                flash(
+                    "Only delegates can cast votes.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("votes")
+                )
+
+            # ------------------------------------------------
+            # CHECK ATTENDANCE
+            # ------------------------------------------------
+
+            attendance = conn.execute("""
+                SELECT attendance
+                FROM delegate_status
+                WHERE username = ?
+            """, (
+                user["username"],
+            )).fetchone()
+
+            if (
+                not attendance
+                or attendance["attendance"]
+                != "PRESENT & VOTING"
+            ):
+
+                flash(
+                    "Only delegates marked PRESENT & VOTING may vote.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("votes")
+                )
+
+            # ------------------------------------------------
+            # VALIDATE CHOICE
+            # ------------------------------------------------
+
+            if choice not in [
+                "FOR",
+                "AGAINST",
+                "ABSTAIN"
+            ]:
+
+                flash(
+                    "Invalid vote.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("votes")
+                )
+
+            # ------------------------------------------------
+            # CHECK VOTE
+            # ------------------------------------------------
+
+            vote = conn.execute("""
+                SELECT *
+                FROM votes
+                WHERE id = ?
+                AND status = 'OPEN'
+            """, (
+                vote_id,
+            )).fetchone()
+
+            if vote is None:
+
+                flash(
+                    "That vote is no longer open.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("votes")
+                )
+
+            # ------------------------------------------------
+            # RECORD VOTE
+            # ------------------------------------------------
+
+            try:
+
+                conn.execute("""
+                    INSERT INTO vote_records
+                    (
+                        vote_id,
+                        username,
+                        choice
+                    )
+                    VALUES (?, ?, ?)
+                """, (
+                    vote_id,
+                    user["username"],
+                    choice
+                ))
+
+                conn.commit()
+
+                flash(
+                    "Vote recorded.",
+                    "success"
+                )
+
+            except sqlite3.IntegrityError:
+
+                conn.rollback()
+
+                flash(
+                    "You have already voted on this motion.",
+                    "error"
+                )
+
+            return redirect(
+                url_for("votes")
+            )
+
+        rows = conn.execute("""
+            SELECT *
+            FROM votes
+            ORDER BY id DESC
+        """).fetchall()
+
+        return render_template(
+            "votes.html",
+            votes=rows,
+            user=user
+        )
+
+    finally:
+
+        conn.close()
+
+
+# ============================================================
+# CHAIR VOTE CONTROL
+# ============================================================
+
+@app.route(
+    "/chair-votes",
+    methods=["GET", "POST"]
+)
+@role_required("chair")
+def chair_votes():
+
+    conn = get_db()
+
+    try:
+
+        # ----------------------------------------------------
+        # CHAIR ACTIONS
+        # ----------------------------------------------------
+
+        if request.method == "POST":
+
+            vote_id = request.form.get(
+                "vote_id",
+                type=int
+            )
+
+            action = request.form.get(
+                "action",
+                ""
+            ).strip().lower()
+
+            # ------------------------------------------------
+            # CREATE NEW VOTE
+            # ------------------------------------------------
+
+            if action == "create":
+
+                title = request.form.get(
+                    "title",
+                    ""
+                ).strip()
+
+                motion = request.form.get(
+                    "motion",
+                    ""
+                ).strip()
+
+                if not title or not motion:
+
+                    flash(
+                        "Vote title and motion are required.",
+                        "error"
+                    )
+
+                    return redirect(
+                        url_for("chair_votes")
+                    )
+
+                # Only one vote can be live at a time.
+
+                conn.execute("""
+                    UPDATE votes
+                    SET status = 'CLOSED',
+                        closed_at = CURRENT_TIMESTAMP
+                    WHERE status = 'OPEN'
+                """)
+
+                conn.execute("""
+                    INSERT INTO votes
+                    (
+                        title,
+                        motion,
+                        status,
+                        created_at
+                    )
+                    VALUES (
+                        ?,
+                        ?,
+                        'OPEN',
+                        CURRENT_TIMESTAMP
+                    )
+                """, (
+                    title,
+                    motion
+                ))
+
+                conn.commit()
+
+                flash(
+                    "New vote opened live.",
+                    "success"
+                )
+
+                return redirect(
+                    url_for("chair_votes")
+                )
+
+            # ------------------------------------------------
+            # CLOSE VOTE
+            # ------------------------------------------------
+
+            if action == "close":
+
+                if not vote_id:
+
+                    flash(
+                        "Invalid vote.",
+                        "error"
+                    )
+
+                    return redirect(
+                        url_for("chair_votes")
+                    )
+
+                vote = conn.execute("""
+                    SELECT id
+                    FROM votes
+                    WHERE id = ?
+                    AND status = 'OPEN'
+                """, (
+                    vote_id,
+                )).fetchone()
+
+                if vote is None:
+
+                    flash(
+                        "That vote is already closed or does not exist.",
+                        "error"
+                    )
+
+                    return redirect(
+                        url_for("chair_votes")
+                    )
+
+                conn.execute("""
+                    UPDATE votes
+                    SET status = 'CLOSED',
+                        closed_at = CURRENT_TIMESTAMP
+                    WHERE id = ?
+                """, (
+                    vote_id,
+                ))
+
+                conn.commit()
+
+                flash(
+                    "Vote closed.",
+                    "success"
+                )
+
+                return redirect(
+                    url_for("chair_votes")
+                )
+
+        # ----------------------------------------------------
+        # LOAD VOTES
+        # ----------------------------------------------------
+
+        rows = conn.execute("""
+            SELECT *
+            FROM votes
+            ORDER BY id DESC
+        """).fetchall()
+
+        # ----------------------------------------------------
+        # BUILD RESULTS FOR EVERY VOTE
+        # ----------------------------------------------------
+
+        vote_data = []
+
+        for vote in rows:
+
+            results = {}
+
+            for choice in [
+                "FOR",
+                "AGAINST",
+                "ABSTAIN"
+            ]:
+
+                results[choice] = conn.execute("""
+                    SELECT COUNT(*)
+                    FROM vote_records
+                    WHERE vote_id = ?
+                    AND choice = ?
+                """, (
+                    vote["id"],
+                    choice
+                )).fetchone()[0]
+
+            total_votes = sum(
+                results.values()
+            )
+
+            vote_data.append({
+                "vote": vote,
+                "results": results,
+                "total_votes": total_votes
+            })
+
+        # ----------------------------------------------------
+        # CURRENT OPEN VOTE
+        # ----------------------------------------------------
+
+        open_vote = conn.execute("""
+            SELECT *
+            FROM votes
+            WHERE status = 'OPEN'
+            ORDER BY id DESC
+            LIMIT 1
+        """).fetchone()
+
+        open_results = {
+            "FOR": 0,
+            "AGAINST": 0,
+            "ABSTAIN": 0
+        }
+
+        open_total = 0
+
+        if open_vote:
+
+            for choice in [
+                "FOR",
+                "AGAINST",
+                "ABSTAIN"
+            ]:
+
+                open_results[choice] = conn.execute("""
+                    SELECT COUNT(*)
+                    FROM vote_records
+                    WHERE vote_id = ?
+                    AND choice = ?
+                """, (
+                    open_vote["id"],
+                    choice
+                )).fetchone()[0]
+
+            open_total = sum(
+                open_results.values()
+            )
+
+        return render_template(
+            "chair_votes.html",
+            votes=rows,
+            vote_data=vote_data,
+            open_vote=open_vote,
+            open_results=open_results,
+            open_total=open_total,
+            user=current_user()
+        )
+
+    except Exception:
+
+        conn.rollback()
+        raise
+
+    finally:
+
+        conn.close()
+
+# ============================================================
+# VOTE RESULTS
+# ============================================================
+
+
+@app.route(
+    "/votes/<int:vote_id>/results"
+)
+@login_required
+def vote_results(vote_id):
+
+    conn = get_db()
+
+    try:
+
+        vote = conn.execute("""
+            SELECT *
+            FROM votes
+            WHERE id = ?
+        """, (
+            vote_id,
+        )).fetchone()
+
+        if vote is None:
+            abort(404)
+
+        results = {}
+
+        for choice in [
+            "FOR",
+            "AGAINST",
+            "ABSTAIN"
+        ]:
+
+            results[choice] = conn.execute("""
+                SELECT COUNT(*)
+                FROM vote_records
+                WHERE vote_id = ?
+                AND choice = ?
+            """, (
+                vote_id,
+                choice
+            )).fetchone()[0]
+
+        total_votes = sum(
+            results.values()
+        )
+
+        return render_template(
+            "vote_results.html",
+            vote=vote,
+            results=results,
+            total_votes=total_votes,
+            user=current_user()
+        )
+
+    finally:
+
+        conn.close()
+
+
+# ============================================================
+# VOTE RESULTS API
+# ============================================================
+
+@app.route(
+    "/api/votes/<int:vote_id>"
+)
+@login_required
+def api_vote_results(vote_id):
+
+    conn = get_db()
+
+    try:
+
+        vote = conn.execute("""
+            SELECT *
+            FROM votes
+            WHERE id = ?
+        """, (
+            vote_id,
+        )).fetchone()
+
+        if vote is None:
+
+            return {
+                "error": "Vote not found"
+            }, 404
+
+        results = {}
+
+        for choice in [
+            "FOR",
+            "AGAINST",
+            "ABSTAIN"
+        ]:
+
+            results[choice] = conn.execute("""
+                SELECT COUNT(*)
+                FROM vote_records
+                WHERE vote_id = ?
+                AND choice = ?
+            """, (
+                vote_id,
+                choice
+            )).fetchone()[0]
+
+        return {
+            "vote": dict(vote),
+            "results": results,
+            "total_votes": sum(
+                results.values()
+            ),
+        }
+
+    finally:
+
+        conn.close()
 
 
 # ============================================================
@@ -1393,41 +3211,41 @@ def delete_crisis(crisis_id):
 # ============================================================
 
 @app.route(
-    "/uploads/<path:filename>"
+    "/uploads/<filename>"
 )
 def uploaded_file(filename):
 
     return send_from_directory(
-        UPLOAD_FOLDER,
+        app.config["UPLOAD_FOLDER"],
         filename
     )
 
 
 # ============================================================
-# FILE TOO LARGE
+# FILE SIZE ERROR
 # ============================================================
 
 @app.errorhandler(413)
-def file_too_large(error):
+def too_large(error):
 
     flash(
-        "The uploaded file is too large. Maximum size is 10 MB."
+        "The uploaded file is too large."
     )
 
     return redirect(
-        url_for("crises")
+        url_for("home")
     )
 
 
 # ============================================================
-# INITIALIZE DATABASE
+# DATABASE INITIALIZATION
 # ============================================================
 
 init_db()
 
 
 # ============================================================
-# RUN
+# RUN LOCAL SERVER
 # ============================================================
 
 if __name__ == "__main__":
@@ -1435,5 +3253,6 @@ if __name__ == "__main__":
     app.run(
         host="127.0.0.1",
         port=5000,
-        debug=True
+        debug=True,
+        use_reloader=False
     )

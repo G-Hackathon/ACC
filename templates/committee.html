@@ -1,0 +1,542 @@
+{% extends "base.html" %}
+{% block title %}Live Committee · ACC{% endblock %}
+{% block content %}
+<style>
+    .live-shell {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 20px 0 80px
+    }
+
+    .live-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        align-items: flex-end;
+        border-bottom: 3px solid #111;
+        padding: 30px 0 20px
+    }
+
+    .eyebrow {
+        font: 700 12px/1 Arial, sans-serif;
+        letter-spacing: .18em
+    }
+
+    .live-head h1 {
+        font: 900 clamp(42px, 7vw, 86px)/.9 Arial Black, Impact, sans-serif;
+        margin: 8px 0 0;
+        text-transform: uppercase
+    }
+
+    .live-badge {
+        border: 2px solid #111;
+        padding: 10px 14px;
+        font: 900 13px Arial Black, Impact, sans-serif
+    }
+
+    .live-dot {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        background: #111;
+        border-radius: 50%;
+        margin-right: 8px
+    }
+
+    .metrics {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        border-bottom: 1px solid #111
+    }
+
+    .metric {
+        padding: 20px 14px;
+        border-right: 1px solid #111
+    }
+
+    .metric:last-child {
+        border-right: 0
+    }
+
+    .metric b {
+        display: block;
+        font: 900 30px Arial Black, Impact, sans-serif
+    }
+
+    .metric span {
+        font: 700 10px Arial, sans-serif;
+        letter-spacing: .12em
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: 1.1fr .9fr;
+        gap: 18px;
+        margin-top: 18px
+    }
+
+    .panel {
+        border: 2px solid #111;
+        background: #fff
+    }
+
+    .panel-head {
+        padding: 16px 18px;
+        border-bottom: 2px solid #111;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px
+    }
+
+    .panel-head h2 {
+        margin: 0;
+        font: 900 19px Arial Black, Impact, sans-serif;
+        text-transform: uppercase
+    }
+
+    .panel-body {
+        padding: 18px
+    }
+
+    .announcement {
+        border-left: 5px solid #111;
+        padding: 12px 14px;
+        margin-bottom: 12px;
+        background: #f4f4f4
+    }
+
+    .announcement strong {
+        font: 900 11px Arial Black, Impact, sans-serif
+    }
+
+    .announcement h3 {
+        margin: 4px 0;
+        font: 900 18px Arial Black, Impact, sans-serif
+    }
+
+    .announcement p {
+        margin: 0;
+        white-space: pre-wrap
+    }
+
+    .tag {
+        display: inline-block;
+        border: 1px solid #111;
+        padding: 4px 7px;
+        font: 800 9px Arial, sans-serif;
+        letter-spacing: .1em
+    }
+
+    .delegate-row {
+        display: grid;
+        grid-template-columns: 1.3fr 1fr auto;
+        gap: 12px;
+        align-items: center;
+        padding: 13px 0;
+        border-bottom: 1px solid #ddd
+    }
+
+    .delegate-row:last-child {
+        border-bottom: 0
+    }
+
+    .delegate-name {
+        font-weight: 900
+    }
+
+    .delegate-sub {
+        font-size: 12px;
+        color: #666
+    }
+
+    .status {
+        font: 900 10px Arial Black, Impact, sans-serif;
+        letter-spacing: .08em
+    }
+
+    .live-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 18px
+    }
+
+    .button-dark {
+        display: inline-block;
+        background: #111;
+        color: #fff !important;
+        border: 2px solid #111;
+        padding: 10px 14px;
+        text-decoration: none;
+        font: 900 11px Arial Black, Impact, sans-serif;
+        letter-spacing: .06em
+    }
+
+    .button-light {
+        display: inline-block;
+        background: #fff;
+        color: #111 !important;
+        border: 2px solid #111;
+        padding: 10px 14px;
+        text-decoration: none;
+        font: 900 11px Arial Black, Impact, sans-serif
+    }
+
+    .empty {
+        color: #777;
+        font-size: 14px
+    }
+
+    .vote-box {
+        background: #111;
+        color: #fff;
+        padding: 18px
+    }
+
+    .vote-box h3 {
+        margin: 0 0 6px;
+        font: 900 22px Arial Black, Impact, sans-serif
+    }
+
+    .vote-box p {
+        margin: 0
+    }
+
+    .vote-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        margin-top: 14px;
+        background: #555
+    }
+
+    .vote-stat {
+        background: #111;
+        padding: 12px
+    }
+
+    .vote-stat b {
+        display: block;
+        font: 900 25px Arial Black, Impact, sans-serif
+    }
+
+    .vote-stat span {
+        font-size: 10px;
+        letter-spacing: .1em
+    }
+
+    .responsive-list {
+        max-height: 520px;
+        overflow: auto
+    }
+
+    @media(max-width:850px) {
+        .grid {
+            grid-template-columns: 1fr
+        }
+
+        .metrics {
+            grid-template-columns: repeat(2, 1fr)
+        }
+
+        .metric {
+            border-bottom: 1px solid #111
+        }
+
+        .live-head {
+            align-items: flex-start;
+            flex-direction: column
+        }
+
+        .delegate-row {
+            grid-template-columns: 1fr auto
+        }
+
+        .delegate-row .delegate-sub {
+            grid-column: 1/-1
+        }
+
+        .live-shell {
+            padding: 10px 0 60px
+        }
+    }
+</style>
+
+<div class="live-shell">
+    <div class="live-head">
+        <div>
+            <div class="eyebrow">ARKANIAN CRISIS COMMITTEE / LIVE SYSTEM</div>
+            <h1>Committee.</h1>
+        </div>
+
+        <div class="live-badge">
+            <span class="live-dot"></span>LIVE SYNC
+        </div>
+    </div>
+
+    <div class="metrics" id="liveMetrics">
+        <div class="metric">
+            <b id="mDelegates">{{ live.delegate_count }}</b>
+            <span>DELEGATES</span>
+        </div>
+
+        <div class="metric">
+            <b id="mPresent">{{ live.present }}</b>
+            <span>PRESENT</span>
+        </div>
+
+        <div class="metric">
+            <b id="mVoting">{{ live.voting }}</b>
+            <span>PRESENT &amp; VOTING</span>
+        </div>
+
+        <div class="metric">
+            <b id="mCrises">{{ live.crisis_count }}</b>
+            <span>CRISES</span>
+        </div>
+
+        <div class="metric">
+            <b id="mDirectives">{{ live.directive_count }}</b>
+            <span>DIRECTIVES IN REVIEW</span>
+        </div>
+    </div>
+
+    <div class="grid">
+
+        <section class="panel">
+            <div class="panel-head">
+                <h2>Live announcements</h2>
+                <span class="tag">AUTO-REFRESH</span>
+            </div>
+
+            <div class="panel-body" id="announcementFeed">
+                {% for a in announcements %}
+                <div class="announcement">
+                    <strong>{{ a.kind }}</strong>
+                    <h3>{{ a.title }}</h3>
+                    <p>{{ a.body }}</p>
+                    <small>{{ a.created_at }}</small>
+                </div>
+                {% else %}
+                <div class="empty">No live announcements.</div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-head">
+                <h2>Live vote</h2>
+                <span class="tag">LIVE</span>
+            </div>
+
+            <div class="panel-body" id="votePanel">
+                {% if live.open_vote %}
+                <div class="vote-box">
+                    <h3>{{ live.open_vote.title }}</h3>
+                    <p>{{ live.open_vote.motion }}</p>
+
+                    <div class="vote-stats">
+                        <div class="vote-stat">
+                            <b id="vFor">—</b>
+                            <span>FOR</span>
+                        </div>
+
+                        <div class="vote-stat">
+                            <b id="vAgainst">—</b>
+                            <span>AGAINST</span>
+                        </div>
+
+                        <div class="vote-stat">
+                            <b id="vAbstain">—</b>
+                            <span>ABSTAIN</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="live-actions">
+                    <a class="button-dark" href="{{ url_for('votes') }}">
+                        OPEN VOTE
+                    </a>
+                </div>
+
+                {% else %}
+                <div class="empty">There is no open vote right now.</div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-head">
+                <h2>Delegate status</h2>
+                <span class="tag">ROLL CALL</span>
+            </div>
+
+            <div class="panel-body responsive-list" id="delegateFeed">
+                {% for d in delegates %}
+                <div class="delegate-row">
+                    <div>
+                        <div class="delegate-name">{{ d.username }}</div>
+                        <div class="delegate-sub">{{ d.delegation }}</div>
+                    </div>
+
+                    <div class="status">{{ d.attendance }}</div>
+                    <div></div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if user.role == 'chair' %}
+            <div class="panel-body">
+                <a class="button-dark" href="{{ url_for('chair_attendance') }}">
+                    MANAGE ATTENDANCE
+                </a>
+            </div>
+            {% endif %}
+        </section>
+
+        <section class="panel">
+            <div class="panel-head">
+                <h2>Committee actions</h2>
+                <span class="tag">SYSTEM</span>
+            </div>
+
+            <div class="panel-body">
+                <div class="live-actions">
+
+                    <a class="button-dark" href="{{ url_for('crises') }}">
+                        CRISES
+                    </a>
+
+                    {% if user.role == 'delegate' %}
+                    <a class="button-dark" href="{{ url_for('directives') }}">
+                        SUBMIT DIRECTIVE
+                    </a>
+                    {% endif %}
+
+                    <a class="button-light" href="{{ url_for('votes') }}">
+                        VOTING
+                    </a>
+
+                    {% if user.role == 'chair' %}
+                    <a class="button-light" href="{{ url_for('chair_announcements') }}">
+                        ANNOUNCEMENTS
+                    </a>
+
+                    <a class="button-light" href="{{ url_for('chair_directives') }}">
+                        DIRECTIVES
+                    </a>
+
+                    <a class="button-light" href="{{ url_for('chair_votes') }}">
+                        VOTE CONTROL
+                    </a>
+                    {% endif %}
+
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<script>
+    async function syncLive() {
+        try {
+            const state = await fetch(
+                '{{ url_for("api_live_state") }}',
+                { cache: 'no-store' }
+            ).then(r => r.json());
+
+            const set = (id, v) => {
+                const e = document.getElementById(id);
+                if (e) e.textContent = v;
+            };
+
+            set('mDelegates', state.delegate_count);
+            set('mPresent', state.present);
+            set('mVoting', state.voting);
+            set('mCrises', state.crisis_count);
+            set('mDirectives', state.directive_count);
+
+            if (state.open_vote) {
+                const r = await fetch(
+                    '/api/votes/' + state.open_vote.id,
+                    { cache: 'no-store' }
+                ).then(x => x.json());
+
+                set('vFor', r.results.FOR);
+                set('vAgainst', r.results.AGAINST);
+                set('vAbstain', r.results.ABSTAIN);
+            }
+
+            const dels = await fetch(
+                '{{ url_for("api_delegates") }}',
+                { cache: 'no-store' }
+            ).then(r => r.json());
+
+            const feed = document.getElementById('delegateFeed');
+
+            if (feed) {
+                feed.innerHTML = dels.map(d => `
+        <div class="delegate-row">
+          <div>
+            <div class="delegate-name">
+              ${escapeHtml(d.username)}
+            </div>
+
+            <div class="delegate-sub">
+              ${escapeHtml(d.delegation)}
+            </div>
+          </div>
+
+          <div class="status">
+            ${escapeHtml(d.attendance)}
+          </div>
+
+          <div></div>
+        </div>
+      `).join('');
+            }
+
+            const anns = await fetch(
+                '{{ url_for("api_announcements") }}',
+                { cache: 'no-store' }
+            ).then(r => r.json());
+
+            const af = document.getElementById('announcementFeed');
+
+            if (af) {
+                af.innerHTML = anns.length
+                    ? anns.map(a => `
+          <div class="announcement">
+            <strong>${escapeHtml(a.kind)}</strong>
+            <h3>${escapeHtml(a.title)}</h3>
+            <p>${escapeHtml(a.body)}</p>
+            <small>${escapeHtml(a.created_at)}</small>
+          </div>
+        `).join('')
+                    : '<div class="empty">No live announcements.</div>';
+            }
+
+        } catch (e) {
+            console.log('Live sync:', e);
+        }
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(
+            /[&<>'"]/g,
+            c => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[c])
+        );
+    }
+
+    syncLive();
+    setInterval(syncLive, 1500);
+</script>
+
+{% endblock %}

@@ -1,0 +1,2378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Chair Control — ACC</title>
+
+    <style>
+        :root {
+            --command-font:
+                "Arial Black",
+                Impact,
+                Haettenschweiler,
+                "Arial Narrow Bold",
+                Arial,
+                sans-serif;
+
+            --bg: #050505;
+            --panel: #0b0b0b;
+            --panel-2: #101010;
+            --border: #242424;
+            --border-light: #333;
+            --text: #f5f5f5;
+            --muted: #777;
+            --dim: #444;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* =========================================================
+   TOP BAR
+========================================================= */
+
+        .topbar {
+            height: 78px;
+
+            padding: 0 42px;
+
+            border-bottom: 1px solid var(--border);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            background: #060606;
+
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 17px;
+        }
+
+        .brand-main {
+            color: #f5f5f5;
+
+            font-family: var(--command-font);
+            font-size: 25px;
+            font-weight: 900;
+
+            letter-spacing: -.04em;
+        }
+
+        .brand-divider {
+            width: 1px;
+            height: 25px;
+            background: #333;
+        }
+
+        .brand-sub {
+            color: #777;
+
+            font-family: var(--command-font);
+            font-size: 10px;
+            font-weight: 900;
+
+            letter-spacing: .17em;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .chair-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            color: #777;
+
+            font-family: var(--command-font);
+            font-size: 9px;
+            font-weight: 900;
+
+            letter-spacing: .13em;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+
+            background: #fff;
+            border-radius: 50%;
+
+            box-shadow: 0 0 10px rgba(255, 255, 255, .35);
+        }
+
+        /* =========================================================
+   EXIT CONTROL
+========================================================= */
+
+        .exit-control {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+
+            color: #f5f5f5;
+            text-decoration: none;
+
+            font-family: var(--command-font);
+            font-size: 9px;
+            font-weight: 900;
+
+            letter-spacing: .12em;
+            text-transform: uppercase;
+
+            padding: 9px 0;
+
+            transition:
+                color .2s ease,
+                transform .2s ease;
+        }
+
+        /* Door / exit icon */
+        .exit-icon {
+            position: relative;
+
+            width: 16px;
+            height: 18px;
+
+            border: 2px solid #fff;
+            border-right: 0;
+
+            display: inline-block;
+
+            transition:
+                transform .2s ease,
+                opacity .2s ease;
+        }
+
+        /* Door knob */
+        .exit-icon::after {
+            content: "";
+
+            position: absolute;
+
+            width: 3px;
+            height: 3px;
+
+            background: #fff;
+            border-radius: 50%;
+
+            right: 2px;
+            top: 7px;
+        }
+
+        /* Exit arrow */
+        .exit-arrow {
+            position: relative;
+
+            width: 11px;
+            height: 2px;
+
+            background: #fff;
+
+            display: inline-block;
+
+            margin-left: -7px;
+
+            transition:
+                transform .2s ease,
+                width .2s ease;
+        }
+
+        .exit-arrow::before,
+        .exit-arrow::after {
+            content: "";
+
+            position: absolute;
+
+            width: 6px;
+            height: 2px;
+
+            background: #fff;
+
+            right: -1px;
+        }
+
+        .exit-arrow::before {
+            top: -2px;
+            transform: rotate(45deg);
+        }
+
+        .exit-arrow::after {
+            bottom: -2px;
+            transform: rotate(-45deg);
+        }
+
+        .exit-control:hover {
+            color: #fff;
+            transform: translateX(2px);
+        }
+
+        .exit-control:hover .exit-icon {
+            transform: translateX(-2px);
+        }
+
+        .exit-control:hover .exit-arrow {
+            width: 14px;
+        }
+
+        /* =========================================================
+   PAGE
+========================================================= */
+
+        .page {
+            max-width: 1500px;
+
+            margin: 0 auto;
+
+            padding: 65px 42px 90px;
+        }
+
+        /* =========================================================
+   HEADER
+========================================================= */
+
+        .page-header {
+            margin-bottom: 55px;
+        }
+
+        .eyebrow {
+            color: #666;
+
+            font-family: var(--command-font);
+            font-size: 10px;
+            font-weight: 900;
+
+            letter-spacing: .2em;
+
+            margin-bottom: 16px;
+        }
+
+        .title {
+            margin: 0;
+
+            font-family: var(--command-font);
+            font-size: clamp(48px, 7vw, 100px);
+            font-weight: 900;
+
+            letter-spacing: -.055em;
+            line-height: .88;
+
+            color: #f5f5f5;
+        }
+
+        .subtitle {
+            max-width: 620px;
+
+            margin-top: 24px;
+
+            color: #666;
+
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* =========================================================
+   SESSION TYPE
+========================================================= */
+
+        .session-types {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+
+            margin-bottom: 35px;
+        }
+
+        .session-type {
+            position: relative;
+
+            min-height: 135px;
+
+            padding: 26px 24px;
+
+            border-right: 1px solid var(--border);
+
+            background: #070707;
+
+            cursor: pointer;
+
+            transition:
+                background .25s ease,
+                transform .25s ease;
+        }
+
+        .session-type:last-child {
+            border-right: 0;
+        }
+
+        .session-type:hover {
+            background: #101010;
+            transform: translateY(-3px);
+        }
+
+        .session-type.active {
+            background: #f5f5f5;
+            color: #050505;
+        }
+
+        .session-type strong {
+            display: block;
+
+            font-family: var(--command-font);
+            font-size: 23px;
+            font-weight: 900;
+
+            letter-spacing: -.03em;
+
+            margin-bottom: 9px;
+        }
+
+        .session-type span {
+            color: #666;
+
+            font-size: 10px;
+            font-weight: 700;
+
+            letter-spacing: .1em;
+            text-transform: uppercase;
+        }
+
+        .session-type.active span {
+            color: #555;
+        }
+
+        /* =========================================================
+   SETUP
+========================================================= */
+
+        .setup-panel {
+            background: var(--panel);
+
+            border: 1px solid var(--border);
+
+            padding: 32px;
+
+            margin-bottom: 35px;
+        }
+
+        .setup-grid {
+            display: grid;
+
+            grid-template-columns:
+                1.5fr 1fr 1fr auto;
+
+            gap: 20px;
+
+            align-items: end;
+        }
+
+        .field label {
+            display: block;
+
+            margin-bottom: 9px;
+
+            color: #666;
+
+            font-family: var(--command-font);
+            font-size: 9px;
+            font-weight: 900;
+
+            letter-spacing: .13em;
+            text-transform: uppercase;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+
+            background: #070707;
+
+            border: 1px solid #2b2b2b;
+
+            color: #f5f5f5;
+
+            padding: 14px 13px;
+
+            outline: none;
+
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 13px;
+
+            transition:
+                border-color .2s ease,
+                background .2s ease;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: #777;
+            background: #0d0d0d;
+        }
+
+        .field input:disabled,
+        .field select:disabled {
+            opacity: .35;
+            cursor: not-allowed;
+        }
+
+        .setup-button {
+            border: 0;
+
+            background: #f5f5f5;
+            color: #050505;
+
+            padding: 15px 23px;
+
+            min-height: 45px;
+
+            font-family: var(--command-font);
+            font-size: 10px;
+            font-weight: 900;
+
+            letter-spacing: .12em;
+            text-transform: uppercase;
+
+            cursor: pointer;
+
+            transition:
+                background .2s ease,
+                color .2s ease,
+                transform .2s ease;
+        }
+
+        .setup-button:hover {
+            background: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* =========================================================
+   MAIN GRID
+========================================================= */
+
+        .control-grid {
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1fr) 390px;
+
+            gap: 35px;
+        }
+
+        /* =========================================================
+   TIMER PANEL
+========================================================= */
+
+        .timer-panel {
+            min-height: 540px;
+
+            background: var(--panel);
+
+            border: 1px solid var(--border);
+
+            display: flex;
+            flex-direction: column;
+
+            padding: 35px;
+        }
+
+        .session-name {
+            color: #666;
+
+            font-family: var(--command-font);
+            font-size: 11px;
+            font-weight: 900;
+
+            letter-spacing: .17em;
+
+            text-transform: uppercase;
+        }
+
+        .current-speaker-area {
+            margin-top: auto;
+            margin-bottom: auto;
+
+            text-align: center;
+        }
+
+        .current-speaker-label {
+            color: #555;
+
+            font-family: var(--command-font);
+            font-size: 9px;
+            font-weight: 900;
+
+            letter-spacing: .2em;
+
+            margin-bottom: 15px;
+        }
+
+        .current-speaker {
+            font-family: var(--command-font);
+
+            font-size: clamp(35px, 5vw, 72px);
+
+            font-weight: 900;
+
+            letter-spacing: -.055em;
+
+            line-height: .95;
+
+            word-break: break-word;
+        }
+
+        .timer {
+            font-family: var(--command-font);
+
+            font-size: clamp(80px, 12vw, 165px);
+
+            font-weight: 900;
+
+            letter-spacing: -.08em;
+
+            line-height: .8;
+
+            text-align: center;
+
+            margin: 40px 0 22px;
+
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-status {
+            text-align: center;
+
+            color: #555;
+
+            font-family: var(--command-font);
+            font-size: 9px;
+            font-weight: 900;
+
+            letter-spacing: .17em;
+
+            text-transform: uppercase;
+        }
+
+        .timer-status.running {
+            color: #f5f5f5;
+        }
+
+        .timer-controls {
+            display: grid;
+
+            grid-template-columns:
+                1fr 1fr 1fr;
+
+            gap: 9px;
+
+            margin-top: 35px;
+        }
+
+        .timer-controls button {
+            min-height: 48px;
+
+            background: #111;
+
+            border: 1px solid #2a2a2a;
+
+            color: #ddd;
+
+            font-family: var(--command-font);
+            font-size: 9px;
+            font-weight: 900;
+
+            letter-spacing: .1em;
+
+            cursor: pointer;
+
+            transition:
+                background .2s ease,
+                color .2s ease,
+                border-color .2s ease;
+        }
+
+        .timer-controls button:hover {
+            background: #f5f5f5;
+            color: #050505;
+            border-color: #f5f5f5;
+        }
+
+        /* =========================================================
+   SPEAKERS PANEL
+========================================================= */
+
+        .speakers-panel {
+            background: var(--panel);
+
+            border: 1px solid var(--border);
+
+            padding: 30px;
+
+            min-height: 540px;
+        }
+
+        .panel-heading {
+            display: flex;
+
+            align-items: center;
+            justify-content: space-between;
+
+            padding-bottom: 20px;
+
+            border-bottom: 1px solid var(--border);
+
+            margin-bottom: 10px;
+        }
+
+        .panel-heading h2 {
+            margin: 0;
+
+            font-family: var(--command-font);
+            font-size: 13px;
+            font-weight: 900;
+
+            letter-spacing: .12em;
+        }
+
+        .panel-count {
+            color: #555;
+
+            font-family: var(--command-font);
+            font-size: 10px;
+            font-weight: 900;
+        }
+
+        .speaker-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .speaker {
+            display: grid;
+
+            grid-template-columns: 42px 1fr auto;
+
+            align-items: center;
+
+            min-height: 66px;
+
+            border-bottom: 1px solid #191919;
+
+            gap: 10px;
+        }
+
+        .speaker-number {
+            color: #444;
+
+            font-family: var(--command-font);
+            font-size: 10px;
+            font-weight: 900;
+        }
+
+        .speaker-name {
+            font-family: var(--command-font);
+            font-size: 12px;
+            font-weight: 900;
+
+            letter-spacing: .02em;
+        }
+
+        .speaker.current {
+            background: #f5f5f5;
+
+            color: #050505;
+
+            padding-left: 10px;
+            padding-right: 10px;
+
+            margin-left: -10px;
+            margin-right: -10px;
+        }
+
+        .speaker.current .speaker-number {
+            color: #555;
+        }
+
+        .remove-speaker {
+            border: 0;
+
+            background: transparent;
+
+            color: #444;
+
+            font-size: 17px;
+
+            cursor: pointer;
+
+            padding: 8px;
+
+            transition: color .2s ease;
+        }
+
+        .remove-speaker:hover {
+            color: #fff;
+        }
+
+        .speakers-disabled-message {
+            padding: 45px 10px;
+
+            color: #444;
+
+            text-align: center;
+
+            font-family: var(--command-font);
+            font-size: 9px;
+            font-weight: 900;
+
+            letter-spacing: .14em;
+
+            text-transform: uppercase;
+        }
+
+        /* =========================================================
+   QUICK ACTIONS
+========================================================= */
+
+        .quick-actions {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 10px;
+
+            margin-top: 35px;
+        }
+
+        .quick-actions button {
+            background: #0b0b0b;
+
+            border: 1px solid var(--border);
+
+            color: #777;
+
+            padding: 13px 10px;
+
+            font-family: var(--command-font);
+            font-size: 9px;
+            font-weight: 900;
+
+            letter-spacing: .1em;
+
+            cursor: pointer;
+
+            transition:
+                background .2s ease,
+                color .2s ease;
+        }
+
+        .quick-actions button:hover {
+            background: #f5f5f5;
+            color: #050505;
+        }
+
+        /* =========================================================
+   HISTORY
+========================================================= */
+
+        .history-panel {
+            margin-top: 35px;
+
+            background: var(--panel);
+
+            border: 1px solid var(--border);
+
+            padding: 30px;
+        }
+
+        .history-list {
+            margin-top: 10px;
+        }
+
+        .history-item {
+            display: grid;
+
+            grid-template-columns:
+                110px 1fr 150px;
+
+            gap: 15px;
+
+            align-items: center;
+
+            padding: 15px 0;
+
+            border-bottom: 1px solid #191919;
+        }
+
+        .history-type {
+            font-family: var(--command-font);
+
+            font-size: 9px;
+            font-weight: 900;
+
+            letter-spacing: .1em;
+        }
+
+        .history-name {
+            color: #aaa;
+
+            font-size: 12px;
+        }
+
+        .history-time {
+            color: #555;
+
+            font-family: var(--command-font);
+
+            font-size: 9px;
+            font-weight: 900;
+
+            letter-spacing: .05em;
+
+            text-align: right;
+        }
+
+        .empty {
+            color: #444;
+
+            padding: 30px 0;
+
+            font-family: var(--command-font);
+
+            font-size: 9px;
+            font-weight: 900;
+
+            letter-spacing: .12em;
+
+            text-transform: uppercase;
+        }
+
+        /* =========================================================
+   RESPONSIVE
+========================================================= */
+
+        @media (max-width: 1050px) {
+
+            .setup-grid {
+                grid-template-columns:
+                    1fr 1fr;
+
+            }
+
+            .setup-button {
+                width: 100%;
+            }
+
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .session-types {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .session-type:nth-child(2) {
+                border-right: 0;
+            }
+
+            .session-type:nth-child(-n+2) {
+                border-bottom: 1px solid var(--border);
+            }
+
+        }
+
+        @media (max-width: 760px) {
+
+            .topbar {
+                height: 65px;
+
+                padding: 0 18px;
+            }
+
+            .brand {
+                gap: 10px;
+            }
+
+            .brand-main {
+                font-size: 20px;
+            }
+
+            .brand-divider {
+                height: 20px;
+            }
+
+            .brand-sub {
+                font-size: 8px;
+                letter-spacing: .1em;
+            }
+
+            .topbar-right {
+                gap: 10px;
+            }
+
+            .chair-status {
+                display: none;
+            }
+
+            .exit-control {
+                font-size: 8px;
+                gap: 7px;
+            }
+
+            .exit-icon {
+                width: 14px;
+                height: 16px;
+            }
+
+            .exit-arrow {
+                width: 9px;
+            }
+
+            .page {
+                padding:
+                    45px 18px 70px;
+            }
+
+            .page-header {
+                margin-bottom: 38px;
+            }
+
+            .title {
+                font-size: 54px;
+            }
+
+            .session-types {
+                grid-template-columns: 1fr;
+            }
+
+            .session-type {
+                border-right: 0;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .session-type:last-child {
+                border-bottom: 0;
+            }
+
+            .setup-panel {
+                padding: 20px;
+            }
+
+            .setup-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timer-panel,
+            .speakers-panel,
+            .history-panel {
+                padding: 22px;
+            }
+
+            .timer {
+                font-size: 85px;
+            }
+
+            .current-speaker {
+                font-size: 38px;
+            }
+
+            .timer-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .history-item {
+                grid-template-columns:
+                    1fr auto;
+            }
+
+            .history-time {
+                text-align: left;
+            }
+
+        }
+
+        @media (max-width: 480px) {
+
+            .brand-sub {
+                display: none;
+            }
+
+            .exit-control {
+                font-size: 8px;
+                letter-spacing: .08em;
+            }
+
+            .exit-icon {
+                width: 13px;
+                height: 15px;
+            }
+
+            .exit-arrow {
+                display: none;
+            }
+
+            .title {
+                font-size: 45px;
+            }
+
+            .timer {
+                font-size: 70px;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <a href="{{ url_for('home') }}" class="brand-main" style="
+                color:#f5f5f5;
+                text-decoration:none;
+            ">
+                ACC
+            </a>
+
+            <div class="brand-divider"></div>
+
+            <div class="brand-sub">
+                CHAIR CONTROL SYSTEM
+            </div>
+
+        </div>
+
+        <div class="topbar-right">
+
+            <div class="chair-status">
+                <span class="status-dot"></span>
+                CHAIR ACCESS
+            </div>
+
+            <a href="{{ url_for('home') }}" class="exit-control" aria-label="Exit Chair Control">
+                <span class="exit-icon"></span>
+                <span class="exit-arrow"></span>
+                EXIT CONTROL
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <main class="page">
+
+        <section class="page-header">
+
+            <div class="eyebrow">
+                ARKANIAN CRISIS COMMITTEE / ADMINISTRATION
+            </div>
+
+            <h1 class="title">
+                CHAIR<br>
+                CONTROL.
+            </h1>
+
+            <p class="subtitle">
+                Manage committee sessions, speaker queues and procedural timing
+                from one centralized command interface.
+            </p>
+
+        </section>
+
+
+        <!-- SESSION TYPES -->
+
+        <section class="session-types">
+
+            <div class="session-type active" data-session="gsl" onclick="selectSession('gsl')">
+                <strong>GSL</strong>
+                <span>General Speakers List</span>
+            </div>
+
+            <div class="session-type" data-session="mod" onclick="selectSession('mod')">
+                <strong>MOD CAUCUS</strong>
+                <span>Moderated Caucus</span>
+            </div>
+
+            <div class="session-type" data-session="unmod" onclick="selectSession('unmod')">
+                <strong>UNMOD</strong>
+                <span>Unmoderated Caucus</span>
+            </div>
+
+            <div class="session-type" data-session="custom" onclick="selectSession('custom')">
+                <strong>CUSTOM</strong>
+                <span>Custom Session</span>
+            </div>
+
+        </section>
+
+
+        <!-- SETUP -->
+
+        <section class="setup-panel">
+
+            <div class="setup-grid">
+
+                <div class="field">
+
+                    <label for="sessionTitle">
+                        Session Title
+                    </label>
+
+                    <input type="text" id="sessionTitle" value="GENERAL SPEAKERS LIST" placeholder="Session title">
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="speakerTime">
+                        Speaker Time
+                    </label>
+
+                    <input type="number" id="speakerTime" value="90" min="1">
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="totalTime">
+                        Total Time
+                    </label>
+
+                    <input type="number" id="totalTime" value="10" min="1">
+
+                </div>
+
+
+                <button class="setup-button" onclick="createSession()">
+                    CREATE SESSION
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- MAIN CONTROL -->
+
+        <section class="control-grid">
+
+
+            <!-- TIMER -->
+
+            <div class="timer-panel">
+
+                <div class="session-name" id="displaySessionTitle">
+                    GENERAL SPEAKERS LIST
+                </div>
+
+
+                <div class="current-speaker-area">
+
+                    <div class="current-speaker-label">
+                        CURRENT SPEAKER
+                    </div>
+
+                    <div class="current-speaker" id="currentSpeaker">
+                        —
+                    </div>
+
+                </div>
+
+
+                <div class="timer" id="timer">
+                    01:30
+                </div>
+
+
+                <div class="timer-status" id="timerStatus">
+                    READY
+                </div>
+
+
+                <div class="timer-controls">
+
+                    <button onclick="startTimer()">
+                        START
+                    </button>
+
+                    <button onclick="pauseTimer()">
+                        PAUSE
+                    </button>
+
+                    <button onclick="resetTimer()">
+                        RESET
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- SPEAKERS -->
+
+            <div class="speakers-panel">
+
+                <div class="panel-heading">
+
+                    <h2>
+                        SPEAKER QUEUE
+                    </h2>
+
+                    <span class="panel-count" id="speakerCount">
+                        0
+                    </span>
+
+                </div>
+
+
+                <div class="speaker-list" id="speakerList">
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- QUICK ACTIONS -->
+
+        <section class="quick-actions">
+
+            <button onclick="adjustTimer(15)">
+                +15 SEC
+            </button>
+
+            <button onclick="adjustTimer(30)">
+                +30 SEC
+            </button>
+
+            <button onclick="adjustTimer(-15)">
+                -15 SEC
+            </button>
+
+            <button onclick="adjustTimer(-30)">
+                -30 SEC
+            </button>
+
+        </section>
+
+
+        <!-- HISTORY -->
+
+        <section class="history-panel">
+
+            <div class="panel-heading">
+
+                <h2>
+                    SESSION HISTORY
+                </h2>
+
+                <button onclick="clearHistory()" style="
+                    background:transparent;
+                    border:0;
+                    color:#555;
+                    font-family:var(--command-font);
+                    font-size:9px;
+                    font-weight:900;
+                    letter-spacing:.1em;
+                    cursor:pointer;
+                ">
+                    CLEAR
+                </button>
+
+            </div>
+
+
+            <div class="history-list" id="historyList">
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script>
+
+        let sessionType = "gsl";
+
+        let speakers = [];
+
+        let speakerQueues = {
+            gsl: [],
+            mod: []
+        };
+
+        let currentIndex = 0;
+
+        let speakerIndexes = {
+            gsl: 0,
+            mod: 0
+        };
+
+        let timerSeconds = 90;
+
+        let originalSpeakerSeconds = 90;
+
+        let timerRunning = false;
+
+        let timerInterval = null;
+
+        let sessionTitle = "GENERAL SPEAKERS LIST";
+
+        let history = [];
+
+
+        /* =========================================================
+           SESSION SELECT
+        ========================================================= */
+
+        function selectSession(type) {
+
+            /*
+             * Save the current queue before switching.
+             * GSL and MOD have completely independent queues.
+             */
+
+            if (sessionType === "gsl" || sessionType === "mod") {
+
+                speakerQueues[sessionType] = [...speakers];
+
+                speakerIndexes[sessionType] = currentIndex;
+
+            }
+
+
+            sessionType = type;
+
+
+            document
+                .querySelectorAll(".session-type")
+                .forEach(button => {
+
+                    button.classList.toggle(
+                        "active",
+                        button.dataset.session === type
+                    );
+
+                });
+
+
+            const speakerTime =
+                document.getElementById("speakerTime");
+
+            const totalTime =
+                document.getElementById("totalTime");
+
+
+            if (type === "gsl" || type === "mod") {
+
+                speakerTime.disabled = false;
+                totalTime.disabled = false;
+
+
+                speakers = [
+                    ...(speakerQueues[type] || [])
+                ];
+
+                currentIndex =
+                    speakerIndexes[type] || 0;
+
+            }
+
+            else {
+
+                /*
+                 * UNMOD and CUSTOM do not use the speaker queue.
+                 * The GSL/MOD queues remain stored in the background.
+                 */
+
+                speakerTime.disabled = true;
+                totalTime.disabled = false;
+
+                speakers = [];
+
+                currentIndex = 0;
+
+            }
+
+
+            renderSpeakers();
+
+            updateSpeakerDisplay();
+
+            saveState();
+
+        }
+
+
+        /* =========================================================
+           CREATE SESSION
+        ========================================================= */
+
+        function createSession() {
+
+            sessionTitle =
+                document
+                    .getElementById("sessionTitle")
+                    .value
+                    .trim()
+                || "UNTITLED SESSION";
+
+
+            const speakerTime =
+                parseInt(
+                    document
+                        .getElementById("speakerTime")
+                        .value
+                ) || 90;
+
+
+            const totalTime =
+                parseInt(
+                    document
+                        .getElementById("totalTime")
+                        .value
+                ) || 10;
+
+
+            if (sessionType === "gsl" || sessionType === "mod") {
+
+                originalSpeakerSeconds = speakerTime;
+
+                timerSeconds = originalSpeakerSeconds;
+
+                currentIndex = 0;
+
+            }
+
+            else {
+
+                originalSpeakerSeconds =
+                    totalTime * 60;
+
+                timerSeconds =
+                    originalSpeakerSeconds;
+
+            }
+
+
+            timerRunning = false;
+
+            stopTimer();
+
+
+            document
+                .getElementById("displaySessionTitle")
+                .textContent = sessionTitle;
+
+
+            updateTimerDisplay();
+
+            updateSpeakerDisplay();
+
+            renderSpeakers();
+
+            saveState();
+
+            addHistory(
+                sessionType.toUpperCase(),
+                sessionTitle
+            );
+
+        }
+
+
+        /* =========================================================
+           ADD SPEAKER
+        ========================================================= */
+
+        function addSpeaker() {
+
+            if (
+                sessionType !== "gsl" &&
+                sessionType !== "mod"
+            ) {
+                return;
+            }
+
+
+            const nameInput =
+                document.getElementById("speakerName");
+
+
+            if (!nameInput) {
+                return;
+            }
+
+
+            const name =
+                nameInput.value.trim();
+
+
+            if (!name) {
+                return;
+            }
+
+
+            speakers.push(name);
+
+
+            if (speakers.length === 1) {
+
+                currentIndex = 0;
+
+                updateSpeakerDisplay();
+
+            }
+
+
+            speakerQueues[sessionType] =
+                [...speakers];
+
+            speakerIndexes[sessionType] =
+                currentIndex;
+
+
+            nameInput.value = "";
+
+            renderSpeakers();
+
+            updateSpeakerDisplay();
+
+            saveState();
+
+        }
+
+
+        /* =========================================================
+           REMOVE SPEAKER
+        ========================================================= */
+
+        function removeSpeaker(index) {
+
+            if (
+                index < 0 ||
+                index >= speakers.length
+            ) {
+                return;
+            }
+
+
+            speakers.splice(index, 1);
+
+
+            if (speakers.length === 0) {
+
+                currentIndex = 0;
+
+            }
+
+            else if (index < currentIndex) {
+
+                currentIndex--;
+
+            }
+
+            else if (
+                currentIndex >= speakers.length
+            ) {
+
+                currentIndex =
+                    speakers.length - 1;
+
+            }
+
+
+            if (
+                sessionType === "gsl" ||
+                sessionType === "mod"
+            ) {
+
+                speakerQueues[sessionType] =
+                    [...speakers];
+
+                speakerIndexes[sessionType] =
+                    currentIndex;
+
+            }
+
+
+            renderSpeakers();
+
+            updateSpeakerDisplay();
+
+            saveState();
+
+        }
+
+
+        /* =========================================================
+           RENDER SPEAKERS
+        ========================================================= */
+
+        function renderSpeakers() {
+
+            const list =
+                document.getElementById("speakerList");
+
+
+            const count =
+                document.getElementById("speakerCount");
+
+
+            if (
+                sessionType === "unmod" ||
+                sessionType === "custom"
+            ) {
+
+                list.innerHTML = `
+            <div class="speakers-disabled-message">
+                SPEAKER QUEUE DISABLED
+            </div>
+        `;
+
+                count.textContent = "—";
+
+                return;
+
+            }
+
+
+            count.textContent =
+                speakers.length;
+
+
+            if (speakers.length === 0) {
+
+                list.innerHTML = `
+            <div class="empty">
+                NO DELEGATES IN QUEUE
+            </div>
+        `;
+
+                return;
+
+            }
+
+
+            list.innerHTML =
+                speakers
+                    .map((speaker, index) => {
+
+                        return `
+                    <div
+                        class="speaker ${index === currentIndex
+                                ? "current"
+                                : ""
+                            }"
+                    >
+
+                        <span class="speaker-number">
+                            ${String(index + 1).padStart(2, "0")}
+                        </span>
+
+                        <span class="speaker-name">
+                            ${escapeHtml(speaker)}
+                        </span>
+
+                        <button
+                            class="remove-speaker"
+                            onclick="removeSpeaker(${index})"
+                            aria-label="Remove speaker"
+                        >
+                            ×
+                        </button>
+
+                    </div>
+                `;
+
+                    })
+                    .join("");
+
+        }
+
+
+        /* =========================================================
+           UPDATE SPEAKER DISPLAY
+        ========================================================= */
+
+        function updateSpeakerDisplay() {
+
+            const display =
+                document.getElementById("currentSpeaker");
+
+
+            if (
+                sessionType === "unmod" ||
+                sessionType === "custom"
+            ) {
+
+                display.textContent = "—";
+
+                return;
+
+            }
+
+
+            if (
+                speakers.length === 0 ||
+                !speakers[currentIndex]
+            ) {
+
+                display.textContent = "—";
+
+                return;
+
+            }
+
+
+            display.textContent =
+                speakers[currentIndex];
+
+        }
+
+
+        /* =========================================================
+           TIMER
+        ========================================================= */
+
+        function startTimer() {
+
+            if (timerRunning) {
+                return;
+            }
+
+
+            timerRunning = true;
+
+
+            document
+                .getElementById("timerStatus")
+                .textContent = "RUNNING";
+
+
+            document
+                .getElementById("timerStatus")
+                .classList.add("running");
+
+
+            timerInterval =
+                setInterval(() => {
+
+                    if (timerSeconds > 0) {
+
+                        timerSeconds--;
+
+                        updateTimerDisplay();
+
+                    }
+
+                    else {
+
+                        stopTimer();
+
+                        document
+                            .getElementById("timerStatus")
+                            .textContent = "TIME EXPIRED";
+
+                    }
+
+                }, 1000);
+
+        }
+
+
+        /* =========================================================
+           PAUSE
+        ========================================================= */
+
+        function pauseTimer() {
+
+            timerRunning = false;
+
+            stopTimer();
+
+
+            document
+                .getElementById("timerStatus")
+                .textContent = "PAUSED";
+
+
+            document
+                .getElementById("timerStatus")
+                .classList.remove("running");
+
+
+            saveState();
+
+        }
+
+
+        /* =========================================================
+           RESET
+        ========================================================= */
+
+        function resetTimer() {
+
+            stopTimer();
+
+            timerRunning = false;
+
+            timerSeconds =
+                originalSpeakerSeconds;
+
+
+            updateTimerDisplay();
+
+
+            document
+                .getElementById("timerStatus")
+                .textContent = "READY";
+
+
+            document
+                .getElementById("timerStatus")
+                .classList.remove("running");
+
+
+            saveState();
+
+        }
+
+
+        /* =========================================================
+           STOP TIMER
+        ========================================================= */
+
+        function stopTimer() {
+
+            if (timerInterval) {
+
+                clearInterval(timerInterval);
+
+                timerInterval = null;
+
+            }
+
+        }
+
+
+        /* =========================================================
+           ADJUST TIMER
+        ========================================================= */
+
+        function adjustTimer(amount) {
+
+            timerSeconds += amount;
+
+
+            if (timerSeconds < 0) {
+                timerSeconds = 0;
+            }
+
+
+            updateTimerDisplay();
+
+            saveState();
+
+        }
+
+
+        /* =========================================================
+           TIMER DISPLAY
+        ========================================================= */
+
+        function updateTimerDisplay() {
+
+            const minutes =
+                Math.floor(timerSeconds / 60);
+
+            const seconds =
+                timerSeconds % 60;
+
+
+            document
+                .getElementById("timer")
+                .textContent =
+                String(minutes).padStart(2, "0")
+                + ":"
+                + String(seconds).padStart(2, "0");
+
+        }
+
+
+        /* =========================================================
+           HISTORY
+        ========================================================= */
+
+        function addHistory(type, name) {
+
+            history.unshift({
+
+                type,
+                name,
+
+                time:
+                    new Date()
+                        .toLocaleTimeString(
+                            [],
+                            {
+                                hour: "2-digit",
+                                minute: "2-digit"
+                            }
+                        )
+
+            });
+
+
+            if (history.length > 30) {
+
+                history =
+                    history.slice(0, 30);
+
+            }
+
+
+            renderHistory();
+
+            saveState();
+
+        }
+
+
+        function renderHistory() {
+
+            const list =
+                document.getElementById("historyList");
+
+
+            if (!history.length) {
+
+                list.innerHTML = `
+            <div class="empty">
+                NO SESSION HISTORY
+            </div>
+        `;
+
+                return;
+
+            }
+
+
+            list.innerHTML =
+                history
+                    .map(item => {
+
+                        return `
+                    <div class="history-item">
+
+                        <div class="history-type">
+                            ${escapeHtml(item.type)}
+                        </div>
+
+                        <div class="history-name">
+                            ${escapeHtml(item.name)}
+                        </div>
+
+                        <div class="history-time">
+                            ${escapeHtml(item.time)}
+                        </div>
+
+                    </div>
+                `;
+
+                    })
+                    .join("");
+
+        }
+
+
+        function clearHistory() {
+
+            history = [];
+
+            renderHistory();
+
+            saveState();
+
+        }
+
+
+        /* =========================================================
+           SAVE STATE
+        ========================================================= */
+
+        function saveState() {
+
+            localStorage.setItem(
+                "accChairControlState",
+                JSON.stringify({
+
+                    sessionType,
+
+                    speakers,
+
+                    speakerQueues,
+
+                    currentIndex,
+
+                    speakerIndexes,
+
+                    timerSeconds,
+
+                    originalSpeakerSeconds,
+
+                    sessionTitle,
+
+                    history
+
+                })
+            );
+
+        }
+
+
+        /* =========================================================
+           LOAD STATE
+        ========================================================= */
+
+        function loadState() {
+
+            const saved =
+                localStorage.getItem(
+                    "accChairControlState"
+                );
+
+
+            if (!saved) {
+
+                updateTimerDisplay();
+                renderSpeakers();
+                renderHistory();
+
+                return;
+
+            }
+
+
+            try {
+
+                const state =
+                    JSON.parse(saved);
+
+
+                sessionType =
+                    state.sessionType || "gsl";
+
+
+                speakerQueues =
+                    state.speakerQueues || {
+                        gsl: [],
+                        mod: []
+                    };
+
+
+                /*
+                 * Migration for older saved versions
+                 * that only had one speaker array.
+                 */
+
+                if (
+                    !state.speakerQueues &&
+                    state.speakers
+                ) {
+
+                    speakerQueues = {
+                        gsl:
+                            state.sessionType === "gsl"
+                                ? [...state.speakers]
+                                : [],
+
+                        mod:
+                            state.sessionType === "mod"
+                                ? [...state.speakers]
+                                : []
+                    };
+
+                }
+
+
+                speakerIndexes =
+                    state.speakerIndexes || {
+                        gsl: 0,
+                        mod: 0
+                    };
+
+
+                if (
+                    !state.speakerIndexes &&
+                    typeof state.currentIndex === "number"
+                ) {
+
+                    speakerIndexes = {
+                        gsl:
+                            state.sessionType === "gsl"
+                                ? state.currentIndex
+                                : 0,
+
+                        mod:
+                            state.sessionType === "mod"
+                                ? state.currentIndex
+                                : 0
+                    };
+
+                }
+
+
+                if (
+                    sessionType === "gsl" ||
+                    sessionType === "mod"
+                ) {
+
+                    speakers =
+                        [
+                            ...(speakerQueues[sessionType] || [])
+                        ];
+
+                    currentIndex =
+                        speakerIndexes[sessionType] || 0;
+
+                }
+
+                else {
+
+                    speakers = [];
+
+                    currentIndex = 0;
+
+                }
+
+
+                originalSpeakerSeconds =
+                    state.originalSpeakerSeconds || 90;
+
+
+                /*
+                 * Always restore the timer to the original
+                 * configured duration after refresh.
+                 */
+
+                timerSeconds =
+                    originalSpeakerSeconds;
+
+
+                sessionTitle =
+                    state.sessionTitle ||
+                    "GENERAL SPEAKERS LIST";
+
+
+                history =
+                    state.history || [];
+
+
+                document
+                    .getElementById("sessionTitle")
+                    .value = sessionTitle;
+
+
+                document
+                    .getElementById("displaySessionTitle")
+                    .textContent = sessionTitle;
+
+
+                document
+                    .querySelectorAll(".session-type")
+                    .forEach(button => {
+
+                        button.classList.toggle(
+                            "active",
+                            button.dataset.session === sessionType
+                        );
+
+                    });
+
+
+                const speakerTime =
+                    document.getElementById("speakerTime");
+
+                const totalTime =
+                    document.getElementById("totalTime");
+
+
+                if (
+                    sessionType === "gsl" ||
+                    sessionType === "mod"
+                ) {
+
+                    speakerTime.disabled = false;
+                    totalTime.disabled = false;
+
+                    speakerTime.value =
+                        originalSpeakerSeconds;
+
+                }
+
+                else {
+
+                    speakerTime.disabled = true;
+                    totalTime.disabled = false;
+
+                }
+
+
+                updateTimerDisplay();
+
+                updateSpeakerDisplay();
+
+                renderSpeakers();
+
+                renderHistory();
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Could not load Chair Control state:",
+                    error
+                );
+
+                updateTimerDisplay();
+                renderSpeakers();
+                renderHistory();
+
+            }
+
+        }
+
+
+        /* =========================================================
+           HTML ESCAPE
+        ========================================================= */
+
+        function escapeHtml(value) {
+
+            return String(value)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+
+        }
+
+
+        /* =========================================================
+           INITIALIZE
+        ========================================================= */
+
+        loadState();
+
+
+        /* =========================================================
+           KEYBOARD SHORTCUTS
+        ========================================================= */
+
+        document.addEventListener(
+            "keydown",
+            event => {
+
+                /*
+                 * Don't trigger shortcuts while typing.
+                 */
+
+                if (
+                    event.target.tagName === "INPUT" ||
+                    event.target.tagName === "TEXTAREA" ||
+                    event.target.tagName === "SELECT"
+                ) {
+                    return;
+                }
+
+
+                if (event.code === "Space") {
+
+                    event.preventDefault();
+
+
+                    if (timerRunning) {
+                        pauseTimer();
+                    }
+
+                    else {
+                        startTimer();
+                    }
+
+                }
+
+
+                if (event.key.toLowerCase() === "r") {
+
+                    resetTimer();
+
+                }
+
+
+                if (event.key === "ArrowUp") {
+
+                    adjustTimer(15);
+
+                }
+
+
+                if (event.key === "ArrowDown") {
+
+                    adjustTimer(-15);
+
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,785 @@
+{% extends "base.html" %}
+
+{% block title %}
+Chair Directives — Arkanian Crisis Committee
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .directive-control-page {
+        width: min(1400px, 92%);
+        margin: 0 auto;
+        padding: 80px 0 120px;
+    }
+
+    /* ------------------------------------------------------ */
+    /* HEADER                                                  */
+    /* ------------------------------------------------------ */
+
+    .control-eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        opacity: 0.45;
+        margin-bottom: 18px;
+    }
+
+    .control-title {
+        margin: 0;
+        font-size: clamp(48px, 8vw, 110px);
+        line-height: 0.86;
+        letter-spacing: -0.065em;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .control-title span {
+        display: block;
+        opacity: 0.12;
+    }
+
+    .control-description {
+        max-width: 650px;
+        margin-top: 32px;
+        font-size: 14px;
+        line-height: 1.8;
+        opacity: 0.55;
+    }
+
+
+    /* ------------------------------------------------------ */
+    /* STATS                                                   */
+    /* ------------------------------------------------------ */
+
+    .directive-stats {
+        margin-top: 70px;
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .directive-stat {
+        padding: 28px 24px;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .directive-stat:last-child {
+        border-right: none;
+    }
+
+    .stat-number {
+        font-size: 36px;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+    }
+
+    .stat-label {
+        margin-top: 8px;
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        opacity: 0.42;
+    }
+
+
+    /* ------------------------------------------------------ */
+    /* SECTION                                                 */
+    /* ------------------------------------------------------ */
+
+    .directives-section {
+        margin-top: 90px;
+    }
+
+    .section-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 30px;
+        margin-bottom: 28px;
+    }
+
+    .section-heading-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .section-number {
+        font-size: 11px;
+        opacity: 0.35;
+        letter-spacing: 0.12em;
+    }
+
+    .section-title {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        font-weight: 600;
+    }
+
+
+    /* ------------------------------------------------------ */
+    /* EMPTY STATE                                             */
+    /* ------------------------------------------------------ */
+
+    .empty-directives {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 80px 30px;
+        text-align: center;
+    }
+
+    .empty-directives-title {
+        font-size: 28px;
+        letter-spacing: -0.03em;
+        text-transform: uppercase;
+    }
+
+    .empty-directives-text {
+        margin-top: 14px;
+        font-size: 12px;
+        opacity: 0.4;
+    }
+
+
+    /* ------------------------------------------------------ */
+    /* DIRECTIVE CARD                                          */
+    /* ------------------------------------------------------ */
+
+    .directive-list {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .directive-card {
+        position: relative;
+        overflow: hidden;
+
+        border: 1px solid rgba(255, 255, 255, 0.1);
+
+        background:
+            linear-gradient(135deg,
+                rgba(255, 255, 255, 0.055),
+                rgba(255, 255, 255, 0.015));
+
+        transition:
+            transform 0.25s ease,
+            border-color 0.25s ease,
+            background 0.25s ease;
+    }
+
+    .directive-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(255, 255, 255, 0.24);
+        background:
+            linear-gradient(135deg,
+                rgba(255, 255, 255, 0.075),
+                rgba(255, 255, 255, 0.02));
+    }
+
+    .directive-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 25px;
+
+        padding: 24px 28px;
+
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .directive-meta {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .directive-id {
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        opacity: 0.35;
+    }
+
+    .directive-delegation {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-weight: 600;
+    }
+
+    .directive-user {
+        font-size: 10px;
+        opacity: 0.38;
+    }
+
+
+    /* ------------------------------------------------------ */
+    /* STATUS BADGES                                           */
+    /* ------------------------------------------------------ */
+
+    .directive-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+
+        padding: 8px 12px;
+
+        border: 1px solid rgba(255, 255, 255, 0.13);
+
+        font-size: 9px;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+
+        white-space: nowrap;
+    }
+
+    .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+        opacity: 0.75;
+    }
+
+    .status-review {
+        opacity: 0.8;
+    }
+
+    .status-approved {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .status-rejected {
+        opacity: 0.42;
+    }
+
+    .status-executed {
+        background: rgba(255, 255, 255, 0.14);
+    }
+
+
+    /* ------------------------------------------------------ */
+    /* BODY                                                    */
+    /* ------------------------------------------------------ */
+
+    .directive-body {
+        padding: 30px 28px;
+    }
+
+    .directive-title {
+        margin: 0;
+
+        font-size: clamp(23px, 3vw, 34px);
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+        font-weight: 700;
+    }
+
+    .directive-content {
+        margin-top: 20px;
+
+        font-size: 13px;
+        line-height: 1.8;
+
+        opacity: 0.6;
+
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+
+
+    /* ------------------------------------------------------ */
+    /* FOOTER META                                             */
+    /* ------------------------------------------------------ */
+
+    .directive-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+
+        padding: 18px 28px;
+
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+
+        opacity: 0.4;
+    }
+
+
+    /* ------------------------------------------------------ */
+    /* CONTROLS                                                */
+    /* ------------------------------------------------------ */
+
+    .directive-controls {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 14px;
+
+        padding: 20px 28px;
+
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .status-form {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .status-select {
+        min-width: 190px;
+
+        padding: 12px 14px;
+
+        background: #050505;
+        color: white;
+
+        border: 1px solid rgba(255, 255, 255, 0.15);
+
+        font-family: inherit;
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+
+        outline: none;
+    }
+
+    .status-select:focus {
+        border-color: rgba(255, 255, 255, 0.45);
+    }
+
+    .control-button {
+        padding: 12px 18px;
+
+        background: white;
+        color: black;
+
+        border: 1px solid white;
+
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 700;
+
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+
+        cursor: pointer;
+
+        transition:
+            background 0.2s ease,
+            color 0.2s ease,
+            transform 0.2s ease;
+    }
+
+    .control-button:hover {
+        background: transparent;
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .delete-button {
+        background: transparent;
+        color: white;
+
+        border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .delete-button:hover {
+        background: white;
+        color: black;
+    }
+
+
+    /* ------------------------------------------------------ */
+    /* RESPONSIVE                                               */
+    /* ------------------------------------------------------ */
+
+    @media (max-width: 900px) {
+
+        .directive-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .directive-stat:nth-child(2) {
+            border-right: none;
+        }
+
+        .directive-stat:nth-child(3),
+        .directive-stat:nth-child(4),
+        .directive-stat:nth-child(5) {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .directive-controls {
+            grid-template-columns: 1fr;
+        }
+
+        .status-form {
+            flex-wrap: wrap;
+        }
+
+    }
+
+
+    @media (max-width: 600px) {
+
+        .directive-control-page {
+            width: 90%;
+            padding-top: 55px;
+        }
+
+        .control-title {
+            font-size: 54px;
+        }
+
+        .control-description {
+            font-size: 12px;
+        }
+
+        .directive-stats {
+            margin-top: 50px;
+        }
+
+        .directive-stat {
+            padding: 20px 16px;
+        }
+
+        .stat-number {
+            font-size: 28px;
+        }
+
+        .directive-top {
+            align-items: flex-start;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .directive-body {
+            padding: 24px 20px;
+        }
+
+        .directive-controls {
+            padding: 18px 20px;
+        }
+
+        .directive-footer {
+            padding: 16px 20px;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .status-form {
+            width: 100%;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .status-select {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .control-button {
+            width: 100%;
+        }
+
+    }
+</style>
+
+
+<div class="directive-control-page">
+
+    <!-- ================================================== -->
+    <!-- HEADER                                             -->
+    <!-- ================================================== -->
+
+    <div class="control-eyebrow">
+        ACC / CHAIR CONTROL / DIRECTIVES
+    </div>
+
+    <h1 class="control-title">
+        DIRECTIVE
+        <span>CONTROL</span>
+    </h1>
+
+    <p class="control-description">
+        Review every directive submitted by the committee.
+        Chairs can change its status, approve or reject
+        proposals, mark actions as executed, and permanently
+        remove directives when necessary.
+    </p>
+
+
+    <!-- ================================================== -->
+    <!-- STATISTICS                                         -->
+    <!-- ================================================== -->
+
+    <div class="directive-stats">
+
+        <div class="directive-stat">
+            <div class="stat-number">
+                {{ total }}
+            </div>
+
+            <div class="stat-label">
+                Total
+            </div>
+        </div>
+
+
+        <div class="directive-stat">
+            <div class="stat-number">
+                {{ under_review }}
+            </div>
+
+            <div class="stat-label">
+                Under Review
+            </div>
+        </div>
+
+
+        <div class="directive-stat">
+            <div class="stat-number">
+                {{ approved }}
+            </div>
+
+            <div class="stat-label">
+                Approved
+            </div>
+        </div>
+
+
+        <div class="directive-stat">
+            <div class="stat-number">
+                {{ rejected }}
+            </div>
+
+            <div class="stat-label">
+                Rejected
+            </div>
+        </div>
+
+
+        <div class="directive-stat">
+            <div class="stat-number">
+                {{ executed }}
+            </div>
+
+            <div class="stat-label">
+                Executed
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- DIRECTIVE LIST                                     -->
+    <!-- ================================================== -->
+
+    <section class="directives-section">
+
+        <div class="section-heading">
+
+            <div class="section-heading-left">
+
+                <div class="section-number">
+                    01
+                </div>
+
+                <div class="section-title">
+                    Committee Directives
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {% if directives %}
+
+        <div class="directive-list">
+
+            {% for directive in directives %}
+
+            <article class="directive-card">
+
+                <!-- ================================= -->
+                <!-- TOP                               -->
+                <!-- ================================= -->
+
+                <div class="directive-top">
+
+                    <div class="directive-meta">
+
+                        <div class="directive-id">
+                            DIR-{{ "%04d"|format(directive.id) }}
+                        </div>
+
+                        <div class="directive-delegation">
+                            {{ directive.delegation }}
+                        </div>
+
+                        <div class="directive-user">
+                            @{{ directive.username }}
+                        </div>
+
+                    </div>
+
+
+                    {% if directive.status == "APPROVED" %}
+
+                    <div class="directive-status status-approved">
+                        <span class="status-dot"></span>
+                        APPROVED
+                    </div>
+
+                    {% elif directive.status == "REJECTED" %}
+
+                    <div class="directive-status status-rejected">
+                        <span class="status-dot"></span>
+                        REJECTED
+                    </div>
+
+                    {% elif directive.status == "EXECUTED" %}
+
+                    <div class="directive-status status-executed">
+                        <span class="status-dot"></span>
+                        EXECUTED
+                    </div>
+
+                    {% else %}
+
+                    <div class="directive-status status-review">
+                        <span class="status-dot"></span>
+                        UNDER REVIEW
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- CONTENT                           -->
+                <!-- ================================= -->
+
+                <div class="directive-body">
+
+                    <h2 class="directive-title">
+                        {{ directive.title }}
+                    </h2>
+
+                    <div class="directive-content">
+                        {{ directive.body }}
+                    </div>
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- META                              -->
+                <!-- ================================= -->
+
+                <div class="directive-footer">
+
+                    <div>
+                        Submitted
+                        {{ directive.created_at }}
+                    </div>
+
+                    <div>
+                        Updated
+                        {{ directive.updated_at }}
+                    </div>
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- CONTROLS                          -->
+                <!-- ================================= -->
+
+                <div class="directive-controls">
+
+                    <!-- STATUS UPDATE -->
+
+                    <form class="status-form" method="POST" action="{{ url_for('chair_directives') }}">
+
+                        <input type="hidden" name="directive_id" value="{{ directive.id }}">
+
+                        <select class="status-select" name="status" aria-label="Directive status">
+
+                            <option value="UNDER REVIEW" {% if directive.status=="UNDER REVIEW" %} selected {% endif %}>
+                                UNDER REVIEW
+                            </option>
+
+                            <option value="APPROVED" {% if directive.status=="APPROVED" %} selected {% endif %}>
+                                APPROVED
+                            </option>
+
+                            <option value="REJECTED" {% if directive.status=="REJECTED" %} selected {% endif %}>
+                                REJECTED
+                            </option>
+
+                            <option value="EXECUTED" {% if directive.status=="EXECUTED" %} selected {% endif %}>
+                                EXECUTED
+                            </option>
+
+                        </select>
+
+
+                        <button type="submit" class="control-button">
+                            UPDATE STATUS
+                        </button>
+
+                    </form>
+
+
+                    <!-- DELETE -->
+
+                    <form method="POST" action="{{ url_for('delete_directive', directive_id=directive.id) }}"
+                        onsubmit="return confirm('Delete this directive permanently? This cannot be undone.');">
+
+                        <button type="submit" class="control-button delete-button">
+                            DELETE
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </article>
+
+            {% endfor %}
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-directives">
+
+            <div class="empty-directives-title">
+                No directives
+            </div>
+
+            <div class="empty-directives-text">
+                Delegates have not submitted any directives yet.
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+</div>
+
+{% endblock %}

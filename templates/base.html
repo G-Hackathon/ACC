@@ -1379,6 +1379,16 @@
                     NOTES
                 </a>
 
+                <a href="{{ url_for('directives') }}"
+                    class="{% if request.endpoint in ['directives'] %}active{% endif %}">
+                    DIRECTIVES
+                </a>
+
+                <a href="{{ url_for('votes') }}"
+                    class="{% if request.endpoint in ['votes', 'cast_vote'] %}active{% endif %}">
+                    VOTES
+                </a>
+
                 {% elif user.role == "press" %}
 
                 <a href="{{ url_for('press_upload') }}"
@@ -1391,6 +1401,16 @@
                 <a href="{{ url_for('crises') }}"
                     class="{% if request.endpoint in ['crises', 'publish_crisis', 'delete_crisis'] %}active{% endif %}">
                     CRISES
+                </a>
+
+                <a href="{{ url_for('chair_directives') }}"
+                    class="{% if request.endpoint in ['chair_directives'] %}active{% endif %}">
+                    DIRECTIVES
+                </a>
+
+                <a href="{{ url_for('chair_votes') }}"
+                    class="{% if request.endpoint in ['chair_votes'] %}active{% endif %}">
+                    VOTES
                 </a>
 
                 {% endif %}

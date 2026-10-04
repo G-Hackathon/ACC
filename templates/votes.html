@@ -1,0 +1,748 @@
+{% extends "base.html" %}
+
+{% block title %}
+Voting — Arkanian Crisis Committee
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* =========================================================
+       VOTING PAGE
+    ========================================================= */
+
+    .vote-page {
+        min-height: calc(100vh - 80px);
+        padding: 80px 24px 120px;
+    }
+
+    .vote-inner {
+        max-width: 1180px;
+        margin: 0 auto;
+    }
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
+
+    .vote-header {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 40px;
+        align-items: end;
+        margin-bottom: 55px;
+    }
+
+    .vote-eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        opacity: 0.45;
+        margin-bottom: 18px;
+        font-weight: 600;
+    }
+
+    .vote-title {
+        margin: 0;
+        font-size: clamp(64px, 10vw, 145px);
+        line-height: 0.82;
+        letter-spacing: -0.07em;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .vote-title span {
+        display: block;
+        opacity: 0.25;
+    }
+
+    .vote-description {
+        max-width: 540px;
+        margin: 25px 0 0;
+        font-size: 15px;
+        line-height: 1.7;
+        opacity: 0.58;
+    }
+
+    .vote-status {
+        min-width: 230px;
+        padding: 22px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.025);
+        backdrop-filter: blur(12px);
+    }
+
+    .vote-status-label {
+        font-size: 9px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        opacity: 0.4;
+        margin-bottom: 12px;
+    }
+
+    .vote-status-value {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .vote-status-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        animation: votePulse 1.8s infinite;
+    }
+
+    @keyframes votePulse {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.35;
+            transform: scale(0.7);
+        }
+    }
+
+    /* =========================================================
+       SECTIONS
+    ========================================================= */
+
+    .vote-section {
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 42px 0 0;
+        margin-top: 65px;
+    }
+
+    .vote-section-layout {
+        display: grid;
+        grid-template-columns: 130px 1fr;
+        gap: 35px;
+    }
+
+    .vote-section-number {
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        opacity: 0.32;
+        padding-top: 7px;
+    }
+
+    .vote-section-heading {
+        margin: 0;
+        font-size: 35px;
+        letter-spacing: -0.04em;
+        line-height: 1;
+    }
+
+    .vote-section-subtitle {
+        margin: 12px 0 35px;
+        font-size: 13px;
+        line-height: 1.6;
+        opacity: 0.42;
+    }
+
+    /* =========================================================
+       VOTE CARDS
+    ========================================================= */
+
+    .vote-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .vote-card {
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.11);
+        background: rgba(255, 255, 255, 0.02);
+        padding: 30px;
+        transition:
+            transform 0.3s ease,
+            border-color 0.3s ease,
+            background 0.3s ease;
+    }
+
+    .vote-card:hover {
+        border-color: rgba(255, 255, 255, 0.23);
+        background: rgba(255, 255, 255, 0.035);
+    }
+
+    /* =========================================================
+       TOP ROW
+    ========================================================= */
+
+    .vote-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 18px;
+    }
+
+    .vote-number {
+        font-size: 10px;
+        letter-spacing: 0.15em;
+        opacity: 0.3;
+    }
+
+    .vote-card-status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        padding: 8px 11px;
+        font-size: 9px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        opacity: 0.65;
+    }
+
+    .vote-card-status::before {
+        content: "";
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: currentColor;
+    }
+
+    /* =========================================================
+       TITLE + MOTION
+    ========================================================= */
+
+    .vote-card-title {
+        margin: 0;
+        font-size: 27px;
+        line-height: 1.1;
+        letter-spacing: -0.04em;
+    }
+
+    .vote-motion-label {
+        margin-top: 23px;
+        margin-bottom: 9px;
+        font-size: 9px;
+        letter-spacing: 0.17em;
+        text-transform: uppercase;
+        opacity: 0.3;
+        font-weight: 600;
+    }
+
+    .vote-motion {
+        max-width: 800px;
+        font-size: 14px;
+        line-height: 1.75;
+        opacity: 0.55;
+        white-space: pre-wrap;
+    }
+
+    /* =========================================================
+       VOTE AREA
+    ========================================================= */
+
+    .vote-action-area {
+        margin-top: 30px;
+        padding-top: 23px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .vote-action-label {
+        margin-bottom: 13px;
+        font-size: 9px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        opacity: 0.3;
+    }
+
+    .vote-options {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    .vote-option {
+        appearance: none;
+        min-height: 55px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.025);
+        color: inherit;
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition:
+            transform 0.25s ease,
+            border-color 0.25s ease,
+            background 0.25s ease,
+            color 0.25s ease;
+    }
+
+    .vote-option:hover {
+        transform: translateY(-3px);
+        border-color: rgba(255, 255, 255, 0.4);
+        background: #fff;
+        color: #000;
+    }
+
+    .vote-option:active {
+        transform: translateY(-1px);
+    }
+
+    .vote-option:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* =========================================================
+       DISABLED VOTING
+    ========================================================= */
+
+    .vote-disabled {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 15px 17px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.025);
+        font-size: 11px;
+        line-height: 1.5;
+        opacity: 0.55;
+    }
+
+    .vote-disabled-icon {
+        width: 29px;
+        height: 29px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        font-size: 11px;
+        flex-shrink: 0;
+    }
+
+    /* =========================================================
+       META
+    ========================================================= */
+
+    .vote-meta {
+        margin-top: 23px;
+        font-size: 9px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        opacity: 0.27;
+    }
+
+    /* =========================================================
+       EMPTY STATE
+    ========================================================= */
+
+    .vote-empty {
+        border: 1px dashed rgba(255, 255, 255, 0.12);
+        padding: 65px 25px;
+        text-align: center;
+    }
+
+    .vote-empty-title {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 9px;
+    }
+
+    .vote-empty-text {
+        font-size: 12px;
+        opacity: 0.35;
+        line-height: 1.6;
+    }
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================= */
+
+    @media (max-width: 800px) {
+
+        .vote-page {
+            padding: 55px 18px 90px;
+        }
+
+        .vote-header {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .vote-status {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .vote-section-layout {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .vote-section-number {
+            padding-top: 0;
+        }
+
+        .vote-options {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 520px) {
+
+        .vote-title {
+            font-size: 58px;
+        }
+
+        .vote-section {
+            margin-top: 50px;
+        }
+
+        .vote-section-heading {
+            font-size: 29px;
+        }
+
+        .vote-card {
+            padding: 22px;
+        }
+
+        .vote-card-title {
+            font-size: 23px;
+        }
+
+        .vote-card-top {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 12px;
+        }
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="vote-page">
+
+    <div class="vote-inner">
+
+        <!-- =====================================================
+             HEADER
+        ====================================================== -->
+
+        <header class="vote-header">
+
+            <div>
+
+                <div class="vote-eyebrow">
+                    Arkanian Crisis Committee / Decision
+                </div>
+
+                <h1 class="vote-title">
+                    VOTES
+                    <span>Decisions.</span>
+                </h1>
+
+                <p class="vote-description">
+                    Participate in formal committee votes and
+                    record your position on active motions.
+                </p>
+
+            </div>
+
+            <div class="vote-status">
+
+                <div class="vote-status-label">
+                    Committee Status
+                </div>
+
+                <div class="vote-status-value">
+                    <span class="vote-status-dot"></span>
+                    Voting System Live
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =====================================================
+             ACTIVE VOTES
+        ====================================================== -->
+
+        <section class="vote-section">
+
+            <div class="vote-section-layout">
+
+                <div class="vote-section-number">
+                    01 / Decisions
+                </div>
+
+                <div>
+
+                    <h2 class="vote-section-heading">
+                        Active Votes
+                    </h2>
+
+                    <p class="vote-section-subtitle">
+                        Formal motions currently available for
+                        delegate voting.
+                    </p>
+
+
+                    {% if votes %}
+
+                    <div class="vote-grid">
+
+                        {% for vote in votes %}
+
+                        <article class="vote-card" data-vote-card>
+
+                            <!-- TOP -->
+
+                            <div class="vote-card-top">
+
+                                <div class="vote-number">
+                                    VOTE {{ "%02d"|format(loop.index) }}
+                                </div>
+
+                                <div class="vote-card-status">
+                                    {{ vote.status }}
+                                </div>
+
+                            </div>
+
+
+                            <!-- TITLE -->
+
+                            <h3 class="vote-card-title">
+                                {{ vote.title }}
+                            </h3>
+
+
+                            <!-- MOTION -->
+
+                            <div class="vote-motion-label">
+                                Motion
+                            </div>
+
+                            <div class="vote-motion">
+                                {{ vote.motion }}
+                            </div>
+
+
+                            <!-- ACTION -->
+
+                            {% if vote.status == "OPEN" and user.attendance == "PRESENT & VOTING" %}
+
+                            <div class="vote-action-area">
+
+                                <div class="vote-action-label">
+                                    Cast your position
+                                </div>
+
+                                <form method="POST" class="vote-options" data-vote-form>
+
+                                    <input type="hidden" name="vote_id" value="{{ vote.id }}">
+
+                                    <button type="submit" name="choice" value="FOR" class="vote-option">
+                                        For →
+                                    </button>
+
+                                    <button type="submit" name="choice" value="AGAINST" class="vote-option">
+                                        Against →
+                                    </button>
+
+                                    <button type="submit" name="choice" value="ABSTAIN" class="vote-option">
+                                        Abstain →
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+
+                            {% elif vote.status == "OPEN" %}
+
+                            <div class="vote-action-area">
+
+                                <div class="vote-disabled">
+
+                                    <div class="vote-disabled-icon">
+                                        —
+                                    </div>
+
+                                    <div>
+                                        Only delegates marked
+                                        <strong>PRESENT &amp; VOTING</strong>
+                                        may vote on this motion.
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            {% endif %}
+
+
+                            <div class="vote-meta">
+                                Official Committee Vote
+                                /
+                                {{ vote.status }}
+                            </div>
+
+                        </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="vote-empty">
+
+                        <div class="vote-empty-title">
+                            No votes have been created
+                        </div>
+
+                        <div class="vote-empty-text">
+                            Formal motions created by the Chair
+                            will appear here.
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        /* =====================================================
+           PREVENT DOUBLE VOTES
+        ====================================================== */
+
+        const forms =
+            document.querySelectorAll(
+                "[data-vote-form]"
+            );
+
+        forms.forEach(function (form) {
+
+            form.addEventListener(
+                "submit",
+                function (event) {
+
+                    const buttons =
+                        form.querySelectorAll(
+                            "button"
+                        );
+
+                    buttons.forEach(function (button) {
+
+                        button.disabled = true;
+
+                    });
+
+                    const clickedButton =
+                        event.submitter;
+
+                    if (clickedButton) {
+
+                        clickedButton.textContent =
+                            "Submitting...";
+
+                    }
+
+                }
+            );
+
+        });
+
+
+        /* =====================================================
+           SUBTLE CARD TILT
+        ====================================================== */
+
+        const cards =
+            document.querySelectorAll(
+                "[data-vote-card]"
+            );
+
+        cards.forEach(function (card) {
+
+            card.addEventListener(
+                "mousemove",
+                function (event) {
+
+                    if (window.innerWidth < 800) {
+                        return;
+                    }
+
+                    const rect =
+                        card.getBoundingClientRect();
+
+                    const x =
+                        event.clientX - rect.left;
+
+                    const y =
+                        event.clientY - rect.top;
+
+                    const centerX =
+                        rect.width / 2;
+
+                    const centerY =
+                        rect.height / 2;
+
+                    const rotateX =
+                        ((y - centerY) / centerY) * -0.8;
+
+                    const rotateY =
+                        ((x - centerX) / centerX) * 0.8;
+
+                    card.style.transform =
+                        "perspective(1000px) " +
+                        "rotateX(" + rotateX + "deg) " +
+                        "rotateY(" + rotateY + "deg) " +
+                        "translateY(-2px)";
+
+                }
+            );
+
+
+            card.addEventListener(
+                "mouseleave",
+                function () {
+
+                    card.style.transform = "";
+
+                }
+            );
+
+        });
+
+    });
+</script>
+
+{% endblock %}
