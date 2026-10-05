@@ -2232,6 +2232,20 @@ def chair_control():
 # COMMITTEE
 # ============================================================
 
+@app.route("/chair-timer")
+@role_required("chair")
+def chair_timer():
+
+    return render_template(
+        "chair_timer.html",
+        user=current_user()
+    )
+
+
+# ============================================================
+# COMMITTEE
+# ============================================================
+
 @app.route("/committee")
 @login_required
 def committee():
@@ -2372,31 +2386,176 @@ def api_announcements():
 
 @app.route(
     "/chair-attendance",
-    methods=["POST"]
+    methods=["GET", "POST"]
 )
 @role_required("chair")
 def chair_attendance():
 
-    username = request.form.get(
-        "username",
-        ""
-    ).strip()
+    conn = get_db()
 
-    attendance = request.form.get(
-        "attendance",
-        ""
-    ).strip().upper()
+    try:
 
-    valid_attendance = {
-        "ABSENT",
-        "PRESENT",
-        "PRESENT & VOTING"
-    }
+        # =========================================================
+        # POST — SAVE ATTENDANCE
+        # =========================================================
 
-    if attendance not in valid_attendance:
+        if request.method == "POST":
+
+            print("========================================")
+            print("CHAIR ATTENDANCE POST RECEIVED")
+            print("FORM DATA:", dict(request.form))
+            print("========================================")
+
+            updated = 0
+
+            for username, account in DELEGATES.items():
+
+                # Ignore chair accounts
+                if account.get(
+                    "role",
+                    "delegate"
+                ) != "delegate":
+                    continue
+
+                field_name = (
+                    f"attendance_{username}"
+                )
+
+                attendance = request.form.get(
+                    field_name
+                )
+
+                print(
+                    "CHECKING:",
+                    username,
+                    "FIELD:",
+                    field_name,
+                    "VALUE:",
+                    attendance
+                )
+
+                # If this delegate wasn't included
+                # in the submitted form, leave them alone.
+                if attendance is None:
+                    continue
+
+                attendance = attendance.strip().upper()
+
+                if attendance not in {
+                    "ABSENT",
+                    "PRESENT",
+                    "PRESENT & VOTING"
+                }:
+
+                    print(
+                        "INVALID VALUE:",
+                        repr(attendance)
+                    )
+
+                    flash(
+                        "Invalid attendance status.",
+                        "error"
+                    )
+
+                    return redirect(
+                        url_for("chair_control")
+                    )
+
+                conn.execute(
+                    """
+                    INSERT INTO delegate_status
+                    (
+                        username,
+                        attendance,
+                        updated_at
+                    )
+                    VALUES
+                    (
+                        ?,
+                        ?,
+                        CURRENT_TIMESTAMP
+                    )
+
+                    ON CONFLICT(username)
+                    DO UPDATE SET
+                        attendance =
+                            excluded.attendance,
+                        updated_at =
+                            CURRENT_TIMESTAMP
+                    """,
+                    (
+                        username,
+                        attendance
+                    )
+                )
+
+                updated += 1
+
+            # =====================================================
+            # IMPORTANT:
+            # If absolutely NO attendance fields were submitted,
+            # do NOT silently accept the request.
+            # =====================================================
+
+            if updated == 0:
+
+                print(
+                    "NO ATTENDANCE FIELDS FOUND"
+                )
+
+                flash(
+                    "No attendance changes were submitted.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("chair_control")
+                )
+
+            conn.commit()
+
+            print(
+                f"ATTENDANCE SAVED: {updated}"
+            )
+
+            flash(
+                f"Attendance saved for {updated} delegates.",
+                "success"
+            )
+
+            return redirect(
+                url_for("chair_control")
+            )
+
+        # =========================================================
+        # GET — DISPLAY ATTENDANCE
+        # =========================================================
+
+        rows = conn.execute(
+            """
+            SELECT *
+            FROM delegate_status
+            ORDER BY username COLLATE NOCASE
+            """
+        ).fetchall()
+
+        return render_template(
+            "chair_control.html",
+            statuses=rows,
+            user=current_user()
+        )
+
+    except sqlite3.Error as error:
+
+        conn.rollback()
+
+        print(
+            "CHAIR ATTENDANCE DATABASE ERROR:",
+            error
+        )
 
         flash(
-            "Invalid attendance status.",
+            "Could not save attendance.",
             "error"
         )
 
@@ -2404,40 +2563,26 @@ def chair_attendance():
             url_for("chair_control")
         )
 
-    conn = get_db()
-
-    try:
-
-        conn.execute("""
-            INSERT INTO delegate_status
-            (
-                username,
-                attendance,
-                updated_at
-            )
-            VALUES (?, ?, CURRENT_TIMESTAMP)
-            ON CONFLICT(username)
-            DO UPDATE SET
-                attendance = excluded.attendance,
-                updated_at = CURRENT_TIMESTAMP
-        """, (
-            username,
-            attendance
-        ))
-
-        conn.commit()
-
-        flash(
-            f"Attendance updated for {username}.",
-            "success"
-        )
-
-    except Exception:
+    except Exception as error:
 
         conn.rollback()
-        raise
+
+        print(
+            "CHAIR ATTENDANCE ERROR:",
+            error
+        )
+
+        flash(
+            "Could not save attendance.",
+            "error"
+        )
+
+        return redirect(
+            url_for("chair_control")
+        )
 
     finally:
+
         conn.close()
 
     return redirect(
@@ -3442,8 +3587,106 @@ def chair_votes():
 
 
 # ============================================================
+# DELETE VOTE
+# ============================================================
+
+@app.route(
+    "/chair-votes/<int:vote_id>/delete",
+    methods=["POST"]
+)
+@role_required("chair")
+def delete_vote(vote_id):
+
+    conn = get_db()
+
+    try:
+
+        # ----------------------------------------------------
+        # CHECK THAT THE VOTE EXISTS
+        # ----------------------------------------------------
+
+        vote = conn.execute(
+            """
+            SELECT id, title
+            FROM votes
+            WHERE id = ?
+            """,
+            (vote_id,)
+        ).fetchone()
+
+        if vote is None:
+
+            flash(
+                "Vote not found.",
+                "error"
+            )
+
+            return redirect(
+                url_for("chair_votes")
+            )
+
+        # ----------------------------------------------------
+        # DELETE ALL RECORDED BALLOTS FIRST
+        # ----------------------------------------------------
+
+        conn.execute(
+            """
+            DELETE FROM vote_records
+            WHERE vote_id = ?
+            """,
+            (vote_id,)
+        )
+
+        # ----------------------------------------------------
+        # DELETE THE ACTUAL VOTE
+        # ----------------------------------------------------
+
+        conn.execute(
+            """
+            DELETE FROM votes
+            WHERE id = ?
+            """,
+            (vote_id,)
+        )
+
+        conn.commit()
+
+        flash(
+            f"Vote '{vote['title']}' deleted.",
+            "success"
+        )
+
+        return redirect(
+            url_for("chair_votes")
+        )
+
+    except sqlite3.Error as error:
+
+        conn.rollback()
+
+        print(
+            "DELETE VOTE ERROR:",
+            error
+        )
+
+        flash(
+            "Could not delete the vote.",
+            "error"
+        )
+
+        return redirect(
+            url_for("chair_votes")
+        )
+
+    finally:
+
+        conn.close()
+
+
+# ============================================================
 # VOTE RESULTS
 # ============================================================
+
 
 @app.route(
     "/votes/<int:vote_id>/results"

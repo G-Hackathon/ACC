@@ -899,6 +899,12 @@
                     VOTES
                 </a>
 
+
+                <a href="{{ url_for('chair_timer') }}"
+                    class="{% if request.endpoint == 'chair_timer' %}active{% endif %}">
+                    TIMER
+                </a>
+
                 {% endif %}
 
                 {% endif %}
@@ -1235,6 +1241,11 @@
                     VOTES
                 </a>
 
+                <a href="{{ url_for('chair_timer') }}">
+                    <span>07</span>
+                    TIMER
+                </a>
+
                 {% endif %}
 
 
@@ -1243,7 +1254,7 @@
                     {% if user.role == "delegate" %}
                     <span>07</span>
                     {% elif user.role == "chair" %}
-                    <span>07</span>
+                    <span>08</span>
                     {% else %}
                     <span>04</span>
                     {% endif %}
@@ -1258,7 +1269,7 @@
                     {% if user.role == "delegate" %}
                     <span>08</span>
                     {% elif user.role == "chair" %}
-                    <span>08</span>
+                    <span>09</span>
                     {% else %}
                     <span>05</span>
                     {% endif %}

@@ -1,0 +1,637 @@
+{% extends "base.html" %}
+
+{% block title %}Session Timer — Arkanian Crisis Committee{% endblock %}
+
+{% block content %}
+<style>
+    .timer-page {
+        --bg: #050505;
+        --panel: #0b0b0b;
+        --panel-2: #101010;
+        --border: #242424;
+        --border-light: #333;
+        --text: #f5f5f5;
+        --muted: #777;
+        --dim: #444;
+        max-width: 1250px;
+        margin: 0 auto;
+        padding: 32px 22px 70px;
+        color: var(--text);
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .timer-commandbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        padding: 16px 18px;
+        margin-bottom: 28px;
+    }
+
+    .timer-kicker,
+    .timer-label,
+    .timer-status,
+    .timer-meta-label,
+    .timer-button,
+    .timer-input label,
+    .timer-session-type,
+    .timer-eyebrow {
+        font-family: "Arial Black", Impact, Haettenschweiler, "Arial Narrow Bold", Arial, sans-serif;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    .timer-kicker {
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    .timer-brand {
+        font-weight: 900;
+        letter-spacing: .08em;
+        font-size: 15px;
+    }
+
+    .timer-back {
+        color: var(--text);
+        text-decoration: none;
+        border: 1px solid var(--border-light);
+        padding: 10px 14px;
+        font-size: 11px;
+        font-family: "Arial Black", Impact, sans-serif;
+        letter-spacing: .07em;
+        transition: .2s ease;
+    }
+
+    .timer-back:hover {
+        background: #fff;
+        color: #000;
+    }
+
+    .timer-hero {
+        margin-bottom: 22px;
+    }
+
+    .timer-eyebrow {
+        color: var(--muted);
+        font-size: 11px;
+        margin-bottom: 8px;
+    }
+
+    .timer-title {
+        margin: 0;
+        font-size: clamp(34px, 6vw, 72px);
+        line-height: .95;
+        font-family: "Arial Black", Impact, sans-serif;
+        letter-spacing: -.035em;
+    }
+
+    .timer-subtitle {
+        color: var(--muted);
+        margin: 12px 0 0;
+        font-size: 13px;
+    }
+
+    .timer-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.5fr) minmax(300px, .7fr);
+        gap: 18px;
+        align-items: stretch;
+    }
+
+    .timer-panel,
+    .timer-setup {
+        border: 1px solid var(--border);
+        background: var(--panel);
+    }
+
+    .timer-panel {
+        padding: 26px;
+        min-height: 500px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .timer-panel-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    .timer-label {
+        color: var(--muted);
+        font-size: 10px;
+    }
+
+    .timer-session-title {
+        margin-top: 8px;
+        font-size: 25px;
+        font-weight: 800;
+    }
+
+    .timer-session-type {
+        color: var(--muted);
+        font-size: 10px;
+        margin-top: 6px;
+    }
+
+    .timer-status {
+        border: 1px solid var(--border-light);
+        padding: 8px 10px;
+        font-size: 9px;
+        white-space: nowrap;
+    }
+
+    .timer-status.running {
+        border-color: #fff;
+        background: #fff;
+        color: #000;
+    }
+
+    .timer-status.expired {
+        border-color: #777;
+        color: #aaa;
+    }
+
+    .timer-display {
+        text-align: center;
+        font-family: "Arial Black", Impact, sans-serif;
+        font-size: clamp(52px, 8vw, 96px);
+        line-height: .85;
+        letter-spacing: -.06em;
+        margin: 48px 0 42px;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .timer-controls {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .timer-button {
+        appearance: none;
+        border: 1px solid var(--border-light);
+        background: #0e0e0e;
+        color: var(--text);
+        padding: 14px 12px;
+        cursor: pointer;
+        font-size: 10px;
+        transition: .18s ease;
+    }
+
+    .timer-button:hover {
+        background: #fff;
+        color: #000;
+        border-color: #fff;
+    }
+
+    .timer-button.primary {
+        background: #fff;
+        color: #000;
+        border-color: #fff;
+    }
+
+    .timer-button.primary:hover {
+        background: #ddd;
+    }
+
+    .timer-button:disabled {
+        opacity: .35;
+        cursor: not-allowed;
+    }
+
+    .timer-adjustments {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-top: 8px;
+    }
+
+    .timer-adjustments .timer-button {
+        padding: 11px 8px;
+        font-size: 9px;
+    }
+
+    .timer-setup {
+        padding: 22px;
+    }
+
+    .timer-setup-head {
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 20px;
+    }
+
+    .timer-setup-title {
+        font-family: "Arial Black", Impact, sans-serif;
+        font-size: 17px;
+    }
+
+    .timer-setup-note {
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 7px;
+        line-height: 1.5;
+    }
+
+    .timer-input {
+        margin-bottom: 16px;
+    }
+
+    .timer-input label {
+        display: block;
+        color: var(--muted);
+        font-size: 9px;
+        margin-bottom: 8px;
+    }
+
+    .timer-input input,
+    .timer-input select {
+        width: 100%;
+        box-sizing: border-box;
+        background: #070707;
+        color: #fff;
+        border: 1px solid var(--border-light);
+        padding: 13px;
+        outline: none;
+        font: 13px Arial, sans-serif;
+    }
+
+    .timer-input input:focus,
+    .timer-input select:focus {
+        border-color: #fff;
+    }
+
+    .timer-create {
+        width: 100%;
+        margin-top: 5px;
+    }
+
+    .timer-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 18px;
+    }
+
+    .timer-info-card {
+        border: 1px solid var(--border);
+        padding: 13px;
+        background: var(--panel-2);
+    }
+
+    .timer-meta-label {
+        color: var(--muted);
+        font-size: 8px;
+    }
+
+    .timer-meta-value {
+        margin-top: 6px;
+        font-weight: 800;
+        font-size: 14px;
+    }
+
+    .timer-warning {
+        margin-top: 18px;
+        border-left: 2px solid #777;
+        padding: 10px 12px;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.5;
+    }
+
+    @media (max-width: 850px) {
+        .timer-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .timer-panel {
+            min-height: auto;
+        }
+
+        .timer-display {
+            margin: 45px 0 35px;
+            font-size: clamp(48px, 13vw, 78px);
+        }
+    }
+
+    @media (max-width: 520px) {
+        .timer-page {
+            padding: 20px 14px 50px;
+        }
+
+        .timer-commandbar {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .timer-panel {
+            padding: 18px;
+        }
+
+        .timer-display {
+            font-size: 20vw;
+        }
+
+        .timer-adjustments {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+
+<div class="timer-page">
+
+    <div class="timer-commandbar">
+        <div>
+            <div class="timer-kicker">ACC // CHAIR SYSTEM</div>
+            <div class="timer-brand">FULL SESSION TIMER</div>
+        </div>
+        <a class="timer-back" href="{{ url_for('chair_control') }}">← CHAIR CONTROL</a>
+    </div>
+
+    <header class="timer-hero">
+        <div class="timer-eyebrow">AUTHORIZED CHAIR ACCESS // LIVE SESSION CONTROL</div>
+        <h1 class="timer-title">SESSION TIMER</h1>
+        <p class="timer-subtitle">One master countdown for the entire session. The clock is chair-only and survives page
+            refreshes.</p>
+    </header>
+
+    <div class="timer-layout">
+
+        <section class="timer-panel">
+            <div class="timer-panel-top">
+                <div>
+                    <div class="timer-label">ACTIVE SESSION</div>
+                    <div class="timer-session-title" id="sessionTitle">NO SESSION CREATED</div>
+                    <div class="timer-session-type" id="sessionType">READY</div>
+                </div>
+                <div class="timer-status" id="timerStatus">READY</div>
+            </div>
+
+            <div class="timer-display" id="timerDisplay">00:00:00</div>
+
+            <div>
+                <div class="timer-controls">
+                    <button class="timer-button primary" id="startButton" onclick="startTimer()">START</button>
+                    <button class="timer-button" onclick="pauseTimer()">PAUSE</button>
+                    <button class="timer-button" onclick="resetTimer()">RESET</button>
+                    <button class="timer-button" onclick="clearSession()">CLEAR SESSION</button>
+                </div>
+
+                <div class="timer-adjustments">
+                    <button class="timer-button" onclick="adjustTimer(-30)">−30 SEC</button>
+                    <button class="timer-button" onclick="adjustTimer(-15)">−15 SEC</button>
+                    <button class="timer-button" onclick="adjustTimer(15)">+15 SEC</button>
+                    <button class="timer-button" onclick="adjustTimer(30)">+30 SEC</button>
+                </div>
+            </div>
+        </section>
+
+        <aside class="timer-setup">
+            <div class="timer-setup-head">
+                <div class="timer-setup-title">SESSION SETUP</div>
+                <div class="timer-setup-note">Create the session before starting the clock. Total Time is the master
+                    session duration.</div>
+            </div>
+
+            <div class="timer-input">
+                <label for="inputTitle">Session Title</label>
+                <input id="inputTitle" type="text" maxlength="80" placeholder="e.g. Moderated Caucus — Border Crisis">
+            </div>
+
+            <div class="timer-input">
+                <label for="inputType">Session Type</label>
+                <select id="inputType">
+                    <option>GSL</option>
+                    <option>MOD CAUCUS</option>
+                    <option>UNMOD</option>
+                    <option>CUSTOM</option>
+                </select>
+            </div>
+
+            <div class="timer-input">
+                <label for="inputMinutes">Total Time — Minutes</label>
+                <input id="inputMinutes" type="number" min="1" max="999" value="10">
+            </div>
+
+            <button class="timer-button primary timer-create" onclick="createSession()">CREATE SESSION</button>
+
+            <div class="timer-info">
+                <div class="timer-info-card">
+                    <div class="timer-meta-label">DURATION</div>
+                    <div class="timer-meta-value" id="durationInfo">10 MIN</div>
+                </div>
+                <div class="timer-info-card">
+                    <div class="timer-meta-label">STATE</div>
+                    <div class="timer-meta-value" id="stateInfo">READY</div>
+                </div>
+            </div>
+
+            <div class="timer-warning">
+                The timer is stored in this browser for the chair station. If you refresh while it is running, the
+                countdown continues from the original end time.
+            </div>
+        </aside>
+
+    </div>
+</div>
+
+<script>
+    (() => {
+        const STORAGE_KEY = "accChairFullSessionTimer";
+
+        let state = {
+            title: "",
+            type: "GSL",
+            duration: 600,
+            remaining: 600,
+            endAt: null,
+            running: false
+        };
+
+        let interval = null;
+
+        const $ = id => document.getElementById(id);
+
+        function formatTime(totalSeconds) {
+            totalSeconds = Math.max(0, Math.floor(totalSeconds));
+            const h = Math.floor(totalSeconds / 3600);
+            const m = Math.floor((totalSeconds % 3600) / 60);
+            const s = totalSeconds % 60;
+            return [h, m, s].map(v => String(v).padStart(2, "0")).join(":");
+        }
+
+        function save() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function stopInterval() {
+            if (interval) {
+                clearInterval(interval);
+                interval = null;
+            }
+        }
+
+        function updateUI() {
+            $("sessionTitle").textContent = state.title || "NO SESSION CREATED";
+            $("sessionType").textContent = state.title ? state.type : "READY";
+            $("timerDisplay").textContent = formatTime(state.remaining);
+            $("durationInfo").textContent = `${Math.ceil(state.duration / 60)} MIN`;
+
+            let status = "READY";
+            if (state.running) status = "RUNNING";
+            else if (state.title && state.remaining <= 0) status = "TIME EXPIRED";
+            else if (state.title && state.remaining < state.duration) status = "PAUSED";
+
+            $("timerStatus").textContent = status;
+            $("timerStatus").className = "timer-status" + (status === "RUNNING" ? " running" : status === "TIME EXPIRED" ? " expired" : "");
+            $("stateInfo").textContent = status;
+            $("startButton").textContent = state.running ? "RUNNING" : "START";
+            $("startButton").disabled = state.running || !state.title || state.remaining <= 0;
+        }
+
+        function tick() {
+            if (!state.running || !state.endAt) return;
+
+            state.remaining = Math.max(0, Math.ceil((state.endAt - Date.now()) / 1000));
+
+            if (state.remaining <= 0) {
+                state.remaining = 0;
+                state.running = false;
+                state.endAt = null;
+                stopInterval();
+            }
+
+            updateUI();
+            save();
+        }
+
+        window.createSession = function () {
+            const title = $("inputTitle").value.trim() || "Untitled Session";
+            const type = $("inputType").value;
+            const minutes = Math.max(1, Math.min(999, parseInt($("inputMinutes").value, 10) || 10));
+
+            stopInterval();
+
+            state = {
+                title,
+                type,
+                duration: minutes * 60,
+                remaining: minutes * 60,
+                endAt: null,
+                running: false
+            };
+
+            save();
+            updateUI();
+        };
+
+        window.startTimer = function () {
+            if (!state.title || state.remaining <= 0 || state.running) return;
+
+            state.endAt = Date.now() + (state.remaining * 1000);
+            state.running = true;
+            save();
+            updateUI();
+
+            stopInterval();
+            interval = setInterval(tick, 250);
+        };
+
+        window.pauseTimer = function () {
+            if (!state.running) return;
+
+            tick();
+            state.running = false;
+            state.endAt = null;
+            stopInterval();
+            save();
+            updateUI();
+        };
+
+        window.resetTimer = function () {
+            if (!state.title) return;
+
+            stopInterval();
+            state.remaining = state.duration;
+            state.endAt = null;
+            state.running = false;
+            save();
+            updateUI();
+        };
+
+        window.clearSession = function () {
+            stopInterval();
+            state = {
+                title: "",
+                type: "GSL",
+                duration: 600,
+                remaining: 600,
+                endAt: null,
+                running: false
+            };
+            localStorage.removeItem(STORAGE_KEY);
+            $("inputTitle").value = "";
+            $("inputType").value = "GSL";
+            $("inputMinutes").value = 10;
+            updateUI();
+        };
+
+        window.adjustTimer = function (seconds) {
+            if (!state.title) return;
+
+            if (state.running) tick();
+
+            state.remaining = Math.max(0, state.remaining + seconds);
+
+            if (state.running) {
+                state.endAt = Date.now() + (state.remaining * 1000);
+            }
+
+            save();
+            updateUI();
+        };
+
+        function load() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+                if (saved && typeof saved === "object") {
+                    state = {
+                        ...state,
+                        ...saved
+                    };
+                }
+            } catch (error) {
+                localStorage.removeItem(STORAGE_KEY);
+            }
+
+            $("inputTitle").value = state.title || "";
+            $("inputType").value = state.type || "GSL";
+            $("inputMinutes").value = Math.max(1, Math.ceil((state.duration || 600) / 60));
+
+            if (state.running && state.endAt) {
+                state.remaining = Math.max(0, Math.ceil((state.endAt - Date.now()) / 1000));
+
+                if (state.remaining > 0) {
+                    interval = setInterval(tick, 250);
+                } else {
+                    state.remaining = 0;
+                    state.running = false;
+                    state.endAt = null;
+                }
+            }
+
+            updateUI();
+            save();
+        }
+
+        load();
+    })();
+</script>
+{% endblock %}
