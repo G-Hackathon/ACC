@@ -4,8 +4,14 @@
 Crises — Arkanian Crisis Committee
 {% endblock %}
 
+
 {% block extra_css %}
+
 <style>
+    /* =========================================================
+       PAGE
+    ========================================================= */
+
     .crisis-page {
         min-height: calc(100vh - 80px);
         padding: 80px 24px 120px;
@@ -16,9 +22,10 @@ Crises — Arkanian Crisis Committee
         margin: 0 auto;
     }
 
-    /* =========================
+
+    /* =========================================================
        HEADER
-    ========================= */
+    ========================================================= */
 
     .crisis-header {
         display: grid;
@@ -106,9 +113,10 @@ Crises — Arkanian Crisis Committee
         }
     }
 
-    /* =========================
+
+    /* =========================================================
        SECTIONS
-    ========================= */
+    ========================================================= */
 
     .crisis-section {
         border-top: 1px solid rgba(255, 255, 255, 0.12);
@@ -143,9 +151,10 @@ Crises — Arkanian Crisis Committee
         opacity: 0.42;
     }
 
-    /* =========================
+
+    /* =========================================================
        CHAIR NOTICE
-    ========================= */
+    ========================================================= */
 
     .chair-only-notice {
         display: flex;
@@ -174,9 +183,10 @@ Crises — Arkanian Crisis Committee
         opacity: 0.55;
     }
 
-    /* =========================
+
+    /* =========================================================
        FORM
-    ========================= */
+    ========================================================= */
 
     .crisis-form {
         display: flex;
@@ -209,8 +219,7 @@ Crises — Arkanian Crisis Committee
         outline: none;
         transition:
             border-color 0.25s ease,
-            background 0.25s ease,
-            transform 0.25s ease;
+            background 0.25s ease;
     }
 
     .crisis-input {
@@ -239,9 +248,10 @@ Crises — Arkanian Crisis Committee
         background: rgba(255, 255, 255, 0.045);
     }
 
-    /* =========================
+
+    /* =========================================================
        FILE UPLOAD
-    ========================= */
+    ========================================================= */
 
     .crisis-file-zone {
         position: relative;
@@ -293,9 +303,10 @@ Crises — Arkanian Crisis Committee
         opacity: 0.65;
     }
 
-    /* =========================
+
+    /* =========================================================
        FORM FOOTER
-    ========================= */
+    ========================================================= */
 
     .crisis-form-footer {
         display: flex;
@@ -340,9 +351,10 @@ Crises — Arkanian Crisis Committee
         transform: none;
     }
 
-    /* =========================
+
+    /* =========================================================
        PUBLISHED CRISES
-    ========================= */
+    ========================================================= */
 
     .published-grid {
         display: flex;
@@ -443,9 +455,10 @@ Crises — Arkanian Crisis Committee
         background: rgba(255, 255, 255, 0.06);
     }
 
-    /* =========================
+
+    /* =========================================================
        EMPTY STATE
-    ========================= */
+    ========================================================= */
 
     .crisis-empty {
         border: 1px dashed rgba(255, 255, 255, 0.12);
@@ -465,9 +478,10 @@ Crises — Arkanian Crisis Committee
         line-height: 1.6;
     }
 
-    /* =========================
+
+    /* =========================================================
        DELETE MODAL
-    ========================= */
+    ========================================================= */
 
     .crisis-modal-backdrop {
         position: fixed;
@@ -538,6 +552,11 @@ Crises — Arkanian Crisis Committee
         gap: 10px;
     }
 
+    .crisis-modal-actions form {
+        width: 100%;
+        margin: 0;
+    }
+
     .crisis-modal-button {
         width: 100%;
         min-height: 45px;
@@ -576,11 +595,13 @@ Crises — Arkanian Crisis Committee
         cursor: not-allowed;
     }
 
-    /* =========================
+
+    /* =========================================================
        RESPONSIVE
-    ========================= */
+    ========================================================= */
 
     @media (max-width: 800px) {
+
         .crisis-page {
             padding: 55px 18px 90px;
         }
@@ -612,9 +633,12 @@ Crises — Arkanian Crisis Committee
         .published-crisis>div:last-child {
             grid-column: 2;
         }
+
     }
 
+
     @media (max-width: 520px) {
+
         .crisis-title {
             font-size: 58px;
         }
@@ -657,24 +681,30 @@ Crises — Arkanian Crisis Committee
         .crisis-modal-actions {
             flex-direction: column;
         }
+
     }
 </style>
+
 {% endblock %}
 
 
 {% block content %}
 
 <div class="crisis-page">
+
     <div class="crisis-inner">
 
-        <!-- =========================
+
+        <!-- =========================================================
              PAGE HEADER
-        ========================== -->
+        ========================================================= -->
 
         <header class="crisis-header">
 
             <div>
+
                 {% if user and user.role == "chair" %}
+
                 <div class="crisis-eyebrow">
                     Chair Control / Crisis Management
                 </div>
@@ -690,6 +720,7 @@ Crises — Arkanian Crisis Committee
                 </p>
 
                 {% else %}
+
                 <div class="crisis-eyebrow">
                     Arkanian Crisis Committee / Live Record
                 </div>
@@ -703,26 +734,35 @@ Crises — Arkanian Crisis Committee
                     Follow the official crisis developments released
                     by the Chair throughout the committee.
                 </p>
+
                 {% endif %}
+
             </div>
 
+
             <div class="crisis-status">
+
                 <div class="crisis-status-label">
                     Committee Status
                 </div>
 
                 <div class="crisis-status-value">
+
                     <span class="crisis-status-dot"></span>
+
                     Live Committee Record
+
                 </div>
+
             </div>
 
         </header>
 
 
-        <!-- =========================
+
+        <!-- =========================================================
              CHAIR PUBLISH SECTION
-        ========================== -->
+        ========================================================= -->
 
         {% if user and user.role == "chair" %}
 
@@ -733,6 +773,7 @@ Crises — Arkanian Crisis Committee
                 <div class="crisis-section-number">
                     01 / Publish
                 </div>
+
 
                 <div>
 
@@ -761,8 +802,10 @@ Crises — Arkanian Crisis Committee
                     </div>
 
 
+
                     <form class="crisis-form" id="crisisForm" method="POST" action="{{ url_for('crises') }}"
                         enctype="multipart/form-data">
+
 
                         <!-- TITLE -->
 
@@ -778,7 +821,8 @@ Crises — Arkanian Crisis Committee
                         </div>
 
 
-                        <!-- DESCRIPTION -->
+
+                        <!-- DEVELOPMENT -->
 
                         <div class="crisis-field">
 
@@ -786,10 +830,11 @@ Crises — Arkanian Crisis Committee
                                 Development
                             </label>
 
-                            <textarea id="crisisDescription" name="description" class="crisis-textarea" maxlength="5000"
+                            <textarea id="crisisDescription" name="body" class="crisis-textarea" maxlength="5000"
                                 placeholder="Describe the latest development..." required></textarea>
 
                         </div>
+
 
 
                         <!-- FILE -->
@@ -800,9 +845,11 @@ Crises — Arkanian Crisis Committee
                                 Official File / Optional
                             </label>
 
+
                             <div class="crisis-file-zone" id="crisisFileZone">
 
                                 <input type="file" id="crisisFile" name="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg">
+
 
                                 <div class="crisis-file-content">
 
@@ -825,6 +872,7 @@ Crises — Arkanian Crisis Committee
                         </div>
 
 
+
                         <!-- FOOTER -->
 
                         <div class="crisis-form-footer">
@@ -832,6 +880,7 @@ Crises — Arkanian Crisis Committee
                             <div class="crisis-counter" id="crisisCounter">
                                 0 / 5000 characters
                             </div>
+
 
                             <button type="submit" class="crisis-publish-button" id="publishButton">
                                 Publish Crisis →
@@ -850,21 +899,30 @@ Crises — Arkanian Crisis Committee
         {% endif %}
 
 
-        <!-- =========================
+
+        <!-- =========================================================
              PUBLISHED CRISES
-        ========================== -->
+        ========================================================= -->
 
         <section class="crisis-section">
 
             <div class="crisis-section-layout">
 
+
                 <div class="crisis-section-number">
+
                     {% if user and user.role == "chair" %}
+
                     02 / Archive
+
                     {% else %}
+
                     01 / Live Record
+
                     {% endif %}
+
                 </div>
+
 
                 <div>
 
@@ -872,38 +930,57 @@ Crises — Arkanian Crisis Committee
                         Published Crises
                     </h2>
 
+
                     <p class="crisis-section-subtitle">
+
                         {% if user and user.role == "chair" %}
+
                         Manage the official crisis record.
+
                         {% else %}
+
                         Official crisis developments released by
                         the Chair.
+
                         {% endif %}
+
                     </p>
+
 
 
                     {% if crises %}
 
                     <div class="published-grid">
 
+
                         {% for crisis in crises %}
 
                         <article class="published-crisis" data-crisis-card>
 
+
                             <div class="crisis-index">
+
                                 {{ "%02d"|format(loop.index) }}
+
                             </div>
+
 
 
                             <div>
 
                                 <h3 class="published-title">
+
                                     {{ crisis["title"] }}
+
                                 </h3>
 
+
                                 <div class="published-description">
+
                                     {{ crisis["description"] }}
+
                                 </div>
+
 
 
                                 {% if crisis["filename"] %}
@@ -916,12 +993,15 @@ Crises — Arkanian Crisis Committee
                                 {% endif %}
 
 
+
                                 <div class="published-meta">
 
                                     Published {{ crisis["created_at"] }}
 
                                     {% if crisis["filename"] %}
+
                                     / File Attached
+
                                     {% endif %}
 
                                 </div>
@@ -929,12 +1009,13 @@ Crises — Arkanian Crisis Committee
                             </div>
 
 
+
                             {% if user and user.role == "chair" %}
 
                             <div>
 
                                 <button type="button" class="crisis-delete-button"
-                                    data-delete-url="{{ url_for('delete_crisis', crisis_id=crisis['id']) }}"
+                                    data-delete-url="{{ url_for('delete_crisis', index=loop.index0) }}"
                                     data-crisis-title="{{ crisis['title']|e }}">
                                     Delete
                                 </button>
@@ -943,11 +1024,13 @@ Crises — Arkanian Crisis Committee
 
                             {% endif %}
 
+
                         </article>
 
                         {% endfor %}
 
                     </div>
+
 
                     {% else %}
 
@@ -957,14 +1040,21 @@ Crises — Arkanian Crisis Committee
                             No crises published
                         </div>
 
+
                         <div class="crisis-empty-text">
+
                             {% if user and user.role == "chair" %}
+
                             Publish the first official crisis
                             development above.
+
                             {% else %}
+
                             The Chair has not published any crisis
                             developments yet.
+
                             {% endif %}
+
                         </div>
 
                     </div>
@@ -978,46 +1068,53 @@ Crises — Arkanian Crisis Committee
         </section>
 
 
-        <!-- =========================
+
+        <!-- =========================================================
              DELETE MODAL
-        ========================== -->
+        ========================================================= -->
 
         {% if user and user.role == "chair" %}
 
         <div class="crisis-modal-backdrop" id="deleteModal" aria-hidden="true">
 
-            <div class="crisis-modal" role="dialog" aria-modal="true" aria-labelledby="deleteModalTitle">
+            <div class="crisis-modal">
 
                 <div class="crisis-modal-eyebrow">
-                    Confirm Command
+                    Chair Control
                 </div>
 
-                <h2 class="crisis-modal-title" id="deleteModalTitle">
-                    Delete Crisis?
+
+                <h2 class="crisis-modal-title">
+                    Delete Crisis
                 </h2>
 
+
                 <p class="crisis-modal-text">
-                    You are about to permanently remove
-                    <strong id="deleteCrisisName"></strong>
-                    from the committee crisis archive.
+
+                    Are you sure you want to delete
+                    <strong id="deleteCrisisName"></strong>?
+
                     This action cannot be undone.
+
                 </p>
 
 
                 <div class="crisis-modal-actions">
+
 
                     <button type="button" class="crisis-modal-button" id="cancelDelete">
                         Cancel
                     </button>
 
 
-                    <form method="POST" id="deleteForm" style="flex: 1;">
+                    <form method="POST" id="deleteForm">
 
                         <button type="submit" class="crisis-modal-button danger" id="confirmDeleteButton">
                             Delete Crisis
                         </button>
 
                     </form>
+
 
                 </div>
 
@@ -1027,217 +1124,237 @@ Crises — Arkanian Crisis Committee
 
         {% endif %}
 
+
+
     </div>
+
 </div>
 
-{% endblock %}
-
-
-{% block extra_js %}
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
 
-        /* =========================
-           PUBLISH FORM
-        ========================== */
+    /* =========================================================
+       PUBLISH FORM
+    ========================================================= */
 
-        const crisisForm =
-            document.getElementById("crisisForm");
+    const crisisForm =
+        document.getElementById("crisisForm");
 
-        const publishButton =
-            document.getElementById("publishButton");
+    const publishButton =
+        document.getElementById("publishButton");
 
-        const crisisDescription =
-            document.getElementById("crisisDescription");
+    const crisisDescription =
+        document.getElementById("crisisDescription");
 
-        const crisisCounter =
-            document.getElementById("crisisCounter");
+    const crisisCounter =
+        document.getElementById("crisisCounter");
 
 
-        if (crisisDescription && crisisCounter) {
+    if (crisisDescription && crisisCounter) {
 
-            function updateCounter() {
+        function updateCounter() {
 
-                const length =
-                    crisisDescription.value.length;
+            crisisCounter.textContent =
+                crisisDescription.value.length +
+                " / 5000 characters";
 
-                crisisCounter.textContent =
-                    length + " / 5000 characters";
+        }
+
+        crisisDescription.addEventListener(
+            "input",
+            updateCounter
+        );
+
+        updateCounter();
+
+    }
+
+
+    if (crisisForm && publishButton) {
+
+        crisisForm.addEventListener(
+            "submit",
+            function () {
+
+                publishButton.disabled = true;
+
+                publishButton.textContent =
+                    "Publishing...";
 
             }
+        );
 
-            crisisDescription.addEventListener(
-                "input",
-                updateCounter
-            );
-
-            updateCounter();
-        }
+    }
 
 
-        if (crisisForm && publishButton) {
 
-            crisisForm.addEventListener(
-                "submit",
-                function () {
+    /* =========================================================
+       FILE UPLOAD
+    ========================================================= */
 
-                    publishButton.disabled = true;
+    const crisisFile =
+        document.getElementById("crisisFile");
 
-                    publishButton.textContent =
-                        "Publishing...";
+    const crisisFileZone =
+        document.getElementById("crisisFileZone");
+
+    const crisisFileName =
+        document.getElementById("crisisFileName");
+
+
+    if (crisisFile && crisisFileName) {
+
+        crisisFile.addEventListener(
+            "change",
+            function () {
+
+                if (
+                    crisisFile.files &&
+                    crisisFile.files.length > 0
+                ) {
+
+                    crisisFileName.textContent =
+                        crisisFile.files[0].name;
+
+                } else {
+
+                    crisisFileName.textContent =
+                        "No file selected";
 
                 }
-            );
 
-        }
+            }
+        );
 
-
-        /* =========================
-           FILE UPLOAD
-        ========================== */
-
-        const crisisFile =
-            document.getElementById("crisisFile");
-
-        const crisisFileZone =
-            document.getElementById("crisisFileZone");
-
-        const crisisFileName =
-            document.getElementById("crisisFileName");
+    }
 
 
-        if (crisisFile && crisisFileName) {
+    if (crisisFileZone && crisisFile) {
 
-            crisisFile.addEventListener(
-                "change",
-                function () {
+        crisisFileZone.addEventListener(
+            "dragover",
+            function (event) {
 
-                    if (crisisFile.files.length > 0) {
+                event.preventDefault();
+
+                crisisFileZone.classList.add(
+                    "dragging"
+                );
+
+            }
+        );
+
+
+        crisisFileZone.addEventListener(
+            "dragleave",
+            function () {
+
+                crisisFileZone.classList.remove(
+                    "dragging"
+                );
+
+            }
+        );
+
+
+        crisisFileZone.addEventListener(
+            "drop",
+            function (event) {
+
+                event.preventDefault();
+
+                crisisFileZone.classList.remove(
+                    "dragging"
+                );
+
+
+                const files =
+                    event.dataTransfer.files;
+
+
+                if (
+                    !files ||
+                    files.length === 0
+                ) {
+
+                    return;
+
+                }
+
+
+                try {
+
+                    const dataTransfer =
+                        new DataTransfer();
+
+                    dataTransfer.items.add(
+                        files[0]
+                    );
+
+                    crisisFile.files =
+                        dataTransfer.files;
+
+
+                    if (crisisFileName) {
 
                         crisisFileName.textContent =
-                            crisisFile.files[0].name;
-
-                    } else {
-
-                        crisisFileName.textContent =
-                            "No file selected";
+                            files[0].name;
 
                     }
 
-                }
-            );
+                } catch (error) {
 
-        }
-
-
-        if (crisisFileZone && crisisFile) {
-
-            crisisFileZone.addEventListener(
-                "dragover",
-                function (event) {
-
-                    event.preventDefault();
-
-                    crisisFileZone.classList.add(
-                        "dragging"
+                    console.warn(
+                        "Could not assign dropped file.",
+                        error
                     );
 
                 }
-            );
+
+            }
+        );
+
+    }
 
 
-            crisisFileZone.addEventListener(
-                "dragleave",
-                function () {
 
-                    crisisFileZone.classList.remove(
-                        "dragging"
-                    );
+    /* =========================================================
+       DELETE SYSTEM
+    ========================================================= */
 
-                }
-            );
+    const deleteModal =
+        document.getElementById("deleteModal");
 
+    const deleteForm =
+        document.getElementById("deleteForm");
 
-            crisisFileZone.addEventListener(
-                "drop",
-                function (event) {
+    const deleteName =
+        document.getElementById("deleteCrisisName");
 
-                    event.preventDefault();
+    const cancelDelete =
+        document.getElementById("cancelDelete");
 
-                    crisisFileZone.classList.remove(
-                        "dragging"
-                    );
+    const confirmDeleteButton =
+        document.getElementById(
+            "confirmDeleteButton"
+        );
 
-                    if (
-                        event.dataTransfer &&
-                        event.dataTransfer.files.length
-                    ) {
-
-                        try {
-
-                            const dataTransfer =
-                                new DataTransfer();
-
-                            dataTransfer.items.add(
-                                event.dataTransfer.files[0]
-                            );
-
-                            crisisFile.files =
-                                dataTransfer.files;
-
-                            if (crisisFileName) {
-
-                                crisisFileName.textContent =
-                                    event.dataTransfer.files[0].name;
-
-                            }
-
-                        } catch (error) {
-
-                            console.warn(
-                                "Could not set dropped file.",
-                                error
-                            );
-
-                        }
-
-                    }
-
-                }
-            );
-
-        }
+    const deleteButtons =
+        document.querySelectorAll(
+            ".crisis-delete-button"
+        );
 
 
-        /* =========================
-           DELETE MODAL
-        ========================== */
-
-        const deleteModal =
-            document.getElementById("deleteModal");
-
-        const deleteForm =
-            document.getElementById("deleteForm");
-
-        const deleteName =
-            document.getElementById("deleteCrisisName");
-
-        const cancelDelete =
-            document.getElementById("cancelDelete");
-
-        const confirmDeleteButton =
-            document.getElementById(
-                "confirmDeleteButton"
-            );
-
-        const deleteButtons =
-            document.querySelectorAll(
-                ".crisis-delete-button"
-            );
+    let deleting = false;
 
 
-        deleteButtons.forEach(function (button) {
+
+    /* =========================================================
+       OPEN DELETE MODAL
+    ========================================================= */
+
+    deleteButtons.forEach(
+        function (button) {
 
             button.addEventListener(
                 "click",
@@ -1248,6 +1365,7 @@ Crises — Arkanian Crisis Committee
                             "data-delete-url"
                         );
 
+
                     const crisisTitle =
                         button.getAttribute(
                             "data-crisis-title"
@@ -1257,11 +1375,33 @@ Crises — Arkanian Crisis Committee
                     if (!deleteUrl) {
 
                         console.error(
-                            "Delete failed: no delete URL found."
+                            "Delete error: no delete URL."
                         );
 
                         return;
+
                     }
+
+
+                    if (!deleteForm) {
+
+                        console.error(
+                            "Delete error: form not found."
+                        );
+
+                        return;
+
+                    }
+
+
+                    deleting = false;
+
+
+                    deleteForm.action =
+                        deleteUrl;
+
+                    deleteForm.method =
+                        "POST";
 
 
                     if (deleteName) {
@@ -1272,24 +1412,22 @@ Crises — Arkanian Crisis Committee
                     }
 
 
-                    if (deleteForm) {
+                    if (confirmDeleteButton) {
 
-                        deleteForm.setAttribute(
-                            "action",
-                            deleteUrl
-                        );
+                        confirmDeleteButton.disabled =
+                            false;
 
-                        deleteForm.setAttribute(
-                            "method",
-                            "POST"
-                        );
+                        confirmDeleteButton.textContent =
+                            "Delete Crisis";
 
                     }
 
 
                     if (deleteModal) {
 
-                        deleteModal.classList.add("open");
+                        deleteModal.classList.add(
+                            "open"
+                        );
 
                         deleteModal.setAttribute(
                             "aria-hidden",
@@ -1304,78 +1442,82 @@ Crises — Arkanian Crisis Committee
                 }
             );
 
-        });
+        }
+    );
 
 
-        function closeDeleteModal() {
 
-            if (!deleteModal) {
-                return;
+    /* =========================================================
+       CLOSE DELETE MODAL
+    ========================================================= */
+
+    function closeDeleteModal() {
+
+        if (!deleteModal) {
+
+            return;
+
+        }
+
+
+        deleteModal.classList.remove(
+            "open"
+        );
+
+
+        deleteModal.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+
+        document.body.style.overflow =
+            "";
+
+
+        deleting = false;
+
+
+        if (confirmDeleteButton) {
+
+            confirmDeleteButton.disabled =
+                false;
+
+            confirmDeleteButton.textContent =
+                "Delete Crisis";
+
+        }
+
+    }
+
+
+    if (cancelDelete) {
+
+        cancelDelete.addEventListener(
+            "click",
+            function () {
+
+                closeDeleteModal();
+
             }
+        );
 
-            deleteModal.classList.remove("open");
-
-            deleteModal.setAttribute(
-                "aria-hidden",
-                "true"
-            );
-
-            document.body.style.overflow = "";
+    }
 
 
-            if (deleteForm) {
 
-                deleteForm.removeAttribute(
-                    "action"
-                );
+    /* =========================================================
+       CLICK BACKDROP TO CLOSE
+    ========================================================= */
 
-            }
+    if (deleteModal) {
 
-        }
-
-
-        if (cancelDelete) {
-
-            cancelDelete.addEventListener(
-                "click",
-                function () {
-
-                    closeDeleteModal();
-
-                }
-            );
-
-        }
-
-
-        if (deleteModal) {
-
-            deleteModal.addEventListener(
-                "click",
-                function (event) {
-
-                    if (
-                        event.target === deleteModal
-                    ) {
-
-                        closeDeleteModal();
-
-                    }
-
-                }
-            );
-
-        }
-
-
-        document.addEventListener(
-            "keydown",
+        deleteModal.addEventListener(
+            "click",
             function (event) {
 
                 if (
-                    event.key === "Escape" &&
-                    deleteModal &&
-                    deleteModal.classList.contains("open")
+                    event.target === deleteModal
                 ) {
 
                     closeDeleteModal();
@@ -1385,96 +1527,165 @@ Crises — Arkanian Crisis Committee
             }
         );
 
-
-        if (deleteForm) {
-
-            deleteForm.addEventListener(
-                "submit",
-                function (event) {
-
-                    const action =
-                        deleteForm.getAttribute(
-                            "action"
-                        );
+    }
 
 
-                    if (!action) {
 
-                        event.preventDefault();
+    /* =========================================================
+       ESCAPE KEY
+    ========================================================= */
 
-                        console.error(
-                            "Delete blocked: no action URL."
-                        );
+    document.addEventListener(
+        "keydown",
+        function (event) {
 
-                        return;
+            if (
+                event.key === "Escape" &&
+                deleteModal &&
+                deleteModal.classList.contains("open")
+            ) {
 
-                    }
+                closeDeleteModal();
 
-
-                    if (confirmDeleteButton) {
-
-                        confirmDeleteButton.disabled =
-                            true;
-
-                        confirmDeleteButton.textContent =
-                            "Deleting...";
-
-                    }
-
-                }
-            );
+            }
 
         }
+    );
 
 
-        /* =========================
-           SUBTLE CARD TILT
-        ========================== */
 
-        const crisisCards =
-            document.querySelectorAll(
-                "[data-crisis-card]"
-            );
+    /* =========================================================
+       ACTUAL DELETE SUBMISSION
+    ========================================================= */
+
+    if (deleteForm) {
+
+        deleteForm.addEventListener(
+            "submit",
+            function (event) {
+
+                const action =
+                    deleteForm.getAttribute(
+                        "action"
+                    );
 
 
-        crisisCards.forEach(function (card) {
+                if (!action) {
+
+                    event.preventDefault();
+
+                    console.error(
+                        "Delete error: no form action."
+                    );
+
+                    return;
+
+                }
+
+
+                if (deleting) {
+
+                    event.preventDefault();
+
+                    return;
+
+                }
+
+
+                deleting = true;
+
+
+                if (confirmDeleteButton) {
+
+                    confirmDeleteButton.disabled =
+                        true;
+
+                    confirmDeleteButton.textContent =
+                        "Deleting...";
+
+                }
+
+                /*
+                 * DO NOT call event.preventDefault().
+                 *
+                 * The browser submits the form normally.
+                 *
+                 * Example:
+                 *
+                 * POST /crises/0/delete
+                 */
+
+            }
+        );
+
+    }
+
+
+
+    /* =========================================================
+       CARD TILT
+    ========================================================= */
+
+    const crisisCards =
+        document.querySelectorAll(
+            "[data-crisis-card]"
+        );
+
+
+    crisisCards.forEach(
+        function (card) {
 
             card.addEventListener(
                 "mousemove",
                 function (event) {
 
-                    if (
-                        window.innerWidth < 800
-                    ) {
+                    if (window.innerWidth < 800) {
+
                         return;
+
                     }
+
 
                     const rect =
                         card.getBoundingClientRect();
 
+
                     const x =
-                        event.clientX - rect.left;
+                        event.clientX -
+                        rect.left;
+
 
                     const y =
-                        event.clientY - rect.top;
+                        event.clientY -
+                        rect.top;
+
 
                     const centerX =
                         rect.width / 2;
 
+
                     const centerY =
                         rect.height / 2;
 
+
                     const rotateX =
-                        ((y - centerY) / centerY) * -1.2;
+                        ((y - centerY) / centerY) *
+                        -1.2;
+
 
                     const rotateY =
-                        ((x - centerX) / centerX) * 1.2;
+                        ((x - centerX) / centerX) *
+                        1.2;
 
 
                     card.style.transform =
                         "perspective(900px) " +
-                        "rotateX(" + rotateX + "deg) " +
-                        "rotateY(" + rotateY + "deg) " +
+                        "rotateX(" +
+                        rotateX +
+                        "deg) " +
+                        "rotateY(" +
+                        rotateY +
+                        "deg) " +
                         "translateY(-2px)";
 
                 }
@@ -1490,9 +1701,9 @@ Crises — Arkanian Crisis Committee
                 }
             );
 
-        });
+        }
+    );
 
-    });
 </script>
 
 {% endblock %}

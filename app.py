@@ -43,16 +43,6 @@ DATA_DIR = os.path.join(
     "data"
 )
 
-os.makedirs(
-    DATA_DIR,
-    exist_ok=True
-)
-
-DB_PATH = os.path.join(
-    DATA_DIR,
-    "acc.db"
-)
-
 UPLOAD_FOLDER = os.path.join(
     BASE_DIR,
     "uploads"
@@ -68,13 +58,16 @@ CRISES_FILE = os.path.join(
     "crises.json"
 )
 
+DB_PATH = os.path.join(
+    DATA_DIR,
+    "acc.db"
+)
+
+os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
-
-os.makedirs(
-    UPLOAD_FOLDER,
-    exist_ok=True
-)
 
 
 # ============================================================
@@ -124,126 +117,151 @@ DELEGATES = {
     "Siddhiksha": {
         "delegation": "National Liberation Council",
         "password": "NLC#Liberation2026!Sec",
+        "role": "delegate",
     },
 
     "Shlok": {
         "delegation": "Southern Arkanian Republic",
         "password": "SAR#SouthArkania!948",
+        "role": "delegate",
     },
 
     "Aarush": {
         "delegation": "Transitional Council of Arkania",
         "password": "TCA#Transition!7392",
+        "role": "delegate",
     },
 
     "Nirav": {
         "delegation": "Republic of Selvar",
         "password": "RoS#SelvarPass!401",
+        "role": "delegate",
     },
 
     "Vihaan": {
         "delegation": "Erdan Province",
         "password": "EP#ErdanSecure!827",
+        "role": "delegate",
     },
 
     "Anika": {
         "delegation": "United Civilian Authority",
         "password": "UCA#CivilianAuth!315",
+        "role": "delegate",
     },
 
     "Shrishti": {
         "delegation": "Western Arkanian Republic",
         "password": "WAR#WestArkania!682",
+        "role": "delegate",
     },
 
     "Ryana": {
         "delegation": "Novera",
         "password": "NOV#NoveraAccess!594",
+        "role": "delegate",
     },
 
     "Ridhu": {
         "delegation": "Republic of Darsen",
         "password": "RoD#DarsenState!173",
+        "role": "delegate",
     },
 
     "Siya": {
         "delegation": "Tavria",
         "password": "chaddilicker",
+        "role": "delegate",
     },
 
     "Shruti": {
         "delegation": "Kavren State",
         "password": "KVR#KavrenPass!209",
+        "role": "delegate",
     },
 
     "Sailesh": {
         "delegation": "Arkanian People's Front",
         "password": "APF#PeoplesFront!518",
+        "role": "delegate",
     },
 
     "Naman": {
         "delegation": "Federal Government of Arkania",
         "password": "FGA#FedGovArkania!902",
+        "role": "delegate",
     },
 
     "Ayushman": {
         "delegation": "Arkanian Military Command",
         "password": "AMC#MilitaryCmd!741",
+        "role": "delegate",
     },
 
     "Rizwan": {
         "delegation": "Arkanian Intelligence Directorate",
         "password": "AID#IntelDir2026!613",
+        "role": "delegate",
     },
 
     "Saanvi": {
         "delegation": "Foreign Affairs Office",
         "password": "FAO#ForeignAffairs!384",
+        "role": "delegate",
     },
 
     "Reyansh": {
         "delegation": "Arkanian General Staff",
         "password": "AGS#GeneralStaff!825",
+        "role": "delegate",
     },
 
     "Adele": {
         "delegation": "Arkanian Border Authority",
         "password": "ABA#BorderAuth!491",
+        "role": "delegate",
     },
 
     "Jazlyn": {
         "delegation": "Lorian Autonomous Territory",
         "password": "LAT#LorianTerritory!637",
+        "role": "delegate",
     },
 
     "Shivani": {
         "delegation": "Arkanian Humanitarian Authority",
         "password": "AHA#Humanitarian!158",
+        "role": "delegate",
     },
 
     "Arshita": {
         "delegation": "Highlands of Ordan",
         "password": "HoO#OrdanHighlands!962",
+        "role": "delegate",
     },
 
     "Guna": {
         "delegation": "Free State of Veyra",
         "password": "FSV#VeyraFreeState!407",
+        "role": "delegate",
     },
 
     "Vidhi": {
         "delegation": "Zarev Republic",
         "password": "ZR#ZarevRepublic!831",
+        "role": "delegate",
     },
 
     "Ashima": {
         "delegation": "Maren Coast",
         "password": "MC#MarenCoast!274",
+        "role": "delegate",
     },
 
     "Manisha": {
         "delegation": "Class Teacher",
         "password": "ClassTeach094",
+        "role": "delegate",
     },
 }
 
@@ -273,11 +291,11 @@ def get_db():
 
 
 def init_db():
-
     conn = get_db()
 
     try:
 
+        # WAL can fail on some existing database states.
         try:
             conn.execute(
                 "PRAGMA journal_mode = WAL"
@@ -405,7 +423,7 @@ def init_db():
         """)
 
         # ----------------------------------------------------
-        # INDEXES FOR MESSAGES
+        # MESSAGE INDEXES
         # ----------------------------------------------------
 
         conn.execute("""
@@ -459,9 +477,7 @@ def init_db():
 
 def current_user():
 
-    username = session.get(
-        "username"
-    )
+    username = session.get("username")
 
     if not username:
         return None
@@ -483,9 +499,7 @@ def current_user():
     # PRESS
     # --------------------------------------------------------
 
-    if username.startswith(
-        "__press__:"
-    ):
+    if username.startswith("__press__:"):
 
         press_name = username.replace(
             "__press__:",
@@ -506,9 +520,7 @@ def current_user():
 
     if username in DELEGATES:
 
-        account = DELEGATES[
-            username
-        ]
+        account = DELEGATES[username]
 
         return {
             "username": username,
@@ -572,9 +584,7 @@ def role_required(required_role):
                     url_for("login")
                 )
 
-            if user.get(
-                "role"
-            ) != required_role:
+            if user.get("role") != required_role:
 
                 flash(
                     "You do not have permission to access that page.",
@@ -673,6 +683,10 @@ def login():
             ""
         )
 
+        # ----------------------------------------------------
+        # MAIN CHAIR
+        # ----------------------------------------------------
+
         if (
             username.lower() == "chair"
             and password == CHAIR_PASSWORD
@@ -689,15 +703,15 @@ def login():
                 url_for("home")
             )
 
+        # ----------------------------------------------------
+        # DELEGATE / SPECIAL CHAIR
+        # ----------------------------------------------------
+
         if username in DELEGATES:
 
-            account = DELEGATES[
-                username
-            ]
+            account = DELEGATES[username]
 
-            if account.get(
-                "password"
-            ) == password:
+            if account.get("password") == password:
 
                 session.clear()
                 session["username"] = username
@@ -744,9 +758,7 @@ def delegate_login():
 
         if username in DELEGATES:
 
-            account = DELEGATES[
-                username
-            ]
+            account = DELEGATES[username]
 
             if (
                 account.get(
@@ -801,6 +813,10 @@ def chair_login():
             ""
         )
 
+        # ----------------------------------------------------
+        # MAIN CHAIR
+        # ----------------------------------------------------
+
         if (
             username.lower() == "chair"
             and password == CHAIR_PASSWORD
@@ -817,11 +833,13 @@ def chair_login():
                 url_for("home")
             )
 
+        # ----------------------------------------------------
+        # SPECIAL CHAIR ACCOUNTS
+        # ----------------------------------------------------
+
         if username in DELEGATES:
 
-            account = DELEGATES[
-                username
-            ]
+            account = DELEGATES[username]
 
             if (
                 account.get("role") == "chair"
@@ -965,7 +983,6 @@ def profile():
 def inbox():
 
     user = current_user()
-    print("INBOX USER:", dict(user))
 
     conn = get_db()
 
@@ -1227,6 +1244,13 @@ def compose_message():
                 ""
             ).strip()
 
+            if not body:
+
+                body = request.form.get(
+                    "description",
+                    ""
+                ).strip()
+
             if not recipient or not subject or not body:
 
                 flash(
@@ -1238,9 +1262,7 @@ def compose_message():
                     url_for("compose_message")
                 )
 
-            chair = current_user()
-
-            sender = chair["display_name"]
+            sender = current_user()["display_name"]
 
             now = datetime.now().isoformat(
                 timespec="seconds"
@@ -1254,8 +1276,7 @@ def compose_message():
 
                 recipients = [
                     username
-                    for username, account
-                    in DELEGATES.items()
+                    for username, account in DELEGATES.items()
                     if account.get(
                         "role",
                         "delegate"
@@ -1361,8 +1382,7 @@ def compose_message():
                     username
                 )
             }
-            for username, account
-            in DELEGATES.items()
+            for username, account in DELEGATES.items()
             if account.get(
                 "role",
                 "delegate"
@@ -1520,10 +1540,18 @@ def new_note():
 
             note_id = cursor.lastrowid
 
-        except Exception:
+        except sqlite3.Error:
 
             conn.rollback()
-            raise
+
+            flash(
+                "Could not create note.",
+                "error"
+            )
+
+            return redirect(
+                url_for("notes")
+            )
 
         finally:
             conn.close()
@@ -1639,30 +1667,40 @@ def edit_note(note_id):
                 )
             )
 
+        rows = conn.execute("""
+            SELECT
+                id,
+                username,
+                title,
+                content,
+                created_at,
+                updated_at
+            FROM notes
+            WHERE username = ?
+            ORDER BY updated_at DESC, id DESC
+        """, (
+            user["username"],
+        )).fetchall()
+
         return render_template(
             "notes.html",
-            notes=conn.execute("""
-                SELECT
-                    id,
-                    username,
-                    title,
-                    content,
-                    created_at,
-                    updated_at
-                FROM notes
-                WHERE username = ?
-                ORDER BY updated_at DESC, id DESC
-            """, (
-                user["username"],
-            )).fetchall(),
+            notes=rows,
             selected_note=note,
             user=user
         )
 
-    except Exception:
+    except sqlite3.Error:
 
         conn.rollback()
-        raise
+
+        flash(
+            "Could not edit note.",
+            "error"
+        )
+
+        return redirect(
+            url_for("notes")
+        )
 
     finally:
         conn.close()
@@ -1754,10 +1792,18 @@ def update_note(note_id):
             )
         )
 
-    except Exception:
+    except sqlite3.Error:
 
         conn.rollback()
-        raise
+
+        flash(
+            "Could not update note.",
+            "error"
+        )
+
+        return redirect(
+            url_for("notes")
+        )
 
     finally:
         conn.close()
@@ -1822,10 +1868,18 @@ def delete_note(note_id):
             url_for("notes")
         )
 
-    except Exception:
+    except sqlite3.Error:
 
         conn.rollback()
-        raise
+
+        flash(
+            "Could not delete note.",
+            "error"
+        )
+
+        return redirect(
+            url_for("notes")
+        )
 
     finally:
         conn.close()
@@ -1837,9 +1891,7 @@ def delete_note(note_id):
 
 def load_articles():
 
-    if not os.path.exists(
-        ARTICLES_FILE
-    ):
+    if not os.path.exists(ARTICLES_FILE):
         return []
 
     try:
@@ -1970,14 +2022,16 @@ def press_upload():
                 image.filename
             )
 
-            image_filename = filename
+            if filename:
 
-            image.save(
-                os.path.join(
-                    app.config["UPLOAD_FOLDER"],
-                    filename
+                image_filename = filename
+
+                image.save(
+                    os.path.join(
+                        app.config["UPLOAD_FOLDER"],
+                        filename
+                    )
                 )
-            )
 
         articles_data = load_articles()
 
@@ -2032,11 +2086,33 @@ def delete_article(index):
     ):
         abort(404)
 
+    article = articles_data[index]
+
+    image_filename = article.get(
+        "image",
+        ""
+    )
+
     articles_data.pop(index)
 
     save_articles(
         articles_data
     )
+
+    if image_filename:
+
+        file_path = os.path.join(
+            app.config["UPLOAD_FOLDER"],
+            os.path.basename(image_filename)
+        )
+
+        try:
+
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+        except OSError:
+            pass
 
     flash(
         "Article deleted.",
@@ -2054,9 +2130,7 @@ def delete_article(index):
 
 def load_crises():
 
-    if not os.path.exists(
-        CRISES_FILE
-    ):
+    if not os.path.exists(CRISES_FILE):
         return []
 
     try:
@@ -2069,10 +2143,66 @@ def load_crises():
 
             data = json.load(file)
 
-            if isinstance(data, list):
-                return data
+            if not isinstance(data, list):
+                return []
 
-            return []
+            changed = False
+
+            # ------------------------------------------------
+            # NORMALIZE OLD CRISIS DATA
+            # ------------------------------------------------
+
+            for crisis in data:
+
+                if not isinstance(crisis, dict):
+                    continue
+
+                if "title" not in crisis:
+
+                    crisis["title"] = (
+                        "Untitled Crisis"
+                    )
+
+                    changed = True
+
+                if "body" not in crisis:
+
+                    crisis["body"] = crisis.get(
+                        "description",
+                        ""
+                    )
+
+                    changed = True
+
+                if "description" not in crisis:
+
+                    crisis["description"] = crisis.get(
+                        "body",
+                        ""
+                    )
+
+                    changed = True
+
+                if "filename" not in crisis:
+
+                    crisis["filename"] = ""
+
+                    changed = True
+
+                if "created_at" not in crisis:
+
+                    crisis["created_at"] = ""
+
+                    changed = True
+
+            if changed:
+
+                try:
+                    save_crises(data)
+                except OSError:
+                    pass
+
+            return data
 
     except (
         json.JSONDecodeError,
@@ -2105,6 +2235,10 @@ def save_crises(crises):
     )
 
 
+# ============================================================
+# CRISIS PAGE / PUBLISH CRISIS
+# ============================================================
+
 @app.route(
     "/crises",
     methods=["GET", "POST"]
@@ -2135,15 +2269,53 @@ def crises():
                 url_for("crises")
             )
 
+        # ----------------------------------------------------
+        # OPTIONAL FILE
+        # ----------------------------------------------------
+
+        uploaded_file = request.files.get(
+            "file"
+        )
+
+        filename = ""
+
+        if (
+            uploaded_file
+            and uploaded_file.filename
+        ):
+
+            original_filename = os.path.basename(
+                uploaded_file.filename
+            )
+
+            if original_filename:
+
+                filename = original_filename
+
+                uploaded_file.save(
+                    os.path.join(
+                        app.config["UPLOAD_FOLDER"],
+                        filename
+                    )
+                )
+
         crises_data = load_crises()
 
-        crises_data.append({
+        now = datetime.now().isoformat(
+            timespec="seconds"
+        )
+
+        crisis = {
             "title": title,
             "body": body,
-            "created_at": datetime.now().isoformat(
-                timespec="seconds"
-            )
-        })
+            "description": body,
+            "filename": filename,
+            "created_at": now
+        }
+
+        crises_data.append(
+            crisis
+        )
 
         save_crises(
             crises_data
@@ -2182,7 +2354,27 @@ def delete_crisis(index):
         index < 0
         or index >= len(crises_data)
     ):
-        abort(404)
+
+        flash(
+            "Crisis not found.",
+            "error"
+        )
+
+        return redirect(
+            url_for("crises")
+        )
+
+    crisis = crises_data[index]
+
+    crisis_title = crisis.get(
+        "title",
+        "Untitled Crisis"
+    )
+
+    filename = crisis.get(
+        "filename",
+        ""
+    )
 
     crises_data.pop(index)
 
@@ -2190,8 +2382,23 @@ def delete_crisis(index):
         crises_data
     )
 
+    if filename:
+
+        file_path = os.path.join(
+            app.config["UPLOAD_FOLDER"],
+            os.path.basename(filename)
+        )
+
+        try:
+
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+        except OSError:
+            pass
+
     flash(
-        "Crisis deleted.",
+        f'Crisis "{crisis_title}" deleted.',
         "success"
     )
 
@@ -2229,7 +2436,7 @@ def chair_control():
 
 
 # ============================================================
-# COMMITTEE
+# CHAIR TIMER
 # ============================================================
 
 @app.route("/chair-timer")
@@ -2395,22 +2602,16 @@ def chair_attendance():
 
     try:
 
-        # =========================================================
-        # POST — SAVE ATTENDANCE
-        # =========================================================
+        # ----------------------------------------------------
+        # POST
+        # ----------------------------------------------------
 
         if request.method == "POST":
-
-            print("========================================")
-            print("CHAIR ATTENDANCE POST RECEIVED")
-            print("FORM DATA:", dict(request.form))
-            print("========================================")
 
             updated = 0
 
             for username, account in DELEGATES.items():
 
-                # Ignore chair accounts
                 if account.get(
                     "role",
                     "delegate"
@@ -2425,32 +2626,22 @@ def chair_attendance():
                     field_name
                 )
 
-                print(
-                    "CHECKING:",
-                    username,
-                    "FIELD:",
-                    field_name,
-                    "VALUE:",
-                    attendance
-                )
-
-                # If this delegate wasn't included
-                # in the submitted form, leave them alone.
                 if attendance is None:
                     continue
 
-                attendance = attendance.strip().upper()
+                attendance = (
+                    attendance
+                    .strip()
+                    .upper()
+                )
 
-                if attendance not in {
+                valid_attendance = {
                     "ABSENT",
                     "PRESENT",
                     "PRESENT & VOTING"
-                }:
+                }
 
-                    print(
-                        "INVALID VALUE:",
-                        repr(attendance)
-                    )
+                if attendance not in valid_attendance:
 
                     flash(
                         "Invalid attendance status.",
@@ -2475,7 +2666,6 @@ def chair_attendance():
                         ?,
                         CURRENT_TIMESTAMP
                     )
-
                     ON CONFLICT(username)
                     DO UPDATE SET
                         attendance =
@@ -2491,17 +2681,7 @@ def chair_attendance():
 
                 updated += 1
 
-            # =====================================================
-            # IMPORTANT:
-            # If absolutely NO attendance fields were submitted,
-            # do NOT silently accept the request.
-            # =====================================================
-
             if updated == 0:
-
-                print(
-                    "NO ATTENDANCE FIELDS FOUND"
-                )
 
                 flash(
                     "No attendance changes were submitted.",
@@ -2514,10 +2694,6 @@ def chair_attendance():
 
             conn.commit()
 
-            print(
-                f"ATTENDANCE SAVED: {updated}"
-            )
-
             flash(
                 f"Attendance saved for {updated} delegates.",
                 "success"
@@ -2527,17 +2703,15 @@ def chair_attendance():
                 url_for("chair_control")
             )
 
-        # =========================================================
-        # GET — DISPLAY ATTENDANCE
-        # =========================================================
+        # ----------------------------------------------------
+        # GET
+        # ----------------------------------------------------
 
-        rows = conn.execute(
-            """
+        rows = conn.execute("""
             SELECT *
             FROM delegate_status
             ORDER BY username COLLATE NOCASE
-            """
-        ).fetchall()
+        """).fetchall()
 
         return render_template(
             "chair_control.html",
@@ -2545,32 +2719,9 @@ def chair_attendance():
             user=current_user()
         )
 
-    except sqlite3.Error as error:
+    except sqlite3.Error:
 
         conn.rollback()
-
-        print(
-            "CHAIR ATTENDANCE DATABASE ERROR:",
-            error
-        )
-
-        flash(
-            "Could not save attendance.",
-            "error"
-        )
-
-        return redirect(
-            url_for("chair_control")
-        )
-
-    except Exception as error:
-
-        conn.rollback()
-
-        print(
-            "CHAIR ATTENDANCE ERROR:",
-            error
-        )
 
         flash(
             "Could not save attendance.",
@@ -2582,12 +2733,7 @@ def chair_attendance():
         )
 
     finally:
-
         conn.close()
-
-    return redirect(
-        url_for("chair_control")
-    )
 
 
 # ============================================================
@@ -2668,6 +2814,19 @@ def chair_announcements():
             "chair_announcements.html",
             announcements=rows,
             user=current_user()
+        )
+
+    except sqlite3.Error:
+
+        conn.rollback()
+
+        flash(
+            "Could not publish announcement.",
+            "error"
+        )
+
+        return redirect(
+            url_for("chair_announcements")
         )
 
     finally:
@@ -2800,6 +2959,10 @@ def directives():
                 url_for("directives")
             )
 
+        # ----------------------------------------------------
+        # LOAD DIRECTIVES
+        # ----------------------------------------------------
+
         if user["role"] == "chair":
 
             rows = conn.execute("""
@@ -2843,6 +3006,19 @@ def directives():
             "directives.html",
             directives=rows,
             user=template_user
+        )
+
+    except sqlite3.Error:
+
+        conn.rollback()
+
+        flash(
+            "Could not load directives.",
+            "error"
+        )
+
+        return redirect(
+            url_for("home")
         )
 
     finally:
@@ -3195,6 +3371,22 @@ def crisis_response(index):
             }
         )
 
+    except sqlite3.Error:
+
+        conn.rollback()
+
+        flash(
+            "Could not submit crisis response.",
+            "error"
+        )
+
+        return redirect(
+            url_for(
+                "crisis_response",
+                index=index
+            )
+        )
+
     finally:
         conn.close()
 
@@ -3262,11 +3454,11 @@ def votes():
                     url_for("votes")
                 )
 
-            if choice not in [
+            if choice not in {
                 "FOR",
                 "AGAINST",
                 "ABSTAIN"
-            ]:
+            }:
 
                 flash(
                     "Invalid vote.",
@@ -3345,6 +3537,19 @@ def votes():
             user=user
         )
 
+    except sqlite3.Error:
+
+        conn.rollback()
+
+        flash(
+            "Could not process vote.",
+            "error"
+        )
+
+        return redirect(
+            url_for("votes")
+        )
+
     finally:
         conn.close()
 
@@ -3376,6 +3581,10 @@ def chair_votes():
                 ""
             ).strip().lower()
 
+            # ------------------------------------------------
+            # CREATE VOTE
+            # ------------------------------------------------
+
             if action == "create":
 
                 title = request.form.get(
@@ -3398,6 +3607,8 @@ def chair_votes():
                     return redirect(
                         url_for("chair_votes")
                     )
+
+                # Close previous open votes.
 
                 conn.execute("""
                     UPDATE votes
@@ -3436,6 +3647,10 @@ def chair_votes():
                 return redirect(
                     url_for("chair_votes")
                 )
+
+            # ------------------------------------------------
+            # CLOSE VOTE
+            # ------------------------------------------------
 
             if action == "close":
 
@@ -3491,6 +3706,10 @@ def chair_votes():
                     url_for("chair_votes")
                 )
 
+        # ----------------------------------------------------
+        # LOAD ALL VOTES
+        # ----------------------------------------------------
+
         rows = conn.execute("""
             SELECT *
             FROM votes
@@ -3503,11 +3722,11 @@ def chair_votes():
 
             results = {}
 
-            for choice in [
+            for choice in (
                 "FOR",
                 "AGAINST",
                 "ABSTAIN"
-            ]:
+            ):
 
                 results[choice] = conn.execute("""
                     SELECT COUNT(*)
@@ -3529,6 +3748,10 @@ def chair_votes():
                 "total_votes": total_votes
             })
 
+        # ----------------------------------------------------
+        # CURRENT OPEN VOTE
+        # ----------------------------------------------------
+
         open_vote = conn.execute("""
             SELECT *
             FROM votes
@@ -3547,11 +3770,11 @@ def chair_votes():
 
         if open_vote:
 
-            for choice in [
+            for choice in (
                 "FOR",
                 "AGAINST",
                 "ABSTAIN"
-            ]:
+            ):
 
                 open_results[choice] = conn.execute("""
                     SELECT COUNT(*)
@@ -3577,10 +3800,18 @@ def chair_votes():
             user=current_user()
         )
 
-    except Exception:
+    except sqlite3.Error:
 
         conn.rollback()
-        raise
+
+        flash(
+            "Could not load voting control.",
+            "error"
+        )
+
+        return redirect(
+            url_for("home")
+        )
 
     finally:
         conn.close()
@@ -3601,18 +3832,15 @@ def delete_vote(vote_id):
 
     try:
 
-        # ----------------------------------------------------
-        # CHECK THAT THE VOTE EXISTS
-        # ----------------------------------------------------
-
-        vote = conn.execute(
-            """
-            SELECT id, title
+        vote = conn.execute("""
+            SELECT
+                id,
+                title
             FROM votes
             WHERE id = ?
-            """,
-            (vote_id,)
-        ).fetchone()
+        """, (
+            vote_id,
+        )).fetchone()
 
         if vote is None:
 
@@ -3626,28 +3854,26 @@ def delete_vote(vote_id):
             )
 
         # ----------------------------------------------------
-        # DELETE ALL RECORDED BALLOTS FIRST
+        # DELETE BALLOTS FIRST
         # ----------------------------------------------------
 
-        conn.execute(
-            """
+        conn.execute("""
             DELETE FROM vote_records
             WHERE vote_id = ?
-            """,
-            (vote_id,)
-        )
+        """, (
+            vote_id,
+        ))
 
         # ----------------------------------------------------
-        # DELETE THE ACTUAL VOTE
+        # DELETE VOTE
         # ----------------------------------------------------
 
-        conn.execute(
-            """
+        conn.execute("""
             DELETE FROM votes
             WHERE id = ?
-            """,
-            (vote_id,)
-        )
+        """, (
+            vote_id,
+        ))
 
         conn.commit()
 
@@ -3660,14 +3886,9 @@ def delete_vote(vote_id):
             url_for("chair_votes")
         )
 
-    except sqlite3.Error as error:
+    except sqlite3.Error:
 
         conn.rollback()
-
-        print(
-            "DELETE VOTE ERROR:",
-            error
-        )
 
         flash(
             "Could not delete the vote.",
@@ -3679,14 +3900,12 @@ def delete_vote(vote_id):
         )
 
     finally:
-
         conn.close()
 
 
 # ============================================================
 # VOTE RESULTS
 # ============================================================
-
 
 @app.route(
     "/votes/<int:vote_id>/results"
@@ -3711,11 +3930,11 @@ def vote_results(vote_id):
 
         results = {}
 
-        for choice in [
+        for choice in (
             "FOR",
             "AGAINST",
             "ABSTAIN"
-        ]:
+        ):
 
             results[choice] = conn.execute("""
                 SELECT COUNT(*)
@@ -3773,11 +3992,11 @@ def api_vote_results(vote_id):
 
         results = {}
 
-        for choice in [
+        for choice in (
             "FOR",
             "AGAINST",
             "ABSTAIN"
-        ]:
+        ):
 
             results[choice] = conn.execute("""
                 SELECT COUNT(*)
@@ -3806,7 +4025,7 @@ def api_vote_results(vote_id):
 # ============================================================
 
 @app.route(
-    "/uploads/<filename>"
+    "/uploads/<path:filename>"
 )
 def uploaded_file(filename):
 
@@ -3835,6 +4054,10 @@ def too_large(error):
 # ============================================================
 # DATABASE INITIALIZATION
 # ============================================================
+
+# IMPORTANT:
+# This MUST be at top level.
+# It must NOT be inside a route/function.
 
 init_db()
 
